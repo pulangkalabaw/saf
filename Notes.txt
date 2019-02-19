@@ -1,0 +1,164 @@
+Version 0.1.8
+Date: 18.1.8
+Modules:   
+    Product
+        I,C,U,D
+    
+    Devices
+        I,C,U,D
+    
+    Plans
+        I,C,U,D
+        
+
+--------------------------------------------------------
+Version 0.1.8
+Date: 18.1.8
+Modules:   
+    Cluster Management
+        Show
+        Edit
+        
+    Statuses Management
+        List
+        Create
+        Edit
+        Delete
+
+    Dashboard
+        Application Counter Cluster
+        Application Counter Team
+        Status Application
+
+    Middleware
+        Admin Only
+
+    Product
+        M,C,F,S
+    
+    Devices
+        M,C,F,S
+    
+    Plans
+        M,C,F,S
+
+--------------------------------------------------------
+Version 0.1.7
+Date: 18.1.7
+Modules:   
+    Sorting
+        Users
+        Teams
+        Clusters
+    Cluster Management
+        List
+        Create
+
+--------------------------------------------------------
+Version 0.1.6
+Date: 19.01.04
+Modules:
+    Login Management
+        Get teams and Cluster (vice versa) // pain in the ass
+    Team Management
+        Modify some codes because of having a cluster and teams separately
+    User Management
+        Modify some codes because of having a cluster and teams separately
+
+--------------------------------------------------------
+Version 0.1.5
+Date: 19.01.3
+Modules:
+    Status Management
+        Migration "statuses"
+        Factory
+        Seeder
+    Application Status Management
+        Migration "application_status"
+
+    Application Management
+        Create
+            Status dropdown in Status option
+        List
+            Show recent status
+        Show
+            w/ all status
+        Edit
+            w/ insert status "application_status"
+
+    Teams Management
+        Remove CL_ID
+
+    Cluster Management
+        Migration
+            columns: cl_id, cluster_name, team_ids "json format"
+        Factory
+
+--------------------------------------------------------
+Version 0.1.4
+Date: 18.12.28
+Modules:
+    Teams Management
+        Edit
+        View
+    User Management
+        BUGS: Fix user's delete
+            description:
+                User must be not in a team, but if has, user must be remove on that team
+                    in order to delete
+    Application Management
+        Create
+            Team
+            Recieved Date
+            Customer name
+            Plan
+            Device
+            Product
+            MSF
+            SAF #
+            Codis #
+            SR #
+            SO #
+            Account #
+            Agent
+            Status
+            Document Remarks
+            Status Remarks
+
+--------------------------------------------------------
+Version 0.1.3
+Modules:
+	Application Management
+		Migrations
+		Seeder
+		Factory
+		List
+
+--------------------------------------------------------
+Version: 0.1.2
+Modules:
+	Team Management
+		Migrations
+		Seeder
+		Factory
+		List
+		Create
+	User Management
+        Show
+		Edit
+		Delete
+
+--------------------------------------------------------
+Version: 0.1.0
+Modules:
+	Layouts template
+	Migrations
+	Factories
+	Seeder
+	Login
+	User Management
+		Create
+		List
+			Make Own DataTable
+            
+--------------------------------------------------------
