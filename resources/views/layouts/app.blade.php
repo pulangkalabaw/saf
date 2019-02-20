@@ -68,38 +68,44 @@
                                 <div class="fa fa-fw fa-home"></div>
                             </div>
 
-                            @if (Auth::user()->role == base64_encode("administrator"))
-                            <div class="quickmenu__item {{ str_contains(url()->current(), ['users', 'teams', 'clusters']) ? 'active' : '' }}">
-                                <div class="fa fa-fw fa-users"></div>
-                            </div>
-                            <div class="quickmenu__item {{ str_contains(url()->current(), ['statuses', 'plans', 'product', 'devices']) ? 'active' : '' }}">
-                                <div class="fa fa-fw fa-cog"></div>
-                            </div>
-                            @endif
+							@if (Auth::user()->role == base64_encode("administrator"))
+								<div class="quickmenu__item {{ str_contains(url()->current(), ['users', 'teams', 'clusters']) ? 'active' : '' }}">
+									<div class="fa fa-fw fa-users"></div>
+								</div>
+								<div class="quickmenu__item {{ str_contains(url()->current(), ['statuses', 'plans', 'product', 'devices']) ? 'active' : '' }}">
+									<div class="fa fa-fw fa-cog"></div>
+								</div>
+							@endif
+              @if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl")
+              <div class="quickmenu__item {{ str_contains(url()->current(), ['attendance']) ? 'active' : '' }}">
+                 <div class="fa fa-clock-o"></div>
+              </div>
+              @endif
+              
                             <div class="quickmenu__item {{ str_contains(url()->current(), ['messages']) ? 'active' : '' }}">
                                 <div class="fa fa-fw fa-bullhorn"></div>
                             </div>
+						</div>
+					</div>
+				</div>
+				<div class="scrollable scrollbar-macosx">
+					<div class="sidebar__cont">
+						<div class="sidebar__menu">
+							<div class="sidebar__title">Home</div>
+							<ul class="nav nav-menu">
+								<li>
+									<a href="{{ route('app.dashboard') }}">
+										<div class="nav-menu__ico"><i class="fa fa-fw fa-dashboard"></i></div>
+										<div class="nav-menu__text"><span>Dashboard</span></div>
+									</a>
+								</li>
+								<li>
+									<a href="{{ route('app.applications.index') }}">
+										<div class="nav-menu__ico"><i class="fa fa-fw fa-folder-o"></i></div>
+										<div class="nav-menu__text"><span>Applications</span></div>
+									</a>
+								</li>
 
-                        </div>
-                    </div>
-                </div>
-                <div class="scrollable scrollbar-macosx">
-                    <div class="sidebar__cont">
-                        <div class="sidebar__menu">
-                            <div class="sidebar__title">Home</div>
-                            <ul class="nav nav-menu">
-                                <li>
-                                    <a href="{{ route('app.dashboard') }}">
-                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-dashboard"></i></div>
-                                        <div class="nav-menu__text"><span>Dashboard</span></div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('app.applications.index') }}">
-                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-folder-o"></i></div>
-                                        <div class="nav-menu__text"><span>Applications</span></div>
-                                    </a>
-                                </li>
 
                                 {{-- YOUR NON ADMIN --}}
                                 @if (session()->get('_c'))

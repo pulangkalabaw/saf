@@ -101,6 +101,26 @@ class Teams extends Model
         return $user->whereIn('id', $ids)->get();
     }
 
+    public function setEncoderIdsAttribute($value)
+    {
+        $this->attributes['encoder_ids'] = json_encode($value);
+    }
+
+    public function getEncoderIdsAttribute($value)
+    {
+        return json_decode($value);
+    }
+	/*
+     * [ Get the available Encoder ]
+     *
+     */
+    public function getAvailableTeams() {
+		$cluster = Clusters::select('team_ids')->get()->map(function($r) {
+			return json_decode($r['team_ids']);
+		});
+        return $this->whereNotIn('team_id', $cluster)->get();
+    }
+
 
 
 }
