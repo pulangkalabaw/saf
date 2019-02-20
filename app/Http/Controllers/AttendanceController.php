@@ -29,7 +29,7 @@ class AttendanceController extends Controller
      }
     public function index()
     {
-        $get_agents = Teams::where('tl_id', 87)->value('encoder_ids'); // GET TL/CL's AGENT/S
+        return $get_agents = Teams::where('tl_id', 87)->value('agent_code'); // GET TL/CL's AGENT/S
 
         // GET UNPRESENT AGENTS
         $selected_unpresent_agents = [];
@@ -69,7 +69,7 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return $request->all();
     }
 
     /**

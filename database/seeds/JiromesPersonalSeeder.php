@@ -74,7 +74,7 @@ class JiromesPersonalSeeder extends Seeder
             'team_name' => 'Team HaIsZt_b3nteqUa4htRo0',
             'team_id' => rand(1111, 9999),
             'tl_id' => $admin_id,
-            'encoder_ids' => $user,
+            'agent_code' => $user,
         ]);
     }
 }

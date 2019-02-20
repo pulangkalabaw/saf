@@ -101,12 +101,12 @@ class Teams extends Model
         return $user->whereIn('id', $ids)->get();
     }
 
-    public function setEncoderIdsAttribute($value)
+    public function setAgentCodeAttribute($value)
     {
-        $this->attributes['encoder_ids'] = json_encode($value);
+        $this->attributes['agent_code'] = json_encode($value);
     }
 
-    public function getEncoderIdsAttribute($value)
+    public function getAgentCodeAttribute($value)
     {
         return json_decode($value);
     }
@@ -121,6 +121,15 @@ class Teams extends Model
         return $this->whereNotIn('team_id', $cluster)->get();
     }
 
+        public function setAgentCodeAttribute($value)
+        {
+            $this->attributes['agent_code'] = json_encode($value);
+        }
+
+        public function getAgentCodeAttribute($value)
+        {
+            return json_decode($value);
+        }
 
 
 }

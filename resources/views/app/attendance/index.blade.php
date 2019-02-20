@@ -44,19 +44,19 @@
                                             </div>
                                         </div>
                                         <div class="clearfix"></div><br>
-
-                                        <table class="table table-hovered table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th><input id="ch6" type="checkbox" onclick="toggle(this);"> Select all</th>
-                                                    <th>Name</th>
-                                                    <th>Activities</th>
-                                                    <th>Location</th>
-                                                    <th>Remarks</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($attendance['unpresent'] as $unpresent)
+                                        <form action="" method="POST">
+                                            <table class="table table-hovered table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th><input id="ch6" type="checkbox" onclick="toggle(this);"> Select all</th>
+                                                        <th>Name</th>
+                                                        <th>Activities</th>
+                                                        <th>Location</th>
+                                                        <th>Remarks</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($attendance['unpresent'] as $unpresent)
                                                     <tr>
                                                         <td class="text-center">
                                                             <div class="form-group">
@@ -71,7 +71,7 @@
                                                         <td>
                                                             <select class="form-control" name="activity[]">
                                                                 <option>Blitz</option>
-                                                                <option>Staturation</option>
+                                                                <option>Saturation</option>
                                                             </select>
                                                         </td>
                                                         <td>
@@ -87,17 +87,18 @@
                                                             </div>
                                                         </td>
                                                     </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </form>
                                         <br>
                                         <div class="panel-body">
                                             <form>
                                                 <input type="hidden" name="0">
                                                 <input type="hidden" name="1">
                                                 <input type="hidden" name="null">
-                                                <button class="btn btn-default" type="button">Present</button>
-                                                <button class="btn btn-warning" type="button">Warning</button>
+                                                <button class="btn btn-primary" type="button">Present</button>
+                                                <button class="btn btn-danger" type="button">Absent</button>
                                             </form>
                                         </div>
                                         <div class="row">
