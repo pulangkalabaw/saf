@@ -23,15 +23,15 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <a href="{{ route('app.users.create') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-plus-circle'></span> 
+                                    <span class='fa fa-plus-circle'></span>
                                 </a>
                             </div>
                         </div>
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            @if (!empty(Request::get('search_string')) ||!empty(Request::get('show')) 
-                            || (!empty(Request::get('sort_in')) && !empty(Request::get('sort_by')))) 
+                            @if (!empty(Request::get('search_string')) ||!empty(Request::get('show'))
+                            || (!empty(Request::get('sort_in')) && !empty(Request::get('sort_by'))))
                             <div class="breadcrumb">
                                 <b><span class='fa fa-filter'></span> Filtered ({{ $total }})</b><br>
                                 {!! filteredBy(request()) !!}
@@ -45,16 +45,16 @@
                                     <div class="form-group">
                                         <label>Number of rows: </label>
                                         <select name="" id="" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value)" class="form-control">
-                                            <option {{ !empty(request()->get('show') && request()->get('show') == 10) ? 'selected' : ''  }} 
+                                            <option {{ !empty(request()->get('show') && request()->get('show') == 10) ? 'selected' : ''  }}
                                                 value="{{ request()->fullUrlWithQuery(['show' => '10']) }}">10
                                             </option>
-                                            <option {{ !empty(request()->get('show') && request()->get('show') == 25) ? 'selected' : ''  }} 
+                                            <option {{ !empty(request()->get('show') && request()->get('show') == 25) ? 'selected' : ''  }}
                                                 value="{{ request()->fullUrlWithQuery(['show' => '25']) }}">25
                                             </option>
-                                            <option {{ !empty(request()->get('show') && request()->get('show') == 50) ? 'selected' : ''  }} 
+                                            <option {{ !empty(request()->get('show') && request()->get('show') == 50) ? 'selected' : ''  }}
                                                 value="{{ request()->fullUrlWithQuery(['show' => '50']) }}">50
                                             </option>
-                                            <option {{ !empty(request()->get('show') && request()->get('show') == 100) ? 'selected' : ''  }} 
+                                            <option {{ !empty(request()->get('show') && request()->get('show') == 100) ? 'selected' : ''  }}
                                                 value="{{ request()->fullUrlWithQuery(['show' => '100']) }}">100
                                             </option>
                                         </select>
@@ -81,19 +81,19 @@
                                     <th>
                                         First name
                                         <a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'fname', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
-                                            <span class='fa fa-sort'></span> 
+                                            <span class='fa fa-sort'></span>
                                         </a>
                                     </th>
                                     <th>
                                         Last name
                                         <a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'lname', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
-                                            <span class='fa fa-sort'></span> 
+                                            <span class='fa fa-sort'></span>
                                         </a>
                                     </th>
                                     <th>
                                         Email
                                         <a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'email', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
-                                            <span class='fa fa-sort'></span> 
+                                            <span class='fa fa-sort'></span>
                                         </a>
                                     </th>
                                     <th>Role</th>
@@ -154,8 +154,8 @@
         });
     });
 
-    function submitSort() {   
-        document.sorting.submit(); 
-    } 
+    function submitSort() {
+        document.sorting.submit();
+    }
 </script>
 @endsection

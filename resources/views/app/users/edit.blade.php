@@ -27,10 +27,10 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <a href="{{ route('app.users.show', $user->id) }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-eye'></span> 
+                                    <span class='fa fa-eye'></span>
                                 </a>
                                 <a href="{{ route('app.users.index') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-th-list'></span> 
+                                    <span class='fa fa-th-list'></span>
                                 </a>
                             </div>
                         </div>
@@ -84,21 +84,21 @@
                                                 <option {{ (base64_decode($user->role) == 'spiderman') ? 'selected' : '' }}value="spiderman">Administrator</option>
                                                 <option {{ (base64_decode($user->role) == 'tl') ? 'selected' : '' }} value="tl">Team Leader</option>
                                                 <option {{ (base64_decode($user->role) == 'cl') ? 'selected' : '' }} value="cl">Cluster Leader</option>
-                                                <option {{ (base64_decode($user->role) == 'agent') ? 'selected' : '' }} value="agent">Agent</option>
                                                 <option {{ (base64_decode($user->role) == 'encoder') ? 'selected' : '' }} value="encoder">Encoder</option>
+                                                <option {{ (base64_decode($user->role) == 'agent') ? 'selected' : '' }} value="agent">Agent</option>
+                                                <option {{ (base64_decode($user->role) == 'agent_referral') ? 'selected' : '' }} value="agent_referral">Agent Referral</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
-
                                     @if ($user->agent_code)
-                                    <div id="code">
+                                    <div class="code">
                                         <div class="col-md-3">Agent Code</div>
                                         <div class="col-md-7">
                                             <input type="text" name="agent_code" id="" class="form-control" value="{{ $user->agent_code }}">
                                         </div>
-                                        <div class="clearfix"></div><br>
                                     </div>
+                                    <div class="clearfix"></div><br>
                                     @endif
 
                                     <div>
@@ -111,6 +111,16 @@
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
+
+                                    @if($user->pat)
+                                    <div>
+                                        <div class="col-md-3">PAT</div>
+                                        <div class="col-md-7">
+                                            <input type="text" name="pat" class="form-control" value="{{ $user->pat }}">
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+                                    @endif
 
                                     <div>
                                         <div class="col-md-3"></div>
@@ -135,11 +145,11 @@
 <script>
     function roleSwitcher()
     {
-        if ($('#roles').val() == "agent") {
-            $('#code').css({'display': 'block'});
+        if ($('#roles').val() == "agent" || $('#roles').val() == "agent_referral") {
+            $('.code').css({'display': 'block'});
         }
         else {
-            $('#code').css({'display': 'none'});
+            $('.code').css({'display': 'none'});
         }
     }
 

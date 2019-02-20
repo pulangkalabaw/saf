@@ -41,9 +41,7 @@ class PlansController extends Controller
      */
     public function create()
     {
-        //
         return view('app.plans.create');
-
     }
 
     /**
@@ -54,27 +52,30 @@ class PlansController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $request->validate([
+        // Validate inputs
+        $validate = Validator::make($request->all(), [
             'plan_name' => 'required|string|max:255',
+            'with_sim' => 'required',
+            'with_device' => 'required',
         ]);
 
+        if($validate->fails()) return back()->withErrors($validate->errors())->withInput();
+
         // Once validated
-        $request['plan_id'] = rand(111, 99999);
         if (Plans::create($request->except('_token'))) {
             return back()->with([
                 'notif.style' => 'success',
                 'notif.icon' => 'plus-circle',
                 'notif.message' => 'Added successful!',
-            ]); 
+            ]);
         }
 
-        else { 
+        else {
             return back()->with([
                 'notif.style' => 'danger',
                 'notif.icon' => 'times-circle',
                 'notif.message' => 'Failed to add',
-            ]); 
+            ]);
         }
     }
 
@@ -97,8 +98,7 @@ class PlansController extends Controller
      */
     public function edit($id)
     {
-        //
-        $plan = Plans::where('plan_id', $id)->firstOrFail();
+        $plan = Plans::where('id', $id)->firstOrFail();
         return view('app.plans.edit', ['plan' => $plan]);
     }
 
@@ -112,27 +112,27 @@ class PlansController extends Controller
     public function update(Request $request, $id)
     {
         //
-        $plan = Plans::where('plan_id', $id)->firstOrFail();
-        
+        $plan = Plans::where('id', $id)->firstOrFail();
+
         $request->validate([
             'plan_name' => 'required|string|max:255',
         ]);
 
         // Once validated
-        if ($plan->update($request->except(['_token','_method']))) {
+        if ($plan->update($request->only('plan_name'))) {
             return back()->with([
                 'notif.style' => 'success',
                 'notif.icon' => 'plus-circle',
                 'notif.message' => 'Update successful!',
-            ]); 
+            ]);
         }
 
-        else { 
+        else {
             return back()->with([
                 'notif.style' => 'danger',
                 'notif.icon' => 'times-circle',
                 'notif.message' => 'Failed to update',
-            ]); 
+            ]);
         }
     }
 
@@ -144,16 +144,17 @@ class PlansController extends Controller
      */
     public function destroy($id)
     {
-        //
-        $plan = Plans::where('plan_id', $id)->firstOrFail();
-
+        // delete plan from plan management
+        $plan = Plans::where('id', $id)->firstOrFail();
+        // delete application from applications
         $application = Application::where('plan_applied', $id);
+
         if ($application->first()) {
             return back()->with([
                 'notif.style' => 'danger',
                 'notif.icon' => 'times-circle',
                 'notif.message' => "Total of ". $application->count(). " application(s) that uses this plan, you must update those application to another devicplan before you remove",
-            ]); 
+            ]);
         }
         else {
             $plan->delete();
@@ -161,7 +162,7 @@ class PlansController extends Controller
                 'notif.style' => 'success',
                 'notif.icon' => 'plus-circle',
                 'notif.message' => 'Delete successful!',
-            ]); 
+            ]);
         }
     }
 }
