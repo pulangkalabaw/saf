@@ -23,12 +23,12 @@ class TeamsController extends Controller
         $teams = $teams
         ->join('users as tl', 'teams.tl_id', '=', 'tl.id')
         ->leftJoin('users as ac', function($q){
-            $q->on('ac.agent_code', '=', 'teams.agent_code')
+            $q->on('ac.id', '=', 'teams.agent_code')
             ->where('ac.role', '=', base64_encode('agent'));
         })
         ->select(
             'tl.fname as tl_fname', 'tl.lname as tl_lname',
-            'ac.fname as ac_fname', 'ac.lname as ac_lname', 'ac.agent_code as ac_agent_code',
+            'ac.fname as ac_fname', 'ac.lname as ac_lname', 'ac.id as ac_agent_code',
             'teams.*'
         );
 
