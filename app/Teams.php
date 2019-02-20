@@ -17,7 +17,7 @@ class Teams extends Model
         $clusters_model = new Clusters();
         $cluster_search = $clusters_model->with('getClusterLeader')->get()->map(function ($r) use ($team_id) {
             // decode the json
-            $r['team_ids'] = json_decode($r['team_ids']);
+            $r['team_ids'] = $r['team_ids'];
             // then search your team id in team ids (array)
             if (in_array($team_id, $r['team_ids'])) return $r;
         });
@@ -35,7 +35,7 @@ class Teams extends Model
         $clusters_model = new Clusters();
         $cluster_search = $clusters_model->get()->map(function ($r) use ($team_id) {
             // decode the json
-            $r['team_ids'] = json_decode($r['team_ids']);
+            $r['team_ids'] = $r['team_ids'];
             // then search your team id in team ids (array)
             if (in_array($team_id, $r['team_ids'])) return $r;
         });
@@ -120,16 +120,5 @@ class Teams extends Model
 		});
         return $this->whereNotIn('team_id', $cluster)->get();
     }
-
-        public function setAgentCodeAttribute($value)
-        {
-            $this->attributes['agent_code'] = json_encode($value);
-        }
-
-        public function getAgentCodeAttribute($value)
-        {
-            return json_decode($value);
-        }
-
 
 }

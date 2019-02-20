@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Attendance;
@@ -21,7 +22,7 @@ class AttendanceController extends Controller
         $faker=faker::create();
 
         // $user_id = Auth::user()->id;
-        return $user_id = User::where('id', 87)->first();
+        return $user_id = User::where('id', 77)->first();
         // if(Auth::user()->role == base64_encode("Team Leader")){
         if($user_id->role == base64_encode("Team Leader")){
             // return Teams::
@@ -29,7 +30,7 @@ class AttendanceController extends Controller
      }
     public function index()
     {
-        return $get_agents = Teams::where('tl_id', 87)->value('agent_code'); // GET TL/CL's AGENT/S
+        $get_agents = Teams::where('tl_id', Auth::user()->id)->value('agent_code'); // GET TL/CL's AGENT/S
 
         // GET UNPRESENT AGENTS
         $selected_unpresent_agents = [];
@@ -69,7 +70,20 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
-        return $request->all();
+        return $request->only('user');
+        $data = [];
+        foreach($request->only('user') as $user){
+            $data = [
+                "user_id" => "61",
+                "activity" => "Saturation",
+                "location" => "pasig city",
+                "remarks" => null,
+                "status" => "1"
+            ];
+        }
+        return $data;
+        Attendance::insert($request->only('user'));
+        return back();
     }
 
     /**
