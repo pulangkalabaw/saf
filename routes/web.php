@@ -27,23 +27,22 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     // Dashboard
     Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard');
     // Users
-    Route::resource('users', 'UserController')->middleware('admin_only');
+
+    Route::resource('users', 'UserController')->middleware('access_control:administrator,encoder');
     // Teams
-    Route::resource('teams', 'TeamsController')->middleware('admin_only');
+    Route::resource('teams', 'TeamsController')->middleware('access_control:administrator,encoder');
     // Clusters
-    Route::resource('clusters', 'ClustersController')->middleware('admin_only');
+    Route::resource('clusters', 'ClustersController')->middleware('access_control:administrator,encoder');
     // Applications
     Route::resource('applications', 'ApplicationController');
-    // Statuses
-    Route::resource('statuses', 'StatusesController')->middleware('admin_only');
-    // Product
-    Route::resource('product', 'ProductController')->middleware('admin_only');
+    // // Statuses
+    // Route::resource('statuses', 'StatusesController');
+    // // Product
+    // Route::resource('product', 'ProductController');
     // Devices
-    Route::resource('devices', 'DevicesController')->middleware('admin_only');
+    Route::resource('devices', 'DevicesController')->middleware('access_control:administrator,encoder');;
     // Plan
-    Route::resource('plans', 'PlansController')->middleware('admin_only');
-    // attendances
-    // Route::resource('attendance', 'AttendanceController')->middleware('admin_only');
+    Route::resource('plans', 'PlansController')->middleware('access_control:administrator,encoder');;
 
     // For non-admin
     Route::get('your-clusters', 'NonAdminController@yourClusters')->name('your.clusters');

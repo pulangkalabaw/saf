@@ -18,7 +18,6 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-
         // Model
         $users = new User();
 
@@ -34,11 +33,11 @@ class UserController extends Controller
 
         // Count all users
         $total_users = User::count();
-        
+
         // Insert pagination
         $users = $users->paginate((!empty($request->show) ? $request->show : 10));
         return view('app.users.index', [
-            'users' => $users, 
+            'users' => $users,
             'users_total' => $total_users,
             'total' => $total,
         ]);
@@ -51,7 +50,6 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
         return view('app.users.create');
     }
 
@@ -70,10 +68,9 @@ class UserController extends Controller
             'role' => 'required|string',
             'isActive' => 'required|integer',
             'password' => 'required|string|min:6',
-
         ]);
 
-        if ($v->fails()) return back()->withErrors($v->errors());
+        if ($v->fails()) return back()->withErrors($v->errors())->withInput();
 
         $request['role'] = base64_encode($request['role']);
         $request['password'] = bcrypt($request['password']);
@@ -82,14 +79,14 @@ class UserController extends Controller
                 'notif.style' => 'success',
                 'notif.icon' => 'plus-circle',
                 'notif.message' => 'Added successful!',
-            ]); 
+            ]);
         }
         else {
             return back()->with([
                 'notif.style' => 'danger',
                 'notif.icon' => 'times-circle',
                 'notif.message' => 'Failed to add',
-            ]); 
+            ]);
         }
     }
 
@@ -111,7 +108,7 @@ class UserController extends Controller
         $clusters = $clusters_model->whereIn('cluster_id', $data['_c'])->get();
 
         return view('app.users.show', [
-            'user' => User::findOrFail($id), 
+            'user' => User::findOrFail($id),
             'teams' => $teams,
             'clusters' => $clusters
         ]);
@@ -125,9 +122,7 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        //
         return view('app.users.edit', ['user' => User::findOrFail($id)]);
-
     }
 
     /**
@@ -139,13 +134,13 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //return $request->all();
         $v = Validator::make($request->all(), [
             'fname' => 'required|string',
             'lname' => 'required|string',
             'email' => 'required|string|email|unique:users,email,'.$id,
             'role' => 'required|string',
             'isActive' => 'required|integer',
-
         ]);
 
         if ($v->fails()) return back()->withErrors($v->errors());
@@ -162,14 +157,14 @@ class UserController extends Controller
                 'notif.style' => 'success',
                 'notif.icon' => 'plus-circle',
                 'notif.message' => 'Update successful!',
-            ]); 
+            ]);
         }
         else {
             return back()->with([
                 'notif.style' => 'danger',
                 'notif.icon' => 'times-circle',
                 'notif.message' => 'Failed to update',
-            ]); 
+            ]);
         }
     }
 
@@ -193,7 +188,7 @@ class UserController extends Controller
                 'notif.style' => 'warning',
                 'notif.icon' => 'warning',
                 'notif.message' => 'This user is currently assigned to a cluster, you must remove this user to that cluster in order to delete',
-            ]); 
+            ]);
         }
 
         // ** CHECK FOR TEAMS TABLE
@@ -213,19 +208,19 @@ class UserController extends Controller
                     return ['m' => $r, 'v' => false ];
                 }
                 else {
-                    return ['m' => $r, 'v' => true ]; 
+                    return ['m' => $r, 'v' => true ];
                 }
             });
 
             // if theres valid false in collection
             // means it is in a team
-            // Encoder specifically 
+            // Encoder specifically
             if (in_array(false, $teams_search[0])) {
                 return redirect()->back()->with([
                     'notif.style' => 'warning',
                     'notif.icon' => 'warning',
                     'notif.message' => 'This user is currently assigned to a team, you must remove this user to that team in order to delete',
-                ]); 
+                ]);
             }
 
             // Everything is good to go, you may delete this user
@@ -234,24 +229,24 @@ class UserController extends Controller
                     'notif.style' => 'success',
                     'notif.icon' => 'plus-circle',
                     'notif.message' => 'Delete successful!',
-                ]); 
+                ]);
             }
             else {
                 return back()->with([
                     'notif.style' => 'danger',
                     'notif.icon' => 'times-circle',
                     'notif.message' => 'Failed to delete',
-                ]); 
+                ]);
             }
         }
         else {
 
-            // This user exist in either CL, TL or Agent code 
+            // This user exist in either CL, TL or Agent code
             return back()->with([
                 'notif.style' => 'warning',
                 'notif.icon' => 'warning',
                 'notif.message' => 'This user is currently assigned to a team, you must remove this user to that team in order to delete',
-            ]); 
+            ]);
         }
 
     }

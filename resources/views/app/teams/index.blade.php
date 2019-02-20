@@ -23,7 +23,7 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <a href="{{ route('app.teams.create') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-plus-circle'></span> 
+                                    <span class='fa fa-plus-circle'></span>
                                 </a>
                             </div>
                         </div>
@@ -35,13 +35,13 @@
                                     <div class="form-group">
                                         <label>Number of rows: </label>
                                         <select name="" id="" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value)" class="form-control">
-                                            <option {{ !empty(request()->get('show') && request()->get('show') == 10) ? 'selected' : ''  }} 
+                                            <option {{ !empty(request()->get('show') && request()->get('show') == 10) ? 'selected' : ''  }}
                                                 value="{{ request()->fullUrlWithQuery(['show' => '10']) }}">10</option>
-                                            <option {{ !empty(request()->get('show') && request()->get('show') == 25) ? 'selected' : ''  }} 
+                                            <option {{ !empty(request()->get('show') && request()->get('show') == 25) ? 'selected' : ''  }}
                                                 value="{{ request()->fullUrlWithQuery(['show' => '25']) }}">25</option>
-                                            <option {{ !empty(request()->get('show') && request()->get('show') == 50) ? 'selected' : ''  }} 
+                                            <option {{ !empty(request()->get('show') && request()->get('show') == 50) ? 'selected' : ''  }}
                                                 value="{{ request()->fullUrlWithQuery(['show' => '50']) }}">50</option>
-                                            <option {{ !empty(request()->get('show') && request()->get('show') == 100) ? 'selected' : ''  }} 
+                                            <option {{ !empty(request()->get('show') && request()->get('show') == 100) ? 'selected' : ''  }}
                                                 value="{{ request()->fullUrlWithQuery(['show' => '100']) }}">100</option>
                                         </select>
                                     </div>
@@ -71,13 +71,13 @@
                                     <th>
                                         Team name
                                         <a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'team-name', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
-                                            <span class='fa fa-sort'></span> 
+                                            <span class='fa fa-sort'></span>
                                         </a>
                                     </th>
                                     <th>
                                         Team Leader
                                         <a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'team-leader', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
-                                            <span class='fa fa-sort'></span> 
+                                            <span class='fa fa-sort'></span>
                                         </a>
                                     </th>
                                     <th>Agent</th>
@@ -100,7 +100,7 @@
                                     <td>{{ $team->tl_fname . ' ' . $team->tl_lname }}</td>
                                     <td>
                                         {{ $team->getAgentCode->fname . " " . $team->getAgentCode->lname }}
-                                        {{ base64_decode($team->getAgentCode->role) == "agent" ? ' (' . $team->getAgentCode->agent_code .')' : '' }}
+                                        {{-- {{ base64_decode($team->getAgentCode->role) == "agent" ? ' (' . $team->getAgentCode->agent_code .')' : '' }} --}}
                                     </td>
                                     <td>
                                         <a data-toggle="tooltip" title="View Team" href="{{ route('app.teams.show', $team->team_id) }}" class="btn btn-warning btn-xs"><span class='fa fa-eye'></span></a>

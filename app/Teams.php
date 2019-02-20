@@ -88,7 +88,7 @@ class Teams extends Model
      *
      */
     public function getAgentCode() {
-        return $this->hasOne('App\User', 'agent_code', 'agent_code');
+        return $this->hasOne('App\User', 'id', 'agent_code');
     }
 
     /*
@@ -110,6 +110,17 @@ class Teams extends Model
     {
         return json_decode($value);
     }
+	/*
+     * [ Get the available Encoder ]
+     *
+     */
+    public function getAvailableTeams() {
+		$cluster = Clusters::select('team_ids')->get()->map(function($r) {
+			return json_decode($r['team_ids']);
+		});
+        return $this->whereNotIn('team_id', $cluster)->get();
+    }
+
 
 
 }
