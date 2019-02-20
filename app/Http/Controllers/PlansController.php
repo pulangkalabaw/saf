@@ -118,7 +118,7 @@ class PlansController extends Controller
         ]);
 
         // Once validated
-        if ($plan->update($request->only('plan_name'))) {
+        if ($plan->update($request->except(['_token','_method']))) {
             return back()->with([
                 'notif.style' => 'success',
                 'notif.icon' => 'plus-circle',
