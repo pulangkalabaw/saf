@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             User::class,
             Teams::class,
             AttendanceSeeder::class,
-            JiromesPersonalSeeder::class,
+            // JiromesPersonalSeeder::class,
         ]);
     }
 }
