@@ -13,12 +13,14 @@ class CreatePlansTable extends Migration
      */
     public function up()
     {
-        Schema::create('plans', function (Blueprint $table) {
-            $table->increments('id');
-            $table->integer('plan_id')->unsigned();
-            $table->string('plan_name');
-            $table->timestamps();
-        });
+        // Schema::create('plans', function (Blueprint $table) {
+        //     $table->increments('id');
+        //     $table->string('plan_name');
+        //     $table->tinyInteger('with_sim');
+        //     $table->tinyInteger('with_device');
+        //     $table->double('msf');
+        //     $table->timestamps();
+        // });
     }
 
     /**

@@ -26,7 +26,7 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <a href="{{ route('app.users.index') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-th-list'></span> 
+                                    <span class='fa fa-th-list'></span>
                                 </a>
                             </div>
                         </div>
@@ -42,7 +42,7 @@
                                     <div>
                                         <div class="col-md-3">First name</div>
                                         <div class="col-md-7">
-                                            <input type="text" name="fname" id="" class="form-control" required>
+                                            <input type="text" name="fname" id="" class="form-control" required value="{{ old('fname') }}">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -50,7 +50,7 @@
                                     <div>
                                         <div class="col-md-3">Last name</div>
                                         <div class="col-md-7">
-                                            <input type="text" name="lname" id="" class="form-control" required>
+                                            <input type="text" name="lname" id="" class="form-control" required value="{{ old('lname') }}">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -58,7 +58,7 @@
                                     <div>
                                         <div class="col-md-3">Email</div>
                                         <div class="col-md-7">
-                                            <input type="email" name="email" id="" class="form-control" required>
+                                            <input type="email" name="email" id="" class="form-control" required value="{{ old('email') }}">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -66,7 +66,7 @@
                                     <div>
                                         <div class="col-md-3">Password</div>
                                         <div class="col-md-7">
-                                            <input type="password" name="password" id="" class="form-control" required>
+                                            <input type="password" name="password" id="" class="form-control" required value="{{ old('password') }}">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -75,21 +75,22 @@
                                         <div class="col-md-3">Role</div>
                                         <div class="col-md-7">
                                             <select name="role" id="roles" class="form-control" required>
-                                                <option value="" disabled="" selected="">Please select for role</option>
-                                                <option value="spiderman">Administrator</option>
-                                                <option value="tl">Team Leader</option>
-                                                <option value="cl">Cluster Leader</option>
-                                                <option value="agent">Agent</option>
-                                                <option value="encoder">Encoder</option>
+                                                <option   value="" disabled="" selected="">Please select for role</option>
+                                                <option  {{ old('role') == 'spiderman' ? 'selected': ''  }} value="spiderman">Administrator</option>
+                                                <option  {{ old('role') == 'tl' ? 'selected': ''  }} value="tl">Team Leader</option>
+                                                <option  {{ old('role') == 'cl' ? 'selected': ''  }} value="cl">Cluster Leader</option>
+                                                <option  {{ old('role') == 'encoder' ? 'selected': ''  }} value="encoder">Encoder</option>
+                                                <option  {{ old('role') == 'agent' ? 'selected': ''  }} value="agent">Agent</option>
+                                                <option  {{ old('role') == 'agent_referral' ? 'selected': ''  }} value="agent_referral">Agent Referral</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
 
-                                    <div id="code">
+                                    <div class="code">
                                         <div class="col-md-3">Agent Code</div>
                                         <div class="col-md-7">
-                                            <input type="text" name="agent_code" id="" class="form-control">
+                                            <input type="text" name="agent_code" id="" class="form-control" value="{{ old('agent_code') }}">
                                         </div>
                                         <div class="clearfix"></div><br>
                                     </div>
@@ -98,9 +99,17 @@
                                         <div class="col-md-3">Status</div>
                                         <div class="col-md-7">
                                             <select name="isActive" class="form-control" required>
-                                                <option value="1">Activated</option>
-                                                <option value="0">Deactivated</option>
+                                                <option {{ old('isActive') == '1' ? 'selected': ''  }} value="1">Activated</option>
+                                                <option {{ old('isActive') == '0' ? 'selected': ''  }} value="0">Deactivated</option>
                                             </select>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
+                                    <div class="code">
+                                        <div class="col-md-3">PAT</div>
+                                        <div class="col-md-7">
+                                            <input type="text" name="pat" class="form-control" value="{{ old('pat') }}">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -128,11 +137,11 @@
 <script>
     function roleSwitcher()
     {
-        if ($('#roles').val() == "agent") {
-            $('#code').css({'display': 'block'});
+        if ($('#roles').val() == "agent" || $('#roles').val() == "agent_referral") {
+            $('.code').css({'display': 'block'});
         }
         else {
-            $('#code').css({'display': 'none'});
+            $('.code').css({'display': 'none'});
         }
     }
 
