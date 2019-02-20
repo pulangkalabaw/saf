@@ -76,7 +76,7 @@
                                         <div class="col-md-7">
                                             <select name="role" id="roles" class="form-control" required>
                                                 <option   value="" disabled="" selected="">Please select for role</option>
-                                                <option  {{ old('role') == 'spiderman' ? 'selected': ''  }} value="spiderman">Administrator</option>
+                                                <option  {{ old('role') == 'administrator' ? 'selected': ''  }} value="administrator">Administrator</option>
                                                 <option  {{ old('role') == 'tl' ? 'selected': ''  }} value="tl">Team Leader</option>
                                                 <option  {{ old('role') == 'cl' ? 'selected': ''  }} value="cl">Cluster Leader</option>
                                                 <option  {{ old('role') == 'encoder' ? 'selected': ''  }} value="encoder">Encoder</option>
