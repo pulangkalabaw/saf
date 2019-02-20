@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class Application extends Model
 {
     //
-    protected $table = "saf_applications";
+    protected $table = "applications";
     protected $guarded = [];
     protected $dates = ['created_at', 'updated_at'];
+
+
 
 
     /*
@@ -18,7 +20,7 @@ class Application extends Model
      *
      */
     public  function scopeSearch($query, $value){
-        //
+        // 
         $user = new User();
         $teams = new Teams();
         $val = trim($value);
@@ -46,7 +48,7 @@ class Application extends Model
 
         // Then try to search to teams
         return $return_query;
-
+        
     }
 
 
@@ -55,11 +57,16 @@ class Application extends Model
      * [ table: application_status ]
      *
      */
-    public function recentStatusShort ($application_id) {
+    public function recentStatusShort ($application_id, $col) {
         $application_status = new ApplicationStatus();
         $application = $application_status->where('application_id', $application_id)->orderBy('id', 'desc')->first();
         if (empty($application)) return "-";
-		return $application->status;
+        if ($col == "id") {
+            return $application_status->getStatus($application->status_id)->id;
+        }
+        else {
+            return $application_status->getStatus($application->status_id)->status;
+        }
     }
 
     public function allStatus ($application_id) {
@@ -78,8 +85,8 @@ class Application extends Model
         return $this->hasOne('App\Clusters', 'cluster_id', 'cluster_id');
     }
 
-    public function getAgentName () {
-        return $this->hasOne('App\User', 'id', 'agent_id');
+    public function getAgentCode () {
+        return $this->hasOne('App\User', 'agent_code', 'agent_code');
     }
 
     public function getTeam () {
@@ -91,7 +98,7 @@ class Application extends Model
     }
 
     public function getPlan () {
-        return $this->hasOne('App\Plans', 'id', 'plan_id');
+        return $this->hasOne('App\Plans', 'plan_id', 'plan_applied');
     }
 
     public function getProduct () {

@@ -23,7 +23,7 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <a href="{{ route('app.plans.create') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-plus-circle'></span>
+                                    <span class='fa fa-plus-circle'></span> 
                                 </a>
                             </div>
                         </div>
@@ -31,23 +31,23 @@
                     <div class="panel-body">
                         <div class="row">
                             @include('includes.notif')
-
+                            
                             <div class="col-md-4 col-xs-4">
                                 <div class="form-inline">
                                     <div class="form-group">
                                         <label>Number of rows: </label>
                                         <select name="" id="" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value)" class="form-control">
-                                            <option
-                                            {{ !empty(request()->get('show') && request()->get('show') == 10) ? 'selected' : ''  }}
+                                            <option 
+                                            {{ !empty(request()->get('show') && request()->get('show') == 10) ? 'selected' : ''  }} 
                                             value="{{ request()->fullUrlWithQuery(['show' => '10']) }}">10</option>
-                                            <option
-                                            {{ !empty(request()->get('show') && request()->get('show') == 25) ? 'selected' : ''  }}
+                                            <option 
+                                            {{ !empty(request()->get('show') && request()->get('show') == 25) ? 'selected' : ''  }} 
                                             value="{{ request()->fullUrlWithQuery(['show' => '25']) }}">25</option>
-                                            <option
-                                            {{ !empty(request()->get('show') && request()->get('show') == 50) ? 'selected' : ''  }}
+                                            <option 
+                                            {{ !empty(request()->get('show') && request()->get('show') == 50) ? 'selected' : ''  }} 
                                             value="{{ request()->fullUrlWithQuery(['show' => '50']) }}">50</option>
-                                            <option
-                                            {{ !empty(request()->get('show') && request()->get('show') == 100) ? 'selected' : ''  }}
+                                            <option 
+                                            {{ !empty(request()->get('show') && request()->get('show') == 100) ? 'selected' : ''  }} 
                                             value="{{ request()->fullUrlWithQuery(['show' => '100']) }}">100</option>
                                         </select>
                                     </div>
@@ -70,15 +70,12 @@
                         <table class="table table-hovered table-striped">
                             <thead>
                                 <tr>
-                                    <th>
+                                    <th width="80%">
                                         Plan
                                         <a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'plan-name', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
-                                            <span class='fa fa-sort'></span>
+                                            <span class='fa fa-sort'></span> 
                                         </a>
                                     </th>
-                                    <th>With Sim</th>
-                                    <th>With Device</th>
-                                    <th>MSF</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -86,13 +83,10 @@
                                 @foreach ($plans as $plan)
                                 <tr>
                                     <td>{{ $plan->plan_name }}</td>
-                                    <td>{{ ($plan->with_sim == 1) ? 'Yes' : 'No' }}</td>
-                                    <td>{{ ($plan->with_device == 1) ? 'Yes' : 'No' }}</td>
-                                    <td>{{ $plan->msf }}</td>
                                     <td>
-                                        <a data-toggle="tooltip" title="Edit Status" href="{{ route('app.plans.edit', $plan->id) }}" class="btn btn-success btn-xs"><span class='fa fa-edit'></span></a>
-                                        <button data-toggle="tooltip" title="Delete Status" class="btn btn-xs btn-danger" for="submit-form" tabindex="0" form="{{ $plan->id }}myform"><span class='fa fa-trash'></span>
-                                            <form class="delete" method="POST" action="{{ route('app.plans.destroy', $plan->id) }}" id="{{ $plan->id }}myform">
+                                        <a data-toggle="tooltip" title="Edit Status" href="{{ route('app.plans.edit', $plan->plan_id) }}" class="btn btn-success btn-xs"><span class='fa fa-edit'></span></a>
+                                        <button data-toggle="tooltip" title="Delete Status" class="btn btn-xs btn-danger" for="submit-form" tabindex="0" form="{{ $plan->plan_id }}myform"><span class='fa fa-trash'></span>
+                                            <form class="delete" method="POST" action="{{ route('app.plans.destroy', $plan->plan_id) }}" id="{{ $plan->plan_id }}myform">
                                                 {{ method_field('DELETE') }}
                                                 {{ csrf_field() }}
                                             </form>
@@ -127,8 +121,8 @@
         });
     });
 
-    function submitSort() {
-        document.sorting.submit();
-    }
+    function submitSort() {   
+        document.sorting.submit(); 
+    } 
 </script>
 @endsection

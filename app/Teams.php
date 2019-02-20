@@ -49,7 +49,7 @@ class Teams extends Model
      *
      */
     public  function scopeSearch($query, $value){
-        //
+        // 
         $user = new User();
         $val = trim($value);
 
@@ -63,7 +63,7 @@ class Teams extends Model
 
         // if (!empty($user->search($val)->first())) {
         //     $user_id = $user->search($val)->first()->id;
-        //     $agent_code = $user->search($val)->first()->agent_code;
+        //     $agent_code = $user->search($val)->first()->agent_code; 
         //     $return_query = $return_query
         //     ->orWhere('teams.tl_id', $user_id)
         //     ->orWhere('teams.agent_code', $agent_code);
@@ -71,10 +71,10 @@ class Teams extends Model
 
         // Then try to search to teams
         return $return_query;
-
+        
     }
 
-
+    
     /*
      * [ Get the Team Leader Information using tl_id ]
      *
@@ -88,7 +88,7 @@ class Teams extends Model
      *
      */
     public function getAgentCode() {
-        return $this->hasOne('App\User', 'id', 'agent_code');
+        return $this->hasOne('App\User', 'agent_code', 'agent_code');
     }
 
     /*
@@ -101,6 +101,15 @@ class Teams extends Model
         return $user->whereIn('id', $ids)->get();
     }
 
+    public function setEncoderIdsAttribute($value)
+    {
+        $this->attributes['encoder_ids'] = json_encode($value);
+    }
+
+    public function getEncoderIdsAttribute($value)
+    {
+        return json_decode($value);
+    }
 	/*
      * [ Get the available Encoder ]
      *

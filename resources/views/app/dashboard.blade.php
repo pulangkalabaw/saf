@@ -2,7 +2,7 @@
 
 @section ('styles')
 
-@endsection
+@endsection 
 
 @section('content')
 
@@ -13,7 +13,6 @@
        <li class="active">Dashboard</li>
    </ol>
 </div>
-{{ base64_encode('administrator') }}
 <div class="container-fluid half-padding">
     <div class="template template__blank">
         {{--  --}}
@@ -24,7 +23,7 @@
                         <h3 class="panel-title">Application counter (Cluster)</h3>
                     </div>
                     <div class="panel-body">
-                        <canvas id="application_counter_by_cluster"></canvas>
+                        <canvas id="application_counter_by_cluster"></canvas>                 
                     </div>
                 </div>
             </div>
@@ -34,7 +33,7 @@
                         <h3 class="panel-title">Application counter (Team)</h3>
                     </div>
                     <div class="panel-body">
-                        <canvas id="application_counter_by_teams"></canvas>
+                        <canvas id="application_counter_by_teams"></canvas>                 
                     </div>
                 </div>
             </div>
@@ -75,14 +74,14 @@
         data: {
             labels: acbc_labels,
             datasets: [
-            {label: 'Application counter', data: acbc_data, backgroundColor:'rgba(255, 99, 132, 0.2)', borderColor: '#ed4949', borderWidth: 3 }
+            {label: 'Application counter', data: acbc_data, backgroundColor:'rgba(255, 99, 132, 0.2)', borderColor: '#ed4949', borderWidth: 3 } 
             ]
         },
         options: {
             scales: {
                 xAxes: [{
                     ticks: {
-                        beginAtZero:true,
+                        beginAtZero:true, 
                     }
                 }],
                 yAxes: [{
@@ -105,14 +104,14 @@
         data: {
             labels: acbt_labels,
             datasets: [
-            {label: 'Application counter', data: acbt_data, backgroundColor:'rgba(54, 162, 235, 0.2)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 3 }
+            {label: 'Application counter', data: acbt_data, backgroundColor:'rgba(54, 162, 235, 0.2)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 3 } 
             ]
         },
         options: {
             scales: {
                 xAxes: [{
                     ticks: {
-                        beginAtZero:true,
+                        beginAtZero:true, 
                     }
                 }],
                 yAxes: [{
@@ -120,7 +119,7 @@
                         maxRotation: 30,
                         minRotation: 30
                     }
-                }]
+                }] 
             },
             responsive: true,
         },
@@ -135,14 +134,14 @@
         data: {
             labels: nostu_labels,
             datasets: [
-            {label: 'Status used', data: nostu_data, backgroundColor:'rgba(255, 206, 86, 0.2)', borderColor: 'rgba(255, 206, 86, 1)', borderWidth: 3 }
+            {label: 'Status used', data: nostu_data, backgroundColor:'rgba(255, 206, 86, 0.2)', borderColor: 'rgba(255, 206, 86, 1)', borderWidth: 3 } 
             ]
         },
         options: {
             scales: {
                 yAxes: [{
                     ticks: {
-                        beginAtZero:true,
+                        beginAtZero:true, 
                     }
                 }],
                 xAxes: [{
@@ -150,7 +149,7 @@
                         maxRotation: 30,
                         minRotation: 30
                     }
-                }]
+                }] 
             },
             responsive: true,
         }
@@ -160,4 +159,4 @@
 
 </script>
 
-@endsection
+@endsection 
