@@ -101,15 +101,15 @@ class Teams extends Model
         return $user->whereIn('id', $ids)->get();
     }
 
-    public function setAgentCodeAttribute($value)
-    {
-        $this->attributes['agent_code'] = json_encode($value);
-    }
+    // public function setAgentCodeAttribute($value)
+    // {
+    //     $this->attributes['agent_code'] = json_encode($value);
+    // }
 
-    public function getAgentCodeAttribute($value)
-    {
-        return json_decode($value);
-    }
+    // public function getAgentCodeAttribute($value)
+    // {
+    //     return json_decode($value);
+    // }
 	/*
      * [ Get the available Encoder ]
      *
