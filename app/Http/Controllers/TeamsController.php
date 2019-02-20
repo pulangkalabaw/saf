@@ -76,14 +76,11 @@ class TeamsController extends Controller
             'team_name' => 'required|string',
             'tl_id' => 'required',
             'agent_code' => 'required',
-            'encoder_ids' => 'required',
-
         ]);
 
         if ($v->fails()) return back()->withErrors($v->errors());
 
         $request['team_id'] = rand(111,99999);
-        $request['encoder_ids'] = json_encode($request['encoder_ids']);
         if (Teams::insert($request->except('_token'))) {
             return back()->with([
                 'notif.style' => 'success',
@@ -149,13 +146,10 @@ class TeamsController extends Controller
             'team_name' => 'required|string',
             'tl_id' => 'required',
             'agent_code' => 'required',
-            'encoder_ids' => 'required',
-
         ]);
 
         if ($v->fails()) return back()->withErrors($v->errors());
 
-        $request['encoder_ids'] = json_encode($request['encoder_ids']);
         if ($teams->update($request->except(['_token', '_method']))) {
             return back()->with([
                 'notif.style' => 'success',

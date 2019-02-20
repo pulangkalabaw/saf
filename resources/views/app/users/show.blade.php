@@ -26,10 +26,10 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <a href="{{ route('app.users.edit', $user->id) }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-edit'></span> 
+                                    <span class='fa fa-edit'></span>
                                 </a>
                                 <a href="{{ route('app.users.index') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-th-list'></span> 
+                                    <span class='fa fa-th-list'></span>
                                 </a>
                             </div>
                         </div>
@@ -89,6 +89,15 @@
                                 </div>
                                 <div class="clearfix"></div><br>
 
+                                @if($user->pat)
+                                <div>
+                                    <div class="col-md-3">PAT:</div>
+                                    <div class="col-md-7">
+                                        {{ $user->pat }}
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div><br>
+                                @endif
 
                                 <div>
                                     <div class="col-md-3">Cluster(s):</div>

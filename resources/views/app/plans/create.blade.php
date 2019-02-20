@@ -26,7 +26,7 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <a href="{{ route('app.plans.index') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-th-list'></span> 
+                                    <span class='fa fa-th-list'></span>
                                 </a>
                             </div>
                         </div>
@@ -44,7 +44,37 @@
                                     <div>
                                         <div class="col-md-3">Plan name</div>
                                         <div class="col-md-7">
-                                            <input type="text" name="plan_name" id="" class="form-control" required>
+                                            <input type="text" name="plan_name" id="" class="form-control" required value="{{ old('plan_name') }}">
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
+                                    <div>
+                                        <div class="col-md-3">With Sim</div>
+                                        <div class="col-md-7">
+                                            <select class="form-control" name="with_sim" required>
+                                                <option {{ old('with_sim') == '1' ? 'selected': '' }} value="1">YES</option>
+                                                <option {{ old('with_sim') == '0' ? 'selected': '' }} value="0">NO</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
+                                    <div>
+                                        <div class="col-md-3">With Device</div>
+                                        <div class="col-md-7">
+                                            <select class="form-control" name="with_device" required>
+                                                <option {{ old('with_device') == '1' ? 'selected': '' }} value="1">YES</option>
+                                                <option {{ old('with_device') == '0' ? 'selected': '' }} value="0">NO</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
+                                    <div>
+                                        <div class="col-md-3">MSF</div>
+                                        <div class="col-md-7">
+                                            <input type="text" name="msf" id="" class="form-control" required value="{{ old('plan_name') }}">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>

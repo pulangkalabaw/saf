@@ -16,326 +16,285 @@ use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
 {
-    public function __construct()
-    {
-        // $this->middleware('admin_only', ['only' => 'create']);
-    }
+	public function __construct()
+	{
+		// $this->middleware('admin_only', ['only' => 'create']);
+	}
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(Request $request)
-    {
-        //
-        $applications = new Application();
+	/**
+	* Display a listing of the resource.
+	*
+	* @return \Illuminate\Http\Response
+	*/
+	public function index(Request $request)
+	{
+		//
+		$applications = new Application();
 
-        if (Auth::user()->role != base64_encode("administrator")) $applications = $applications->where('user_id', Auth::user()->id);
-        if (!empty($request->get('search_string'))) {
-            // With search string parameter
-            $applications = $applications->search($request->get('search_string'));
-        }
+		if (Auth::user()->role != base64_encode("administrator")) $applications = $applications->where('insert_by', Auth::user()->id);
+		if (!empty($request->get('search_string'))) {
+			// With search string parameter
+			$applications = $applications->search($request->get('search_string'));
+		}
 
-        // Count all before paginate
-        $total = $applications->count();
+		// Count all before paginate
+		$total = $applications->count();
 
-        // Insert pagination
-        $applications = $applications
-        ->with(['getEncoder', 'getTeam'])
-        ->paginate((!empty($request->show) ? $request->show : 10));
+		// Insert pagination
+		$applications = $applications
+		->with(['getClusterName', 'getTeam', 'getAgentName'])
+		->paginate((!empty($request->show) ? $request->show : 10));
 
-        return view('app.applications.index', ['applications' => $applications, 'applications_total' => $total]);
-    }
+		return view('app.applications.index', ['applications' => $applications, 'applications_total' => $total]);
+	}
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        $users = new User();
-        $teams = Teams::whereIn('team_id', Session::get('_t'))->get();
-        $statuses = Statuses::get();
-        $plans = Plans::get();
-        $devices = Devices::get();
-        $products = Product::get();
-        
-        return view('app.applications.create', [
-            'users' => $users, 
-            'teams' => $teams,
-            'plans' => $plans,
-            'devices' => $devices,
-            'products' => $products,
-            'statuses' => $statuses,
-        ]);
-    }
+	/**
+	* Show the form for creating a new resource.
+	*
+	* @return \Illuminate\Http\Response
+	*/
+	public function create()
+	{
+		$users = new User();
+		$teams = Teams::whereIn('team_id', Session::get('_t'))->get();
+		$statuses = Statuses::get();
+		$plans = Plans::get();
+		$devices = Devices::get();
+		$products = Product::get();
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        // Team id must be prioritized to be required
-        if (empty($request->team_id)) {
-            return back()->with([
-                'notif.style' => 'danger',
-                'notif.icon' => 'times-circle',
-                'notif.message' => 'All fields are required',
-            ])->withInput();
-        }
+		return view('app.applications.create', [
+			'agents' => $users->whereIn('role', [base64_encode('agent'), base64_encode('agent_referral')])->get(), // Get agent only!
+			'plans' => $plans,
+			'devices' => $devices,
+			'products' => $products,
+			'statuses' => $statuses,
+		]);
+	}
 
-        // Local var
-        $application_data = [];
-        $application_status_data = [];
+	/**
+	* Store a newly created resource in storage.
+	*
+	* @param  \Illuminate\Http\Request  $request
+	* @return \Illuminate\Http\Response
+	*/
+	public function store(Request $request)
+	{
 
-        // Init setup
-        $data = [];
-        $data['team_id'] = str_replace("", "-", $request->team_id);
-        $data['received_date'] = str_replace("", "-", $request->received_date);
-        $data['customer_name'] = str_replace("", "-", $request->customer_name);
-        $data['plan_applied'] = str_replace("", "-", $request->plan_applied);
-        $data['device_name'] = str_replace("", "-", $request->device_name);
-        $data['product_type'] = str_replace("", "-", $request->product_type);
-        $data['msf'] = str_replace("", "-", $request->msf);
-        $data['saf_no'] = str_replace("", "-", $request->saf_no);
-        $data['codis_no'] = str_replace("", "-", $request->codis_no);
-        $data['sr_no'] = str_replace("", "-", $request->sr_no);
-        $data['so_no'] = str_replace("", "-", $request->so_no);
-        $data['saf_no'] = str_replace("", "-", $request->saf_no);
-        $data['account_no'] = str_replace("", "-", $request->account_no);
-        $data['agent_code'] = str_replace("", "-", $request->agent_code);
-        $data['status'] = str_replace("", "-", $request->status);
-        $data['document_remarks'] = str_replace("", "-", $request->document_remarks);
+		// Count row for looping (for now, we will reference customer_name)
+		// how many row did he/she filled
+		$row_count = count(array_filter($request['customer_name']));
 
-        if (
-            empty($data['team_id']) || empty($data['received_date']) || empty($data['customer_name']) ||
-            empty($data['plan_applied']) || empty($data['device_name']) || empty($data['product_type']) ||
-            empty($data['msf']) || empty($data['saf_no']) || empty($data['codis_no']) ||
-            empty($data['sr_no']) || empty($data['so_no']) || empty($data['account_no']) || empty($data['saf_no']) ||
-            empty($data['agent_code']) || empty($data['status']) || empty($data['document_remarks'])
-        ) {
-            return back()->with([
-                'notif.style' => 'danger',
-                'notif.icon' => 'times-circle',
-                'notif.message' => 'All fields are required',
-            ])->withInput();
-        }
-        // Count Team id count
-        $counted_array = count($request->team_id) - 1;
-        $teams = new Teams();
+		// if the row has a length of 0
+		if ($row_count == 0) {
+			return back()->with([
+				'notif.style' => 'danger',
+				'notif.icon' => 'times-circle',
+				'notif.message' =>
+				'All fields are required'
+			])
+			->withInput();
+		}
 
-        for ($i = 0; $i <= $counted_array; $i++) {
+		// Loop through all rows
+		for ($i = 0; $i <= $row_count - 1; $i++) {
 
-            $team_id = $this->replaceDashIfNull($data['team_id'][$i]);
-            $cluster_id = $teams->getCluster($team_id)[0]['cluster_id'];
+			if ($request['agent_id'][$i] == 0 || $request['plan_id'][$i] == 0) {
+				return back()->with([
+					'notif.style' => 'danger',
+					'notif.icon' => 'times-circle',
+					'notif.message' => 'Agent and Plan are also requried!',
+				])
+				->withInput();
+			}
 
-            $received_date = $this->replaceDashIfNull($data['received_date'][$i]);
-            $customer_name = $this->replaceDashIfNull($data['customer_name'][$i]);
-            $plan_applied = $this->replaceDashIfNull($data['plan_applied'][$i]);
-            $device_name = $this->replaceDashIfNull($data['device_name'][$i]);
-            $product_type = $this->replaceDashIfNull($data['product_type'][$i]);
-            $msf = $this->replaceDashIfNull($data['msf'][$i]);
-            $codis_no = $this->replaceDashIfNull($data['codis_no'][$i]);
-            $sr_no = $this->replaceDashIfNull($data['sr_no'][$i]);
-            $saf_no = $this->replaceDashIfNull($data['saf_no'][$i]);
-            $so_no = $this->replaceDashIfNull($data['so_no'][$i]);
-            $account_no = $this->replaceDashIfNull($data['account_no'][$i]);
-            $agent_code = $this->replaceDashIfNull($data['agent_code'][$i]);
-            $status = $this->replaceDashIfNull($data['status'][$i]);
-            $document_remarks = $this->replaceDashIfNull($data['document_remarks'][$i]);
+			// Get the amount of that plan
+			$plan = Plans::findOrFail($request['plan_id'][$i]);
 
-            if ($sr_no) {
-                if (!Application::where(['sr_no' => $sr_no])->first()) {
+			// Generate application_id
+			$application_id = rand(1111, 99999);
 
-                    // Application ID
-                    $application_id = rand(11111, 99999);
+			// Data to insert in Application table
+			$application_data[$i] = [
 
-                    // Data to insert in Application table
-                    $application_data[$i] = [
-                        'application_id' => $application_id,
-                        'user_id' => Auth::user()->id,
-                        'team_id' => $team_id,
-                        'cluster_id' => $cluster_id,
-                        'received_date' => $received_date,
-                        'customer_name' => $customer_name,
-                        'plan_applied' => $plan_applied,
-                        'device_name' => $device_name,
-                        'product_type' => $product_type,
-                        'msf' => $msf,
-                        'codis_no' => $codis_no,
-                        'sr_no' => $sr_no,
-                        'saf_no' => $saf_no,
-                        'so_no' => $so_no,
-                        'account_no' => $account_no,
-                        'agent_code' => $agent_code,
-                        'status' => $status,  // Leave it like that, official status will not be here
-                        'document_remarks' => $document_remarks,
-                        'encoded_date' => now(),
-                    ];
+				'application_id' => $application_id,
+				'customer_name' => $this->replaceDashIfNull($request['customer_name'][$i]),
+				'insert_by' => Auth::user()->id,
+				'team_id' => Session::get('_t')[0],
+				'cluster_id' => Session::get('_c')[0],
+				'contact' => $this->replaceDashIfNull($request['contact'][$i]),
+				'address' => $this->replaceDashIfNull($request['address'][$i]),
+				'plan_id' => (int) $request['plan_id'][$i],
+				'msf' => (double) $plan->msf,
+				'sim' => $this->replaceDashIfNull($request['sim'][$i]),
+				'device_id' => $this->replaceDashIfNull($request['device_id'][$i]), // string
+				'agent_id' => (int) $request['agent_id'][$i],
+				'status' => 'new',
+				'created_at' => now(),
 
-                    // Data to insert in Application Status table
-                    $application_status_data[$i] = [
-                        'application_id' => (string) $application_id,
-                        'team_id' => $team_id,
-                        'status_id' => (int) $status,
-                        'active' => 1,
-                        'added_by' => Auth::user()->id,
-                        'created_at' =>now(),
-                    ];
+			];
 
-                }
-            }
-        }
+			// Data to insert in Application Status table
+			$application_status_data[$i] = [
+				'application_id' => (string) $application_id,
+				'team_id' => Session::get('_t')[0],
+				'status' => 'new',
+				'active' => 1, // Active means it is the current status ;)
+				'added_by' => Auth::user()->id,
+				'created_at' =>now(),
+			];
+		}
 
-        if (Application::insert($application_data)) {
+		if (Application::insert($application_data)) {
 
-            // Insert Application Status
-            ApplicationStatus::insert($application_status_data);
+			// Insert Application Status
+			ApplicationStatus::insert($application_status_data);
 
-            // Maybe we just pretend everything is fine :(
-            // so, return it hehe
-            return back()->with([
-                'notif.style' => 'success',
-                'notif.icon' => 'plus-circle',
-                'notif.message' => 'Added successful!',
-            ]); 
-        }
-        else {
-            return back()->with([
-                'notif.style' => 'danger',
-                'notif.icon' => 'times-circle',
-                'notif.message' => 'Failed to add',
-            ]); 
-        }
-    }
+			// Maybe we just pretend everything is fine :(
+			// so, return it hehe
+			return back()->with([
+				'notif.style' => 'success',
+				'notif.icon' => 'plus-circle',
+				'notif.message' => 'Added successful!',
+			]);
+		}
+		else {
+			return back()->with([
+				'notif.style' => 'danger',
+				'notif.icon' => 'times-circle',
+				'notif.message' => 'Failed to add',
+			]);
+		}
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Application  $application
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-        $application_model = new Application();
-        $application_status = new ApplicationStatus();
-        $application = $application_model
-        ->with([
-            'getDevice',
-            'getPlan',
-            'getProduct',
-        ])
-        ->where('application_id', $id)->firstOrFail();
+	}
 
-        return view('app.applications.show', ['application' => $application, 'application_model' => $application_model, 'application_status' => $application_status]);
-    }
+	/**
+	* Display the specified resource.
+	*
+	* @param  \App\Application  $application
+	* @return \Illuminate\Http\Response
+	*/
+	public function show($id)
+	{
+		//
+		$application_model = new Application();
+		$application_status = new ApplicationStatus();
+		$application = $application_model
+		->with([
+			'getDevice',
+			'getPlan',
+			'getProduct',
+		])
+		->where('application_id', $id)
+		->firstOrFail();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Application  $application
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-        $users = new User();
-        $teams = Teams::whereIn('team_id', Session::get('_t'))->get();
-        $statuses = Statuses::get();
-        $application_model = new Application();
-        $application_status = new ApplicationStatus();
-        $plans = Plans::get();
-        $devices = Devices::get();
-        $products = Product::get();
+		return view('app.applications.show', [
+			'application' => $application,
+			'application_model' => $application_model, 'application_status' => $application_status]);
+		}
 
-        $application = $application_model->where('application_id', $id)->firstOrFail();
+		/**
+		* Show the form for editing the specified resource.
+		*
+		* @param  \App\Application  $application
+		* @return \Illuminate\Http\Response
+		*/
+		public function edit($id)
+		{
+			//
+			$users = new User();
+			$teams = Teams::whereIn('team_id', Session::get('_t'))->get();
+			$application_model = new Application();
+			$application_status = new ApplicationStatus();
+			$plans = Plans::get();
+			$devices = Devices::get();
+			$products = Product::get();
+
+			$application = $application_model->where('application_id', $id)->firstOrFail();
+
+			return view('app.applications.edit', [
+				'application' => $application,
+				'application_model' => $application_model,
+				'application_status' => $application_status,
+				'agents' => $users->whereIn('role', [base64_encode('agent_referral'), base64_encode('agent')])->get(),
+				'teams' => $teams,
+				'plans' => $plans,
+				'devices' => $devices,
+				'products' => $products,
+			]);
+
+		}
+
+		/**
+		* Update the specified resource in storage.
+		*
+		* @param  \Illuminate\Http\Request  $request
+		* @param  \App\Application  $application
+		* @return \Illuminate\Http\Response
+		*/
+		public function update(Request $request, $id)
+		{
+			$application_model = new Application();
+			$application = $application_model->where('application_id', $id)->firstOrFail();
+
+			// Place to $data variable
+			$data['customer_name'] = $request->post('customer_name');
+			$data['contact'] = $request->post('contact');
+			$data['address'] = $request->post('address');
+			$data['plan_id'] = (int) $request->post('plan_id');
+			$data['sim'] = $request->post('sim');
+			$data['device_id'] = empty($request->post('device_id')) ? '-' : $request->post('device_id');
+			$data['agent_id'] = (int) $request->post('agent_id');
+			$data['sr_no'] = $request->post('sr_no');
+			$data['so_no'] = $request->post('so_no');
+			$data['status'] = $request->post('status');
+			$data['encoder_id'] = Auth::user()->id;
+			$data['encoded_at'] = now();
+			$data['updated_at'] = now();
 
 
+			if ($application->update($data)) {
 
-        return view('app.applications.edit', [
-            'application' => $application, 
-            'application_model' => $application_model, 
-            'application_status' => $application_status,
-            'users' => $users, 
-            'teams' => $teams,
-            'plans' => $plans,
-            'devices' => $devices,
-            'products' => $products,
-            'statuses' => $statuses,
-        ]);
+					ApplicationStatus::where('id', $id)->update(['active' => 0]);
 
-    }
+					ApplicationStatus::insert([
+						'application_id' => (string) $id,
+						'status' => $data['status'],
+						'added_by' => Auth::user()->id,
+						'active' => 1,
+						'team_id' => (int) $request->post('team_id'),
+						'created_at' => now(),
+					]);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Application  $application
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-        $application_model = new Application();
-        $application = $application_model->where('application_id', $id)->firstOrFail();
 
-        if ($application->update($request->only([
-            'team_id', 'received_date', 'customer_name',
-            'device_name', 'plan_applied', 'product_type',
-            'volume', 'msf', 'saf_no',
-            'codis_no', 'sr_no', 'so_no',
-            'account_no', 'mobile_no', 'iccid',
-            'imei', 'sales_source', 'agent_code',
-            'status_remarks', 'document_remarks',
-            'status',
-        ]))) {
 
-            ApplicationStatus::where('application_id', $id)->update(['active' => 0]);
+					return back()->with([
+						'notif.style' => 'success',
+						'notif.icon' => 'plus-circle',
+						'notif.message' => 'Update successful!',
+					]);
+				}
+				else {
+					return back()->with([
+						'notif.style' => 'danger',
+						'notif.icon' => 'times-circle',
+						'notif.message' => 'Failed to update',
+					]);
+				}
+			}
 
-            ApplicationStatus::insert([
-                'application_id' => (string) $id,
-                'status_id' => (int) $request->post('status'),
-                'added_by' => Auth::user()->id,
-                'active' => 1,
-                'team_id' => (int) $request->post('team_id'),
-                'created_at' => now(),
-            ]);
+			/**
+			* Remove the specified resource from storage.
+			*
+			* @param  \App\Application  $application
+			* @return \Illuminate\Http\Response
+			*/
+			public function destroy(Application $application)
+			{
+				//
+			}
 
-            return back()->with([
-                'notif.style' => 'success',
-                'notif.icon' => 'plus-circle',
-                'notif.message' => 'Update successful!',
-            ]); 
-        }
-        else {
-            return back()->with([
-                'notif.style' => 'danger',
-                'notif.icon' => 'times-circle',
-                'notif.message' => 'Failed to update',
-            ]); 
-        }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Application  $application
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Application $application)
-    {
-        //
-    }
-
-    public function replaceDashIfNull($arr)
-    {
-        return !empty($arr) ? $arr : "-";
-    }
-}
-
+			public function replaceDashIfNull($arr)
+			{
+				return !empty($arr) ? $arr : "-";
+			}
+		}

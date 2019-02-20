@@ -11,9 +11,9 @@ class ApplicationStatus extends Model
     protected $guarded = [];
     protected $dates = ['created_at', 'updated_at'];
 
-    public function getStatus ($status_id) {
-        return Statuses::where('id', $status_id)->firstOrFail();
-    }
+    // public function getStatus ($status_id) {
+    //     return Statuses::where('id', $status_id)->firstOrFail();
+    // }
 
     public function addedBy ($application_id) {
         $application_status = $this->where('application_id', $application_id)->firstOrFail();

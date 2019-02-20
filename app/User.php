@@ -51,7 +51,8 @@ class User extends Authenticatable
      *
      */
     public function getAvailableClusterLeader() {
-        return $this->where('role', base64_encode('cl'))->get();
+		$cl = Clusters::select('cl_id')->get();
+        return $this->where('role', base64_encode('cl'))->whereNotIn('id', $cl)->get();
     }
 
 
@@ -60,7 +61,9 @@ class User extends Authenticatable
      *
      */
     public function getAvailableTeamLeader() {
-        return $this->where('role', base64_encode('tl'))->get();
+		// Get all tl created
+		$tl = Teams::select('tl_id')->get();
+        return $this->where('role', base64_encode('tl'))->whereNotIn('id', $tl)->get();
     }
 
 
@@ -69,7 +72,8 @@ class User extends Authenticatable
      *
      */
     public function getAvailableAgent() {
-        return $this->where('role', base64_encode('agent'))->get();
+		$agent = Teams::select('agent_code')->get(); // not really a agent code, it is a user.id
+        return $this->where('role', base64_encode('agent'))->whereNotIn('id', $agent)->get();
     }
 
     /*
