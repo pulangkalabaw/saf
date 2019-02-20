@@ -48,6 +48,7 @@ class AttendanceController extends Controller
         // GET ABSENT AGENTS
         $attendance['absent'] = Attendance::whereIn('user_id', $get_agents)->whereDate('created_at', Carbon::today())->where('status', 0)->with(['Users'])->get();
 
+        // return $attendance;
         return view('app.attendance.index', compact('attendance'));
     }
 
