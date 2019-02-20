@@ -18,6 +18,9 @@ Route::get('/login', 'LoginController@login')->name('login');
 Route::post('/login', 'LoginController@postLogin')->name('login');
 Route::get('/logout', 'LoginController@logout')->name('logout');
 
+Route::get('attendance/sample', 'AttendanceController@sample');
+Route::resource('attendance', 'AttendanceController');
+
 
 // App Routes
 Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], function () {
@@ -39,6 +42,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     Route::resource('devices', 'DevicesController')->middleware('admin_only');
     // Plan
     Route::resource('plans', 'PlansController')->middleware('admin_only');
+    // attendances
+    // Route::resource('attendance', 'AttendanceController')->middleware('admin_only');
 
     // For non-admin
     Route::get('your-clusters', 'NonAdminController@yourClusters')->name('your.clusters');

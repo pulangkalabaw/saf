@@ -75,6 +75,12 @@
                                 </div>
                             @endif
 
+                            @if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl")
+                            <div class="quickmenu__item {{ str_contains(url()->current(), ['attendance']) ? 'active' : '' }}">
+                               <div class="fa fa-clock-o"></div>
+                            </div>
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -162,8 +168,33 @@
                                     </li>
                                 </ul>
                             </div>
+
+                            <div class="sidebar__menu">
+                              <div class="sidebar__title">Attendance</div>
+                                <ul class="nav nav-menu">
+                                  <li>
+                                    <a href="{{ route('attendance.index')}}">
+                                       <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
+                                      <div class="nav-menu__text"><span>User Attendance</span></div>
+                                    </a>
+                                  </li>
+                                </ul>
+                            </div>
                         @endif
 
+                        @if (Auth::user()->role == base64_encode("tl"))
+                        <div class="sidebar__menu">
+                          <div class="sidebar__title">Attendance</div>
+                           <ul class="nav nav-menu">
+                              <li>
+                                <a href="{{ route('attendance.index')}}">
+                                   <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
+                                  <div class="nav-menu__text"><span>User Attendance</span></div>
+                                </a>
+                              </li>
+                           </ul>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
