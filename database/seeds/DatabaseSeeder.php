@@ -13,8 +13,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             Application::class,
-            Statuses::class,
-            Product::class,
+            // Statuses::class,
+            // Product::class,
             Devices::class,
             Plans::class,
             User::class,
