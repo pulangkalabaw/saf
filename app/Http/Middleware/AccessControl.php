@@ -14,11 +14,11 @@ class AccessControl
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next, ...$can_access)
+    public function handle($request, Closure $next)
     {
-		if(!in_array(base64_decode(Auth::user()->role), $can_access)) {
-			return back();
-		}
+        if (!in_array(base64_decode(Auth::user()->role), ['administrator'])) {
+            return redirect()->route('login');
+        }
         return $next($request);
     }
 }
