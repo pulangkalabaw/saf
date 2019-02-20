@@ -6,7 +6,7 @@ function filteredBy($request) {
 
     // Sorting
     if (!empty($request->get('sort_in')) && !empty($request->get('sort_by'))) {
-        $string = "Sort in: <b>". ucwords(str_replace('-', ' ', $request->get('sort_in'))) 
+        $string = "Sort in: <b>". ucwords(str_replace('-', ' ', $request->get('sort_in')))
                 . "</b>, Sort by: <b>" . ucwords($request->get('sort_by')) . "</b> <br>";
     }
 
@@ -26,7 +26,7 @@ function filteredBy($request) {
 function array_random_assoc ($arr, $num = 1) {
     $keys = array_keys($arr);
     shuffle($keys);
-    
+
     $r = array();
     for ($i = 0; $i < $num; $i++) {
         $r[$keys[$i]] = $arr[$keys[$i]];
@@ -90,23 +90,23 @@ function searchTeamAndCluster ($auth) {
         // Then check your agent code to them
         // $get_teams = $get_teams->get();
 
-        if (count($get_teams) == 0) {
-
-            // If your ID not in Agent Code
-            // Check for Encoders IDs
-            if (count($get_teams) == 0) {
-                $get_teams = $teams_model->get()->map(function ($r) use ($auth, $teams_model) {
-                    // search your id in encoders ids (array)
-                    if (in_array($auth->id, json_decode($r['encoder_ids']))) return $r;
-
-                });
-
-                // Filter all null if it has
-                $get_teams  = array_filter($get_teams->toArray());
-
-            } // Encoder Search
-
-        } // Agent Code Search
+        // if (count($get_teams) == 0) {
+        //
+        //     // If your ID not in Agent Code
+        //     // Check for Encoders IDs
+        //     if (count($get_teams) == 0) {
+        //         $get_teams = $teams_model->get()->map(function ($r) use ($auth, $teams_model) {
+        //             // search your id in encoders ids (array)
+        //             if (in_array($auth->id, json_decode($r['encoder_ids']))) return $r;
+        //
+        //         });
+        //
+        //         // Filter all null if it has
+        //         $get_teams  = array_filter($get_teams->toArray());
+        //
+        //     } // Encoder Search
+        //
+        // } // Agent Code Search
 
     } // TL search
 
@@ -140,7 +140,7 @@ function searchTeamAndCluster ($auth) {
         // **************************
 
 
-        $cluster = $clusters_model->where('cl_id', $auth->id)->get(); 
+        $cluster = $clusters_model->where('cl_id', $auth->id)->get();
 
         if (count($cluster) != 0) {
 
