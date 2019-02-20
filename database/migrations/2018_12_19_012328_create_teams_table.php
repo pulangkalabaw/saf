@@ -19,6 +19,7 @@ class CreateTeamsTable extends Migration
             $table->string('team_id');
             // $table->integer('cl_id')->unsigned();
             $table->integer('tl_id')->unsigned();
+            $table->string('encoder_ids', 255);
             $table->string('agent_code')->nullable();
             $table->timestamps();
         });

@@ -27,13 +27,13 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <a href="{{ route('app.plans.index') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-th-list'></span>
+                                    <span class='fa fa-th-list'></span> 
                                 </a>
                             </div>
                         </div>
                     </div>
                     <div class="panel-body">
-                        <form action="{{ route('app.plans.update', $plan->id) }}" method="POST">
+                        <form action="{{ route('app.plans.update', $plan->plan_id) }}" method="POST">
                             @include('includes.notif')
 
                             {{ csrf_field() }}
@@ -45,36 +45,6 @@
                                         <div class="col-md-3">Plans name</div>
                                         <div class="col-md-7">
                                             <input type="text" name="plan_name" id="" class="form-control" value="{{ $plan->plan_name }}" required>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div><br>
-
-                                    <div>
-                                        <div class="col-md-3">With Sim</div>
-                                        <div class="col-md-7">
-                                            <select class="form-control" name="with_sim" required>
-                                                <option {{ $plan->with_sim == '1' ? 'selected':'' }} value="1">YES</option>
-                                                <option {{ $plan->with_sim == '0' ? 'selected':'' }} value="0">NO</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div><br>
-
-                                    <div>
-                                        <div class="col-md-3">With Device</div>
-                                        <div class="col-md-7">
-                                            <select class="form-control" name="with_device" required>
-                                                <option {{ $plan->with_device == '1' ? 'selected':'' }} value="1">YES</option>
-                                                <option {{ $plan->with_device == '0' ? 'selected':'' }} value="0">NO</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div><br>
-
-                                    <div>
-                                        <div class="col-md-3">MSF</div>
-                                        <div class="col-md-7">
-                                            <input type="text" name="msf" id="" class="form-control" value="{{ $plan->msf }}" required>
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>

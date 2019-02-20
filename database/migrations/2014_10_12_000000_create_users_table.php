@@ -22,7 +22,6 @@ class CreateUsersTable extends Migration
             $table->string('role');
             $table->string('isActive');
             $table->string('agent_code')->nullable();
-            $table->string('pat')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
