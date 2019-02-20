@@ -101,6 +101,15 @@ class Teams extends Model
         return $user->whereIn('id', $ids)->get();
     }
 
+    public function setEncoderIdsAttribute($value)
+    {
+        $this->attributes['encoder_ids'] = json_encode($value);
+    }
+
+    public function getEncoderIdsAttribute($value)
+    {
+        return json_decode($value);
+    }
 	/*
      * [ Get the available Encoder ]
      *

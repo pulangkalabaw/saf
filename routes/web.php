@@ -18,6 +18,9 @@ Route::get('/login', 'LoginController@login')->name('login');
 Route::post('/login', 'LoginController@postLogin')->name('login');
 Route::get('/logout', 'LoginController@logout')->name('logout');
 
+Route::get('attendance/sample', 'AttendanceController@sample');
+Route::resource('attendance', 'AttendanceController');
+
 
 // App Routes
 Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], function () {
