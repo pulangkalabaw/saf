@@ -28,10 +28,10 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <a href="{{ route('app.teams.edit', $team->team_id) }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-edit'></span>
+                                    <span class='fa fa-edit'></span> 
                                 </a>
                                 <a href="{{ route('app.teams.index') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-th-list'></span>
+                                    <span class='fa fa-th-list'></span> 
                                 </a>
                             </div>
                         </div>
@@ -78,6 +78,20 @@
                                     <div class="col-md-3">Team leader</div>
                                     <div class="col-md-7">
                                         <a href="{{ route('app.users.show', $team->getTeamLeader->id) }}">{{ $team->getTeamLeader->fname . ' ' . $team->getTeamLeader->lname }}</a>
+                                    </div>
+                                </div>
+                                <div class="clearfix"></div><br>
+
+                                <div>
+                                    <div class="col-md-3">Encoder(s)</div>
+                                    <div class="col-md-7">
+                                        @foreach ($team->getEncoder($team->encoder_ids) as $key => $encoder)
+                                        <a href="{{ route('app.users.show', $encoder->id) }}">
+                                            {{ $encoder->fname }}
+                                            {{ $encoder->lname }}
+                                        </a>
+                                        {{ ($key != (count($team->getEncoder($team->encoder_ids)) - 1)) ? ', ' : '' }}
+                                        @endforeach
                                     </div>
                                 </div>
                                 <div class="clearfix"></div><br>

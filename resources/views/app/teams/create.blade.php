@@ -35,7 +35,7 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <a href="{{ route('app.teams.index') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-th-list'></span>
+                                    <span class='fa fa-th-list'></span> 
                                 </a>
                             </div>
                         </div>
@@ -73,7 +73,19 @@
                                         <div class="col-md-7">
                                             <select name="agent_code" id="" class="form-control" required="">
                                                 @foreach ($users->getAvailableAgent() as $agent)
-                                                <option value="{{ $agent->id }}">{{ $agent->fname . ' ' . $agent->lname }}</option>
+                                                <option value="{{ $agent->agent_code }}">{{ $agent->fname . ' ' . $agent->lname }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
+                                    <div>
+                                        <div class="col-md-3">Encoder(s)</div>
+                                        <div class="col-md-7">
+                                            <select name="encoder_ids[]" id="" class="form-control selectpicker" multiple="" required="">
+                                                @foreach ($users->getAvailableEncoder() as $encoder)
+                                                <option value="{{ $encoder->id }}">{{ $encoder->fname . ' ' . $encoder->lname }}</option>
                                                 @endforeach
                                             </select>
                                         </div>

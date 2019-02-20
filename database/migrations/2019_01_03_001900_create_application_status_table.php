@@ -16,7 +16,7 @@ class CreateApplicationStatusTable extends Migration
         Schema::create('application_status', function (Blueprint $table) {
             $table->increments('id');
             $table->string('application_id');
-            $table->string('status');
+            $table->integer('status_id')->unsigned();
             $table->integer('team_id')->unsigned();
             $table->integer('active');
             $table->integer('added_by')->unsigned();
@@ -26,6 +26,7 @@ class CreateApplicationStatusTable extends Migration
 
         Schema::table('application_status', function(Blueprint $table) {
             $table->foreign('added_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('status_id')->references('id')->on('statuses')->onDelete('cascade');
         });
     }
 

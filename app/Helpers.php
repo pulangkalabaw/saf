@@ -1,24 +1,4 @@
 <?php
-function comma_separated_to_array($string, $separator = ',')
-{
-  //Explode on comma
-  $vals = explode($separator, $string);
-
-  //Trim whitespace
-  foreach($vals as $key => $val) {
-    $vals[$key] = trim($val);
-  }
-  //Return empty array if no items found
-  return array_diff($vals, array(""));
-}
-
-// Access Control: were you can give an array of roles that can access
-// specific div
-function accesesControl ($can_access) {
-
-	// $can_access is a array of roles
-	return in_array(base64_decode(Auth::user()->role), $can_access);
-}
 
 // Filtered By Helper
 function filteredBy($request) {
@@ -26,7 +6,7 @@ function filteredBy($request) {
 
     // Sorting
     if (!empty($request->get('sort_in')) && !empty($request->get('sort_by'))) {
-        $string = "Sort in: <b>". ucwords(str_replace('-', ' ', $request->get('sort_in')))
+        $string = "Sort in: <b>". ucwords(str_replace('-', ' ', $request->get('sort_in'))) 
                 . "</b>, Sort by: <b>" . ucwords($request->get('sort_by')) . "</b> <br>";
     }
 
@@ -46,7 +26,7 @@ function filteredBy($request) {
 function array_random_assoc ($arr, $num = 1) {
     $keys = array_keys($arr);
     shuffle($keys);
-
+    
     $r = array();
     for ($i = 0; $i < $num; $i++) {
         $r[$keys[$i]] = $arr[$keys[$i]];
@@ -100,36 +80,33 @@ function searchTeamAndCluster ($auth) {
         // Search your Agent to Agent Code
 
         // Filter all non null agent code
-        if ($auth->role == base64_encode("agent") || $auth->role == base64_encode("agent_referral")) {
-            $get_teams = $teams_model->where('agent_code', $auth->id)->get();
+        if ($auth->role == base64_encode("agent")) {
+            $get_teams = $teams_model->where('agent_code', $auth->agent_code)->get();
         }
         else {
             $get_teams = [];
+        }
+
+        // Then check your agent code to them
+        // $get_teams = $get_teams->get();
+
+        if (count($get_teams) == 0) {
+
+            // If your ID not in Agent Code
+            // Check for Encoders IDs
+            if (count($get_teams) == 0) {
+                $get_teams = $teams_model->get()->map(function ($r) use ($auth, $teams_model) {
+                    // search your id in encoders ids (array)
+                    if (in_array($auth->id, json_decode($r['encoder_ids']))) return $r;
+
+                });
+
+                // Filter all null if it has
+                $get_teams  = array_filter($get_teams->toArray());
+
+            } // Encoder Search
+
         } // Agent Code Search
-
-		// ***** Since encoder can access all application instead of their "teams"
-		// 		 	We will remove this code (under)
-
-        // // Then check your agent code to them
-        // // $get_teams = $get_teams->get();
-		//
-        // if (count($get_teams) == 0) {
-		//
-        //     // If your ID not in Agent Code
-        //     // Check for Encoders IDs
-        //     if (count($get_teams) == 0) {
-        //         $get_teams = $teams_model->get()->map(function ($r) use ($auth, $teams_model) {
-        //             // search your id in encoders ids (array)
-        //             if (in_array($auth->id, json_decode($r['encoder_ids']))) return $r;
-		//
-        //         });
-		//
-        //         // Filter all null if it has
-        //         $get_teams  = array_filter($get_teams->toArray());
-		//
-        //     } // Encoder Search
-		//
-        // }
 
     } // TL search
 
@@ -163,7 +140,7 @@ function searchTeamAndCluster ($auth) {
         // **************************
 
 
-        $cluster = $clusters_model->where('cl_id', $auth->id)->get();
+        $cluster = $clusters_model->where('cl_id', $auth->id)->get(); 
 
         if (count($cluster) != 0) {
 
