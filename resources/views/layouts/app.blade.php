@@ -169,18 +169,18 @@
                                 </ul>
                             </div>
 
-                            <div class="sidebar__menu">
-                              <div class="sidebar__title">Attendance</div>
-                                <ul class="nav nav-menu">
-                                  <li>
-                                    <a href="{{ route('attendance.index')}}">
-                                       <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
-                                      <div class="nav-menu__text"><span>User Attendance</span></div>
-                                    </a>
-                                  </li>
-                                </ul>
-                            </div>
                         @endif
+                        <div class="sidebar__menu">
+                            <div class="sidebar__title">Attendance</div>
+                            <ul class="nav nav-menu">
+                                <li>
+                                    <a href="{{ route('attendance.index')}}">
+                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
+                                        <div class="nav-menu__text"><span>User Attendance</span></div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
 
                         @if (Auth::user()->role == base64_encode("tl"))
                         <div class="sidebar__menu">
