@@ -91,6 +91,15 @@ class Teams extends Model
 		return $this->hasOne('App\User', 'id', 'agent_code');
 	}
 
+	/**
+	* Get all agents
+	*/
+	public function getAgents ($id) {
+		$user = new User();
+		$ids = json_decode($id);
+		return $user->whereIn('id', $ids)->get();
+	}
+
 	/*
 	* [ Get all Encoder Information using encoder_ids ]
 	*

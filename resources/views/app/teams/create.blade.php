@@ -71,7 +71,7 @@
                                     <div>
                                         <div class="col-md-3">Agent</div>
                                         <div class="col-md-7">
-                                            <select name="agent_code" id="" class="form-control" required="">
+                                            <select name="agent_code[]" id="" class="form-control selectpicker" multiple="" required="">
                                                 @foreach ($users->getAvailableAgent() as $agent)
                                                 <option value="{{ $agent->id }}">{{ $agent->fname . ' ' . $agent->lname }}</option>
                                                 @endforeach
