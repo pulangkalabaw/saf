@@ -59,7 +59,7 @@ class Application extends Model
         $application_status = new ApplicationStatus();
         $application = $application_status->where('application_id', $application_id)->orderBy('id', 'desc')->first();
         if (empty($application)) return "-";
-		return $application->status;
+		return $application->status_id;
     }
 
     public function allStatus ($application_id) {

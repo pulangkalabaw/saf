@@ -137,7 +137,7 @@ class ApplicationController extends Controller
 			$application_status_data[$i] = [
 				'application_id' => (string) $application_id,
 				'team_id' => Session::get('_t')[0],
-				'status' => 'new',
+				'status_id' => 'new', // change this to status
 				'active' => 1, // Active means it is the current status ;)
 				'added_by' => Auth::user()->id,
 				'created_at' =>now(),
@@ -258,7 +258,7 @@ class ApplicationController extends Controller
 
 					ApplicationStatus::insert([
 						'application_id' => (string) $id,
-						'status' => $data['status'],
+						'status_id' => $data['status'], // change this to status
 						'added_by' => Auth::user()->id,
 						'active' => 1,
 						'team_id' => (int) $request->post('team_id'),
