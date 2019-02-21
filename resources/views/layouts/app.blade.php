@@ -70,7 +70,6 @@
 							<div class="quickmenu__item {{ str_contains(url()->current(), ['dashboard', 'applications']) ? 'active' : '' }}">
 								<div class="fa fa-fw fa-home"></div>
 							</div>
-
 							@if (Auth::user()->role == base64_encode("administrator"))
 								<div class="quickmenu__item {{ str_contains(url()->current(), ['users', 'teams', 'clusters']) ? 'active' : '' }}">
 									<div class="fa fa-fw fa-users"></div>
@@ -177,6 +176,19 @@
 								</ul>
 							</div>
 						@endif
+                        {{-- USER ATTENDANCE --}}
+                        <div class="sidebar__menu">
+                            <div class="sidebar__title">Attendance</div>
+                            <ul class="nav nav-menu">
+                                <li>
+                                    <a href="{{ route('attendance.index') }}">
+                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
+                                        <div class="nav-menu__text"><span>Users Attendance</span></div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        {{-- Message Board --}}
 						<div class="sidebar__menu">
 							<div class="sidebar__title">Message Board</div>
 							<ul class="nav nav-menu">

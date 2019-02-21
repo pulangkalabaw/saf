@@ -37,7 +37,7 @@ class Clusters extends Model
      */
     public function getTeams($team_id, $session = []) {
         $teams = new Teams();
-        $ids = json_decode($team_id);
+        $ids = $team_id;
         $teams = $teams->whereIn('team_id', $ids)->get();
 
         if (count($session) != 0) {
@@ -76,5 +76,15 @@ class Clusters extends Model
         // Then try to search to teams
         return $return_query;
 
+    }
+
+    public function setTeamIdsAttribute($value)
+    {
+        $this->attributes['team_ids'] = json_encode($value);
+    }
+
+    public function getTeamIdsAttribute($value)
+    {
+        return json_decode($value);
     }
 }
