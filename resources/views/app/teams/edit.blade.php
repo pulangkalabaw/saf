@@ -66,7 +66,13 @@
                                     <div>
                                         <div class="col-md-3">Team Leader</div>
                                         <div class="col-md-7">
+
+
                                             <select name="tl_id" id="" class="form-control" required="">
+												<option selected value="{{ $team->tl_id }}">
+													{{ $team->getTeamLeader->fname }}
+													{{ $team->getTeamLeader->lname }}
+												</option>
                                                 @foreach ($users->getAvailableTeamLeader() as $tl)
                                                 <option {{ $team->getTeamLeader->id == $tl->id ? 'selected' : '' }} value="{{ $tl->id }}">{{ $tl->fname . ' ' . $tl->lname }}</option>
                                                 @endforeach
@@ -78,10 +84,21 @@
                                     <div>
                                         <div class="col-md-3">Agent</div>
                                         <div class="col-md-7">
-                                            <select name="agent_code" id="" class="form-control" required="">
+                                            <select name="agent_code" id="" class="form-control selectpicker" required="" multiple>
                                                 @foreach ($users->getAvailableAgent() as $agent)
-                                                <option {{ $team->getAgentCode->agent_code == $agent->agent_code ? 'selected' : '' }} value="{{ $agent->agent_code }}">{{ $agent->fname . ' ' . $agent->lname }}</option>
+                                                {{-- <option {{ $team->getAgentCode->agent_code == $agent->agent_code ? 'selected' : '' }} value="{{ $agent->agent_code }}">{{ $agent->fname . ' ' . $agent->lname }}</option> --}}
+                                                <option {{ in_array($agent->id, $team->getAgents($team->agent_code)->map(function($r) {
+                                                    return $r['id'];
+                                                })->toArray()) ? 'selected' : '' }}
+												 value="{{ $agent->id }}">{{ $agent->fname . ' ' . $agent->lname }}</option>
                                                 @endforeach
+												{{--
+												@foreach ($users->getAvailableEncoder() as $encoder)
+                                                <option {{ in_array($encoder->id, $team->getEncoder($team->encoder_ids)->map(function($r) {
+                                                    return $r['id'];
+                                                })->toArray()) ? 'selected' : '' }}
+                                                value="{{ $encoder->id }}">{{ $encoder->fname . ' ' . $encoder->lname }}</option>
+                                                @endforeach --}}
                                             </select>
                                         </div>
                                     </div>

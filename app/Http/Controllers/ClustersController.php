@@ -59,7 +59,7 @@ class ClustersController extends Controller
         $users = new User();
         $teams = new Teams();
         return view('app.clusters.create', [
-            'users' => $users->get(),
+            'users' => $users->getAvailableClusterLeader(), // clusters
             'teams' => $teams->get(),
         ]);
     }

@@ -75,12 +75,14 @@ class TeamsController extends Controller
         $v = Validator::make($request->all(), [
             'team_name' => 'required|string',
             'tl_id' => 'required',
-            'agent_code' => 'required',
+            'agent_code' => 'required', // agent id
         ]);
 
         if ($v->fails()) return back()->withErrors($v->errors());
 
         $request['team_id'] = rand(111,99999);
+		$request['agent_code'] = json_encode($request['agent_code']);
+
         if (Teams::insert($request->except('_token'))) {
             return back()->with([
                 'notif.style' => 'success',
@@ -150,6 +152,7 @@ class TeamsController extends Controller
 
         if ($v->fails()) return back()->withErrors($v->errors());
 
+		$request['agent_code'] = json_encode($request['agent_code']);
         if ($teams->update($request->except(['_token', '_method']))) {
             return back()->with([
                 'notif.style' => 'success',

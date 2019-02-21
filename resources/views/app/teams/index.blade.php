@@ -99,8 +99,29 @@
                                     <td>{{ $team->team_name }}</td>
                                     <td>{{ $team->tl_fname . ' ' . $team->tl_lname }}</td>
                                     <td>
-                                        {{ $team->getAgentCode->fname . " " . $team->getAgentCode->lname }}
-                                        {{-- {{ base64_decode($team->getAgentCode->role) == "agent" ? ' (' . $team->getAgentCode->agent_code .')' : '' }} --}}
+										{{-- Input <BR> every 3 encoders --}}
+                                        @php $counter = 0; @endphp {{-- Counter --}}
+                                        @foreach ($team->getAgents($team->agent_code) as $key => $agent)
+
+                                        @php $counter++; @endphp {{-- Increment Counter --}}
+
+                                        <a href="{{ route('app.users.show', $agent->id) }}">
+                                            {{ $agent->fname }}
+                                            {{ $agent->lname }}
+                                        </a>
+
+                                        {{-- Comma --}}
+                                        {{ ($key != (count($team->getAgents($team->agent_code)) - 1)) ? ',' : '' }}
+
+                                        {{-- Check counter if 3 --}}
+                                        @if ($counter == 3)
+                                        {{-- if its 3, we need to change the value of counter to 0 then insert <BR> --}}
+                                        @php $counter = 0; @endphp
+                                        <br>
+                                        @endif
+
+                                        @endforeach
+                                        
                                     </td>
                                     <td>
                                         <a data-toggle="tooltip" title="View Team" href="{{ route('app.teams.show', $team->team_id) }}" class="btn btn-warning btn-xs"><span class='fa fa-eye'></span></a>
