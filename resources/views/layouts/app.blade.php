@@ -183,7 +183,7 @@
                                 <li>
                                     <a href="{{ route('attendance.index') }}">
                                         <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
-                                        <div class="nav-menu__text"><span>User Attendance</span></div>
+                                        <div class="nav-menu__text"><span>Users Attendance</span></div>
                                     </a>
                                 </li>
                             </ul>
