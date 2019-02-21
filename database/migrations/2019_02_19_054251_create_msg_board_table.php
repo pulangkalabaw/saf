@@ -15,8 +15,8 @@ class CreateMsgBoardTable extends Migration
     {
         Schema::create('msg_board', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('cluster_id');
-            $table->string('team_id');
+            $table->string('cluster_id')->nullable();
+            $table->string('team_id')->nullable();
             $table->integer('posted_by')->unsigned();
             $table->tinyInteger('pinned')->default(0);
             $table->text('subject');
