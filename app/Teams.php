@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Teams extends Model
 {
+
 	//
 	protected $table = "teams";
 	protected $guarded = [];
@@ -17,7 +18,7 @@ class Teams extends Model
 		$clusters_model = new Clusters();
 		$cluster_search = $clusters_model->with('getClusterLeader')->get()->map(function ($r) use ($team_id) {
 			// decode the json
-			$r['team_ids'] = json_decode($r['team_ids']);
+			$r['team_ids'] = $r['team_ids'];
 			// then search your team id in team ids (array)
 			if (in_array($team_id, $r['team_ids'])) return $r;
 		});
@@ -35,7 +36,7 @@ class Teams extends Model
 		$clusters_model = new Clusters();
 		$cluster_search = $clusters_model->get()->map(function ($r) use ($team_id) {
 			// decode the json
-			$r['team_ids'] = json_decode($r['team_ids']);
+			$r['team_ids'] = $r['team_ids'];
 			// then search your team id in team ids (array)
 			if (in_array($team_id, $r['team_ids'])) return $r;
 		});
@@ -91,15 +92,6 @@ class Teams extends Model
 		return $this->hasOne('App\User', 'id', 'agent_code');
 	}
 
-	/**
-	* Get all agents
-	*/
-	public function getAgents ($id) {
-		$user = new User();
-		$ids = json_decode($id);
-		return $user->whereIn('id', $ids)->get();
-	}
-
 	/*
 	* [ Get all Encoder Information using encoder_ids ]
 	*
@@ -110,15 +102,15 @@ class Teams extends Model
 		return $user->whereIn('id', $ids)->get();
 	}
 
-	// public function setAgentCodeAttribute($value)
-	// {
-	//     $this->attributes['agent_code'] = json_encode($value);
-	// }
+	public function setAgentCodeAttribute($value)
+	{
+		$this->attributes['agent_code'] = json_encode($value);
+	}
 
-	// public function getAgentCodeAttribute($value)
-	// {
-	//     return json_decode($value);
-	// }
+	public function getAgentCodeAttribute($value)
+	{
+		return json_decode($value);
+	}
 	/*
 	* [ Get the available Encoder ]
 	*
@@ -129,16 +121,5 @@ class Teams extends Model
 		});
 		return $this->whereNotIn('team_id', $cluster)->get();
 	}
-
-	// public function setAgentCodeAttribute($value)
-	// {
-	//     $this->attributes['agent_code'] = json_encode($value);
-	// }
-	//
-	// public function getAgentCodeAttribute($value)
-	// {
-	//     return json_decode($value);
-	// }
-
 
 }

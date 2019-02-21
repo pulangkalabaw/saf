@@ -44,7 +44,8 @@
                                             </div>
                                         </div>
                                         <div class="clearfix"></div><br>
-                                        <form action="" method="POST">
+                                        <form action="{{route('attendance.store')}}" method="POST">
+                                            {{ csrf_field() }}
                                             <table class="table table-hovered table-striped">
                                                 <thead>
                                                     <tr>
@@ -56,7 +57,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    @foreach($attendance['unpresent'] as $unpresent)
+                                                    @foreach($attendance['unpresent'] as $index => $value)
                                                     <tr>
                                                         <td class="text-center">
                                                             <div class="form-group">
@@ -67,9 +68,10 @@
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td>{{ $unpresent['fname'] . ' ' . $unpresent['lname'] }}</td>
+                                                        <td>{{ $value['fname'] . ' ' . $value['lname'] }}</td>
                                                         <td>
-                                                            <select class="form-control" name="activity[]">
+                                                            <input name="user[{{ $index }}][user_id]" class="form-control" type="hidden" value={{ $value['id'] }}>
+                                                            <select class="form-control" name="user[{{ $index }}][activity]">
                                                                 <option>Blitz</option>
                                                                 <option>Saturation</option>
                                                             </select>
@@ -77,30 +79,27 @@
                                                         <td>
                                                             <div class="form-group">
                                                                 <div class="col-sm-7">
-                                                                    <input name="location[]" class="form-control" type="text">
+                                                                    <input name="user[{{ $index }}][location]" class="form-control" type="text">
                                                                 </div>
                                                             </div>
                                                         </td>
                                                         <td>
                                                             <div class="col-sm-7">
-                                                                <input name="remarks[]" class="form-control" type="text">
+                                                                <input name="user[{{ $index }}][remarks]" class="form-control" type="text">
+                                                                <input type="hidden" name="user[{{ $index }}][status]" class="setStatus" id="status">
                                                             </div>
                                                         </td>
                                                     </tr>
                                                     @endforeach
                                                 </tbody>
                                             </table>
-                                        </form>
                                         <br>
-                                        <div class="panel-body">
-                                            <form>
-                                                <input type="hidden" name="0">
-                                                <input type="hidden" name="1">
-                                                <input type="hidden" name="null">
-                                                <button class="btn btn-primary" type="button">Present</button>
-                                                <button class="btn btn-danger" type="button">Absent</button>
-                                            </form>
-                                        </div>
+                                            <div class="panel-body">
+                                                {{-- <input type="hidden" id="status"> --}}
+                                                <button class="btn btn-primary" onclick="$('.setStatus').val('1')">Present</button>
+                                                <button class="btn btn-danger" onclick="$('.setStatus').val('0') ">Absent</button>
+                                            </div>
+                                        </form>
                                         <div class="row">
                                             <div class="col-md-10">
                                             </div>
@@ -121,16 +120,9 @@
                                         <table class="table table-hovered table-striped">
                                             <thead>
                                                 <tr>
-                                                    <th>
-                                                        Name
-                                                    </th>
-                                                    <th>
-                                                        Activities
-                                                    </th>
-                                                    <th>
-                                                        Location
-                                                    </th>
-
+                                                    <th>Name</th>
+                                                    <th>Activities</th>
+                                                    <th>Location</th>
                                                     <th>Remarks</th>
                                                 </tr>
                                             </thead>
@@ -165,16 +157,9 @@
                                         <table class="table table-hovered table-striped">
                                             <thead>
                                                 <tr>
-                                                    <th>
-                                                        Name
-                                                    </th>
-                                                    <th>
-                                                        Activities
-                                                    </th>
-                                                    <th>
-                                                        Location
-                                                    </th>
-
+                                                    <th>Name</th>
+                                                    <th>Activities</th>
+                                                    <th>Location</th>
                                                     <th>Remarks</th>
                                                 </tr>
                                             </thead>

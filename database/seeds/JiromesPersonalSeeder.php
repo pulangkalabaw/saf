@@ -4,6 +4,7 @@ use Illuminate\Database\Seeder;
 use Faker\Factory as Faker;
 Use App\User;
 use App\Teams;
+use App\Clusters;
 class JiromesPersonalSeeder extends Seeder
 {
     /**
@@ -24,7 +25,18 @@ class JiromesPersonalSeeder extends Seeder
             'isActive' => 1,
             'remember_token' => str_random(10),
         ]);
-        $users = array(
+        // CLUSTER LEADER
+        $user_cl = User::insertGetId([
+            'fname' => 'Sarah Jane',
+            'lname' => 'Sarasua',
+            'email' => 'sarah@gmail.com',
+            'password' => bcrypt('sadsad'),
+            'role' => base64_encode('cl'),
+            'isActive' => 1,
+            'remember_token' => str_random(10),
+        ]);
+        // TEAM LEADER
+        $users_tl = array(
             'fname' => 'jiromes Angel',
             'lname' => 'Baril',
             'email' => 'jiromes@gmail.com',
@@ -33,7 +45,7 @@ class JiromesPersonalSeeder extends Seeder
             'isActive' => 1,
             'remember_token' => str_random(10),
         );
-        $admin_id = User::insertGetId($users);
+        $user_tl = User::insertGetId($users_tl);
         $user_agents = array(
             array(
                 'fname' => 'Monica',
@@ -67,13 +79,22 @@ class JiromesPersonalSeeder extends Seeder
             )
         );
         User::insert($user_agents);
-        $user = User::where('role', base64_encode('agent'))->take(5)->orderBy('id', 'desc')->pluck('id');
 
+        // CLUSTER
+        $users_teams = User::where('id', $user_tl)->take(5)->orderBy('id', 'desc')->pluck('id');
+        Clusters::create([
+            'cluster_id' => rand(1111, 9999),
+            'cluster_name' => 'Team HaIsZt_b3nteqUa4htRo0',
+            'cl_id' => $user_cl,
+            'team_ids' => $users_teams,
+        ]);
+
+        $user = User::where('role', base64_encode('agent'))->take(5)->orderBy('id', 'desc')->pluck('id');
         // TEAM SELECT
         Teams::create([
             'team_name' => 'Team HaIsZt_b3nteqUa4htRo0',
             'team_id' => rand(1111, 9999),
-            'tl_id' => $admin_id,
+            'tl_id' => $user_tl,
             'agent_code' => $user,
         ]);
     }
