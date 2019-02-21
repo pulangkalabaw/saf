@@ -24,13 +24,12 @@ $factory->define(App\User::class, function (Faker $faker) {
     return [
         'fname' => $faker->firstname,
         'lname' => $faker->lastname,
-        // 'email' => $faker->unique()->safeEmail,
-        'email' => 'kllopez@iplusonline.com',
+        'email' => $faker->unique()->safeEmail,
+        // 'email' => 'kllopez@iplusonline.com',
         'password' => $password ?: $password = bcrypt('secret'),
         'role' => base64_encode($role),
         'isActive' => 1,
-        'agent_code' => ($role == 'agent' || $role == 'agent_referral') ? rand(1111, 9999) : '',
         'remember_token' => str_random(10),
-        'pat' => ($role == 'agent' || $role == 'agent_referral') ? rand(1111, 9999) : '',
+        'target' => '10000',
     ];
 });

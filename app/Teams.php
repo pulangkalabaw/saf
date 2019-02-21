@@ -54,21 +54,12 @@ class Teams extends Model
 		$user = new User();
 		$val = trim($value);
 
-
 		// Search from the user table first
 		// Use this id to search for the cl, tl, encoder, agent_code
 		$return_query = $query->where('teams.team_name', 'LIKE', "%".$val."%")
 		->orWhere('tl.fname', 'LIKE', "%".$val."%")->orWhere('tl.lname', 'LIKE', "%".$val."%")
 		->orWhere('ac.fname', 'LIKE', "%".$val."%")->orWhere('ac.lname', 'LIKE', "%".$val."%")
 		->orWhere('ac.agent_code', 'LIKE', "%".$val."%");
-
-		// if (!empty($user->search($val)->first())) {
-		//     $user_id = $user->search($val)->first()->id;
-		//     $agent_code = $user->search($val)->first()->agent_code;
-		//     $return_query = $return_query
-		//     ->orWhere('teams.tl_id', $user_id)
-		//     ->orWhere('teams.agent_code', $agent_code);
-		// }
 
 		// Then try to search to teams
 		return $return_query;
@@ -80,25 +71,19 @@ class Teams extends Model
 	* [ Get the Team Leader Information using tl_id ]
 	*
 	*/
-	public function getTeamLeader() {
-		return $this->hasOne('App\User', 'id', 'tl_id');
+	public function getTeamLeader ($tl_ids) {
+		$user = new User();
+		// $tl_ids = json_decode($tl_ids);
+		return $user->whereIn('id', $tl_ids)->get();
 	}
-
-	/*
-	* [ Get the Agent Information using agent_code ]
-	*
-	*/
-	// public function getAgentCode() {
-	// 	return $this->hasOne('App\User', 'id', 'agent_code');
-	// }
 
 	/**
 	* Get all agents
 	*/
-	public function getAgents ($ids) {
+	public function getAgents ($agent_ids) {
 		$user = new User();
-		// $ids = json_decode($id);
-		return $user->whereIn('id', [$ids])->get();
+		// $agent_ids = json_decode($agent_ids);
+		return $user->whereIn('id', $agent_ids)->get();
 	}
 
 	/*
@@ -111,24 +96,34 @@ class Teams extends Model
 		return $user->whereIn('id', $ids)->get();
 	}
 
-	public function setAgentCodeAttribute($value)
+	/**
+	 * SET AND GET FOR AGENT ID
+	 */
+
+	public function setAgentIdsAttribute($value)
 	{
-		$this->attributes['agent_code'] = json_encode($value);
+		$this->attributes['agent_ids'] = json_encode($value);
 	}
 
-	public function getAgentCodeAttribute($value)
+	public function getAgentIdsAttribute($value)
 	{
 		return json_decode($value);
 	}
-	/*
-	* [ Get the available Encoder ]
-	*
-	*/
-	public function getAvailableTeams() {
-		$cluster = Clusters::select('team_ids')->get()->map(function($r) {
-			return json_decode($r['team_ids']);
-		});
-		return $this->whereNotIn('team_id', $cluster)->get();
+
+
+	/**
+	 * SET AND GET FOR TEAM LEADER
+	 */
+
+	public function setTlIdsAttribute($value)
+	{
+		$this->attributes['tl_ids'] = json_encode($value);
 	}
+
+	public function getTlIdsAttribute($value)
+	{
+		return json_decode($value);
+	}
+
 
 }

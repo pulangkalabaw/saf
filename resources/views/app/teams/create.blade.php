@@ -48,6 +48,14 @@
                             <div class="row">
                                 <div class="col-md-7">
 
+									<div>
+                                        <div class="col-md-3">Team code</div>
+                                        <div class="col-md-7">
+                                            <input type="text" maxlength="4" name="team_id" id="" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
                                     <div>
                                         <div class="col-md-3">Team name</div>
                                         <div class="col-md-7">
@@ -59,11 +67,13 @@
                                     <div>
                                         <div class="col-md-3">Team Leader</div>
                                         <div class="col-md-7">
-                                            <select name="tl_id" id="" class="form-control" required="">
-                                                @foreach ($users->getAvailableTeamLeader() as $tl)
-                                                <option value="{{ $tl->id }}">{{ $tl->fname . ' ' . $tl->lname }}</option>
+
+											<select name="tl_ids[]" id="" class="form-control selectpicker" multiple="">
+                                                @foreach ($users as $user)
+                                                <option value="{{ $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
                                                 @endforeach
                                             </select>
+
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -71,13 +81,13 @@
                                     <div>
                                         <div class="col-md-3">Agent</div>
                                         <div class="col-md-7">
-											{{ $users->getAvailableAgent() }}
-											
-                                            <select name="agent_code[]" id="" class="form-control selectpicker" multiple="" required="">
-                                                @foreach ($users->getAvailableAgent() as $agent)
-                                                <option value="{{ $agent->id }}">{{ $agent->fname . ' ' . $agent->lname }}</option>
+
+                                            <select name="agent_ids[]" id="" class="form-control selectpicker" multiple="">
+                                                @foreach ($users as $user)
+                                                <option value="{{ $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
                                                 @endforeach
                                             </select>
+
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>

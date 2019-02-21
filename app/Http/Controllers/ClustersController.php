@@ -17,6 +17,19 @@ class ClustersController extends Controller
      */
     public function index(Request $request)
     {
+
+		$cluters = new Clusters();
+
+		// Count all before paginate
+		$total = $cluters->count();
+
+		// Pagination
+		$cluters = $cluters->paginate((!empty($request->show) ? $request->show : 10));
+
+		return view('app.clusters.index', ['clusters' => $cluters, 'clusters_total' => $total]);
+
+
+
          // Model
         $clusters = new Clusters();
 
@@ -59,7 +72,7 @@ class ClustersController extends Controller
         $users = new User();
         $teams = new Teams();
         return view('app.clusters.create', [
-            'users' => $users->getAvailableClusterLeader(), // clusters
+            'users' => $users->get(), // clusters
             'teams' => $teams->get(),
         ]);
     }
