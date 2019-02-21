@@ -149,7 +149,7 @@
 							<div class="sidebar__menu">
 								<div class="sidebar__title">Settings</div>
 								<ul class="nav nav-menu">
-									<li>
+									{{-- <li>
 										<a href="{{ route('app.statuses.index') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-quote-right"></i></div>
 											<div class="nav-menu__text"><span>Status Management</span></div>
@@ -160,7 +160,7 @@
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-bullseye"></i></div>
 											<div class="nav-menu__text"><span>Product Management</span></div>
 										</a>
-									</li>
+									</li> --}}
 									<li>
 										<a href="{{ route('app.devices.index') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-mobile"></i></div>

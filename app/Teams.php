@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Teams extends Model
 {
+
     //
     protected $table = "teams";
     protected $guarded = [];
@@ -111,14 +112,14 @@ class Teams extends Model
         return json_decode($value);
     }
 	/*
-     * [ Get the available Encoder ]
-     *
-     */
-    public function getAvailableTeams() {
+	* [ Get the available Encoder ]
+	*
+	*/
+	public function getAvailableTeams() {
 		$cluster = Clusters::select('team_ids')->get()->map(function($r) {
 			return json_decode($r['team_ids']);
 		});
-        return $this->whereNotIn('team_id', $cluster)->get();
+  return $this->whereNotIn('team_id', $cluster)->get();
     }
 
 }
