@@ -19,8 +19,14 @@ class MessageBoardController extends Controller
     {
         $msgboard_tbl = new MessageBoard();
         // $data = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]])->where('team_id', 'like', '%'.Session::get('_t')[0].'%')->with(['user'])->get();
-        $data['allposts'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
-        $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
+
+        if( !empty(Session::get('_c')[0]) ){
+            $data['allposts'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
+            $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
+        }else{
+            $data['allposts'] = $msgboard_tbl->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
+            $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
+        }
 
         
         // dd(Session::get('_t'));
@@ -62,7 +68,7 @@ class MessageBoardController extends Controller
                 $msgboard_tbl->where('pinned',1)->update(['pinned'=>0]);
             }
             $dom = new \DomDocument();
-            $dom->loadHtml($request->message, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD); 
+            $dom->loadHtml($request->message, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
             $images = $dom->getElementsByTagName('img');
             // foreach($images as $k => $img){
 
@@ -97,7 +103,6 @@ class MessageBoardController extends Controller
 
             return $this->index();
         }else{
-            // $request->session()->with('errors', $validator->errors());
             return $this->index($validator->errors());
         }
 
@@ -127,15 +132,42 @@ class MessageBoardController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * UPDATE MSG BOARD || CAN ALSO BE USED FOR CHANGE PINNED POST
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $msgboard_tbl = new MessageBoard();
+
+        if(!empty($request->post('pin'))){
+            // clicked pin button
+
+            $msgboard_tbl->where('pinned', 1)->update(['pinned' => 0]);
+            $msgboard_tbl->where('id',$request->post('id'))->update(['pinned' => 1]);
+
+            return 'success update pin';
+        }else{
+            // Clicked update message button
+            $validator = Validator::make($request->except('_token'),[
+                'message' => 'required',
+            ]);
+
+            if(!$validator->fails()){
+
+                $msgboard_tbl->where('id', $request->post('id'))->update([
+                    'subject' => $request->subject,
+                    'message' => $request->message,
+                ]);
+
+                // return 'success update message';
+                return $this->index();
+            }else{
+                return $this->index($validator->errors());
+            }
+        }
     }
 
     /**
@@ -146,7 +178,14 @@ class MessageBoardController extends Controller
      */
     public function destroy($id)
     {
-        //
+        //find id first
+        $find_id = MessageBoard::findOrFail($id);
+        if($find_id){
+            // delete post
+            MessageBoard::where('id',$id)->delete();
+            // return to index
+            return $this->index();
+        }
     }
     /**
      *return view of the message board
