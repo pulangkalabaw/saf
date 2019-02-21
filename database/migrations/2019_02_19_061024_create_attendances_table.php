@@ -18,7 +18,7 @@ class CreateAttendancesTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->string('activities');
             $table->string('location');
-            $table->string('remarks');
+            $table->string('remarks')->nullable();
             $table->tinyInteger('status')->nullable();
             $table->timestamps();
         });

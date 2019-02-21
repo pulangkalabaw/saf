@@ -14,6 +14,7 @@
 	<link href="{{ asset('assets/libs/ionrangeslider/css/ion.rangeSlider.css') }}" rel="stylesheet">
 	<link href="{{ asset('assets/libs/ionrangeslider/css/ion.rangeSlider.skinFlat.css') }}" rel="stylesheet">
 	<link href="{{ asset('assets/libs/summernote/summernote.css') }}" rel="stylesheet">
+	<link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
 
 	<style>
 	input[type="search"]::-webkit-search-cancel-button {

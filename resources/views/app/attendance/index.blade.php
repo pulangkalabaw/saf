@@ -38,61 +38,53 @@
                             <div class="tab-content">
                                 <div class="tab-pane active" id="unpresent" role="tabpanel">
                                     <div class="panel-body">
-                                        <div class="row">
-                                            <div class="col-md-3"></div>
-                                            <div class="col-md-5 col-xs-5">
-                                            </div>
-                                        </div>
-                                        <div class="clearfix"></div><br>
                                         <form action="{{route('attendance.store')}}" method="POST">
                                             {{ csrf_field() }}
-                                            <table class="table table-hovered table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th><input id="ch6" type="checkbox" onclick="toggle(this);"> Select all</th>
-                                                        <th>Name</th>
-                                                        <th>Activities</th>
-                                                        <th>Location</th>
-                                                        <th>Remarks</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @foreach($attendance['unpresent'] as $index => $value)
-                                                    <tr>
-                                                        <td class="text-center">
-                                                            <div class="form-group">
-                                                                <div class="col-sm-10">
-                                                                    <div class="checkbox">
-                                                                        <input id="chb1" type="checkbox" name="selected_user[]">
+                                            <div class="table-responsive">
+                                                <table class="table table-hovered table-striped">
+                                                    <thead>
+                                                        <tr>
+                                                            <th><input id="ch6" type="checkbox" onclick="toggle(this);"> Select all</th>
+                                                            <th>{{ Auth::user()->role == base64_encode('tl') ? 'Agents Name': (Auth::user()->role == base64_encode('cl') ? 'Teams Name' : '') }}</th>
+                                                            <th>Activities</th>
+                                                            <th>Location</th>
+                                                            <th>Remarks</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($attendance['unpresent'] as $index => $value)
+                                                        <tr>
+                                                            <td class="text-center">
+                                                                <div class="form-group">
+                                                                    <div class="col-sm-10">
+                                                                        <div class="checkbox">
+                                                                            <input id="chb1" type="checkbox" name="user[{{ $index }}][selected_row]">
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>{{ $value['fname'] . ' ' . $value['lname'] }}</td>
-                                                        <td>
-                                                            <input name="user[{{ $index }}][user_id]" class="form-control" type="hidden" value={{ $value['id'] }}>
-                                                            <select class="form-control" name="user[{{ $index }}][activity]">
-                                                                <option>Blitz</option>
-                                                                <option>Saturation</option>
-                                                            </select>
-                                                        </td>
-                                                        <td>
-                                                            <div class="form-group">
-                                                                <div class="col-sm-7">
-                                                                    <input name="user[{{ $index }}][location]" class="form-control" type="text">
+                                                            </td>
+                                                            <td class="text-bg-light"><span class="margin-vertical">{{ $value['fname'] . ' ' . $value['lname'] }}</span></td>
+                                                            <td>
+                                                                <input name="user[{{ $index }}][user_id]" class="form-control" type="hidden" value={{ $value['id'] }}>
+                                                                <select class="form-control input-gray" name="user[{{ $index }}][activities]">
+                                                                    <option>Blitz</option>
+                                                                    <option>Saturation</option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input name="user[{{ $index }}][location]" class="form-control input-gray" type="text">
                                                                 </div>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="col-sm-7">
-                                                                <input name="user[{{ $index }}][remarks]" class="form-control" type="text">
+                                                            </td>
+                                                            <td>
+                                                                <input name="user[{{ $index }}][remarks]" class="form-control input-gray" type="text">
                                                                 <input type="hidden" name="user[{{ $index }}][status]" class="setStatus" id="status">
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
+                                                            </td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         <br>
                                             <div class="panel-body">
                                                 {{-- <input type="hidden" id="status"> --}}
@@ -110,33 +102,29 @@
                                 </div>
                                 <div class="tab-pane" id="present" role="tabpanel">
                                     <div class="panel-body">
-                                        <div class="row">
-                                            <div class="col-md-3"></div>
-                                            <div class="col-md-5 col-xs-5">
-                                            </div>
-                                        </div>
-                                        <div class="clearfix"></div><br>
+                                        <div class="table-responsive">
+                                            <table class="table table-hovered table-striped">
 
-                                        <table class="table table-hovered table-striped">
-                                            <thead>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>Activities</th>
-                                                    <th>Location</th>
-                                                    <th>Remarks</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($attendance['present'] as $present)
-                                                <tr>
-                                                    <td>{{ $present['users']['lname'] }}</td>
-                                                    <td>{{ $present['activities'] }}</td>
-                                                    <td>{{ $present['location'] }}</td>
-                                                    <td>{{ $present['remarks'] }}</td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Activities</th>
+                                                        <th>Location</th>
+                                                        <th>Remarks</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($attendance['present'] as $present)
+                                                    <tr>
+                                                        <td>{{ $present['users']['fname'] . ' ' . $present['users']['lname'] }}</td>
+                                                        <td>{{ $present['activities'] }}</td>
+                                                        <td>{{ $present['location'] }}</td>
+                                                        <td>{{ $present['remarks'] }}</td>
+                                                    </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
                                         <br>
                                         <div class="row">
                                             <div class="col-md-10">
@@ -166,7 +154,7 @@
                                             <tbody>
                                                 @foreach($attendance['absent'] as $absent)
                                                 <tr>
-                                                    <td>{{ $absent['users']['lname'] }}</td>
+                                                    <td>{{ $absent['users']['fname'] . ' ' . $absent['users']['lname'] }}</td>
                                                     <td>{{ $absent['activities'] }}</td>
                                                     <td>{{ $absent['location'] }}</td>
                                                     <td>{{ $absent['remarks'] }}</td>

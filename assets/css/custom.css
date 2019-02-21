@@ -1,0 +1,15 @@
+/* PUT YOUR CUSTOM CSS HERE */
+
+/* INPUT COLOR */
+.input-gray {
+    /* background: #202428 !important; */
+    background: #30363C !important;
+    color: white !important;
+}
+
+/* CUSTOM TEXT */
+.text-bg-light {
+    color: #fff !important;
+}
+
+/* CUSTOM MARGIN */
