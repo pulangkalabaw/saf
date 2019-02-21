@@ -77,7 +77,10 @@
                                     </div>
                                     <div class="col-md-12">
                                         {!! $pinned->message !!}
-                                        <h5 class="text-right">Posted by: <b>{{ $pinned->user->fname.' '.$pinned->user->lname }}</b></h5>
+                                        <h5 class="text-right">
+                                            Posted by: <b>{{ $pinned->user->fname.' '.$pinned->user->lname }}</b><br>
+                                            <small>{{ $pinned->created_at->diffForHumans() }}</small>
+                                        </h5>                                        
                                     </div>
                                 </div>
 

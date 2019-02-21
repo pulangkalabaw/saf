@@ -19,10 +19,16 @@ class MessageBoardController extends Controller
     {
         $msgboard_tbl = new MessageBoard();
         // $data = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]])->where('team_id', 'like', '%'.Session::get('_t')[0].'%')->with(['user'])->get();
-        $data['allposts'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
-        $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
 
+        if( !empty(Session::get('_c')[0]) ){
+            $data['allposts'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
+            $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
+        }else{
+            $data['allposts'] = $msgboard_tbl->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
+            $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
+        }
 
+        
         // dd(Session::get('_t'));
         return view('app.message_board.message_board', [
             'messages' => $data['allposts'],
