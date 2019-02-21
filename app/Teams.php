@@ -88,8 +88,17 @@ class Teams extends Model
 	* [ Get the Agent Information using agent_code ]
 	*
 	*/
-	public function getAgentCode() {
-		return $this->hasOne('App\User', 'id', 'agent_code');
+	// public function getAgentCode() {
+	// 	return $this->hasOne('App\User', 'id', 'agent_code');
+	// }
+
+	/**
+	* Get all agents
+	*/
+	public function getAgents ($ids) {
+		$user = new User();
+		// $ids = json_decode($id);
+		return $user->whereIn('id', [$ids])->get();
 	}
 
 	/*

@@ -110,7 +110,6 @@ class TeamsController extends Controller
         //
         $teams = Teams::where('team_id', $id)->with([
             'getTeamLeader',
-            'getAgentCode',
         ])->firstOrFail();
 
         return view('app.teams.show', ['team' => $teams]);
@@ -127,10 +126,12 @@ class TeamsController extends Controller
         $users = new User();
         $teams = Teams::where('team_id', $id)->with([
             'getTeamLeader',
-            'getAgentCode',
         ])->firstOrFail();
 
-        return view('app.teams.edit', ['team' => $teams, 'users' => $users]);
+		$agents = $users->where('role', base64_encode('agent'))
+		->orWhere('role', base64_encode('agent'))
+		->get();
+        return view('app.teams.edit', ['team' => $teams, 'users' => $users, 'agents' => $agents]);
     }
 
     /**
@@ -152,7 +153,6 @@ class TeamsController extends Controller
 
         if ($v->fails()) return back()->withErrors($v->errors());
 
-		$request['agent_code'] = json_encode($request['agent_code']);
         if ($teams->update($request->except(['_token', '_method']))) {
             return back()->with([
                 'notif.style' => 'success',
