@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Attendance;
 use App\User;
 use App\Teams;
+use App\Clusters;
 use Faker\Factory as Faker;
 
 class AttendanceController extends Controller
@@ -30,17 +31,24 @@ class AttendanceController extends Controller
      }
     public function index()
     {
-        $get_agents = Teams::where('tl_id', Auth::user()->id)->value('agent_code'); // GET TL/CL's AGENT/S
+        if(Auth::user()->role == base64_encode('tl')){
+            $get_agents = Teams::where('tl_id', Auth::user()->id)->value('agent_code'); // GET TL/CL's AGENT/S
+        }
+        else if(Auth::user()->role == base64_encode('cl')){
+            $get_agents = Clusters::where('cl_id', Auth::user()->id)->value('tl_ids'); // GET TL/CL's AGENT/S
+        }
 
         // GET UNPRESENT AGENTS
         $selected_unpresent_agents = [];
         foreach($get_agents as $agent){
             // CHECK IF AGENT IS ALREADY EXISTING ON ATTENDANCE TABLE ON THIS DAY
+            // return $agent;
             $check_agent = Attendance::where('user_id', $agent)->whereDate('created_at', Carbon::today())->first();
-            if(empty($check_agent)){
+            if(empty($check_agent) || $check_agent == null){
                 array_push($selected_unpresent_agents, $agent);
             }
         }
+        // return $selected_unpresent_agents;
         $attendance['unpresent'] = User::whereIn('id', $selected_unpresent_agents)->get();
 
         // GET PRESENT AGENTS
@@ -70,19 +78,24 @@ class AttendanceController extends Controller
      */
     public function store(Request $request)
     {
-        return $request->only('user');
+        // return $request->all();
         $data = [];
-        foreach($request->only('user') as $user){
-            $data = [
-                "user_id" => "61",
-                "activity" => "Saturation",
-                "location" => "pasig city",
-                "remarks" => null,
-                "status" => "1"
-            ];
+        foreach($request->only('user')['user'] as $user){
+            if(!empty($user['selected_row'])){
+                $set_data = [
+                    "user_id" => $user['user_id'],
+                    "activities" => $user['activities'],
+                    "location" => $user['location'],
+                    "remarks" => $user['remarks'],
+                    "status" => $user['status'],
+                    'created_at' => Carbon::today(),
+                    'updated_at' => Carbon::today(),
+                ];
+                array_push($data, $set_data);
+            }
         }
-        return $data;
-        Attendance::insert($request->only('user'));
+        // return $data;
+        Attendance::insert($data);
         return back();
     }
 
