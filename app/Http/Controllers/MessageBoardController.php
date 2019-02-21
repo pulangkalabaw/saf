@@ -69,7 +69,10 @@ class MessageBoardController extends Controller
             }
             $dom = new \DomDocument();
             $dom->loadHtml($request->message, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-            $images = $dom->getElementsByTagName('img');
+
+            // *** FOR IMAGES ***
+
+            // $images = $dom->getElementsByTagName('img');
             // foreach($images as $k => $img){
 
             //     $data = $img->getAttribute('src');
@@ -91,10 +94,13 @@ class MessageBoardController extends Controller
             //     $img->setAttribute('src', $image_name);
 
             // }
+
+            // *** END FOR IMAGES ***
+
             $detail = $dom->saveHTML();
             $msgboard_tbl->create([
-                'cluster_id' => Session::get('_c')[0],
-                'team_id' => json_encode(Session::get('_t')),
+                'cluster_id' => (!empty(Session::get('_c'))) ? Session::get('_c')[0] : null,
+                'team_id' => (!empty(Session::get('_t'))) ? json_encode(Session::get('_t')) : null,
                 'subject' => $request->subject,
                 'message' => $detail,
                 'posted_by' => Auth()->user()->id,
@@ -103,6 +109,7 @@ class MessageBoardController extends Controller
 
             return $this->index();
         }else{
+            // $request->session()->with('errors', $validator->errors());
             return $this->index($validator->errors());
         }
 
@@ -148,7 +155,8 @@ class MessageBoardController extends Controller
             $msgboard_tbl->where('pinned', 1)->update(['pinned' => 0]);
             $msgboard_tbl->where('id',$request->post('id'))->update(['pinned' => 1]);
 
-            return 'success update pin';
+            return $this->index();
+
         }else{
             // Clicked update message button
             $validator = Validator::make($request->except('_token'),[
@@ -178,21 +186,17 @@ class MessageBoardController extends Controller
      */
     public function destroy($id)
     {
+        
+    }
+   // delete specific post
+    public function delete(Request $request){
         //find id first
-        $find_id = MessageBoard::findOrFail($id);
+        $find_id = MessageBoard::findOrFail($request->post('id'));
         if($find_id){
             // delete post
-            MessageBoard::where('id',$id)->delete();
+            MessageBoard::where('id',$request->post('id'))->delete();
             // return to index
             return $this->index();
         }
-    }
-    /**
-     *return view of the message board
-     */
-    public function messageBoard(){
-
-        return view('app.message_board.message_board');
-
     }
 }

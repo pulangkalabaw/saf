@@ -45,6 +45,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     // Message Board
     Route::resource('messages', 'MessageBoardController');
     // Route::get('message-board', 'MessageBoardController@messageBoard')->name('messageboard');
+    // delete specific post
+    Route::post('delete-post', 'MessageBoardController@delete')->name('delete-post');
+
 
     // For non-admin
     Route::get('your-clusters', 'NonAdminController@yourClusters')->name('your.clusters');
