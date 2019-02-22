@@ -28,7 +28,7 @@ class MessageBoardController extends Controller
             $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
         }
 
-        
+
         // dd(Session::get('_t'));
         return view('app.message_board.message_board', [
             'messages' => $data['allposts'],
@@ -56,33 +56,6 @@ class MessageBoardController extends Controller
     {
         //
         // return $request->all();
-<<<<<<< HEAD
-        $data = [];
-        if(!empty($request->file('img'))){
-            $image = $request->file('img');
-            $name=$image->getClientOriginalName();
-                $image->move(public_path('assets/images/message_board'),$image);
-                dd(file_exists(public_path('/images/message_board')));
-
-                // dd($image->move(public_path('/images/message_board'),$name));
-
-
-            // foreach($request->file('img') as $image)
-            // {
-            //     $name=$image->getClientOriginalName();
-            //     $image->move(public_path().'/images/message_board', $name);
-            //
-            //     $data[] = $name;
-            //
-            // }
-
-        }else{
-
-            dd('asp');
-        }
-        dd('asd');
-=======
->>>>>>> ddaa218caa219fb6e181c7ae6f39c16bbb7b8c33
         $validator = Validator::make($request->all(),[
             'message' => 'required',
             'subject' => 'required',
@@ -213,7 +186,7 @@ class MessageBoardController extends Controller
      */
     public function destroy($id)
     {
-        
+
     }
    // delete specific post
     public function delete(Request $request){
