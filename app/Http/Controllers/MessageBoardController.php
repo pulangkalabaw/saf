@@ -7,7 +7,6 @@ use App\MessageBoard;
 
 use Validator;
 use Session;
-use File;
 
 class MessageBoardController extends Controller
 {
@@ -29,7 +28,7 @@ class MessageBoardController extends Controller
             $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
         }
 
-
+        
         // dd(Session::get('_t'));
         return view('app.message_board.message_board', [
             'messages' => $data['allposts'],
@@ -57,6 +56,7 @@ class MessageBoardController extends Controller
     {
         //
         // return $request->all();
+<<<<<<< HEAD
         $data = [];
         if(!empty($request->file('img'))){
             $image = $request->file('img');
@@ -81,6 +81,8 @@ class MessageBoardController extends Controller
             dd('asp');
         }
         dd('asd');
+=======
+>>>>>>> ddaa218caa219fb6e181c7ae6f39c16bbb7b8c33
         $validator = Validator::make($request->all(),[
             'message' => 'required',
             'subject' => 'required',
@@ -130,8 +132,6 @@ class MessageBoardController extends Controller
                 'message' => $detail,
                 'posted_by' => Auth()->user()->id,
                 'pinned' => (!empty($request->pinned)) ? $request->pinned : 0,
-
-
             ]);
 
             return $this->index();
@@ -213,7 +213,7 @@ class MessageBoardController extends Controller
      */
     public function destroy($id)
     {
-
+        
     }
    // delete specific post
     public function delete(Request $request){

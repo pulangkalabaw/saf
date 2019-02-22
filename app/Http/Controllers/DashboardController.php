@@ -7,9 +7,7 @@ use App\Clusters;
 use App\Statuses;
 use App\Application;
 use App\ApplicationStatus;
-use App\Attendance;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -26,9 +24,8 @@ class DashboardController extends Controller
         $statuses_model = new Statuses();
         $teams_model = new Teams();
         $clusters_model = new Clusters();
-        $attendance_model = new Attendance();
 
-        //
+        // 
         $no_of_status_that_used = $statuses_model->get(['id', 'status'])->map(function ($r) use ($application_model){
             $r['total_count'] = $application_model->where('status', $r['id'])->count();
             return $r;
@@ -50,14 +47,11 @@ class DashboardController extends Controller
 
         // dd($application_counter_by_teams);
 
-        $attendance = $attendance_model->where('created_at','like', '%'.Carbon::today()->toDateString().'%')->get();
-        // $attendance = Carbon::today()->toDateString();
 
         return view('app.dashboard', [
             'no_of_status_that_used' => $no_of_status_that_used,
             'application_counter_by_cluster' => $application_counter_by_cluster,
             'application_counter_by_teams' => $application_counter_by_teams,
-            'attendance' => $attendance,
         ]);
     }
 }
