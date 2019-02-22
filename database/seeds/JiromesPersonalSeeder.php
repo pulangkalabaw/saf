@@ -36,16 +36,8 @@ class JiromesPersonalSeeder extends Seeder
             'remember_token' => str_random(10),
         ]);
         // TEAM LEADER
-        $users_tl = array(
-            'fname' => 'jiromes Angel',
-            'lname' => 'Baril',
-            'email' => 'jiromes@gmail.com',
-            'password' => bcrypt('sadsad'),
-            'role' => base64_encode('tl'),
-            'isActive' => 1,
-            'remember_token' => str_random(10),
-        );
-        $user_tl = User::insertGetId($users_tl);
+        $user_tl = User::where('email', 'jiromes@gmail.com')->value('id');
+
         $user_agents = array(
             array(
                 'fname' => 'Monica',
@@ -80,22 +72,31 @@ class JiromesPersonalSeeder extends Seeder
         );
         User::insert($user_agents);
 
+        $user = User::where('role', base64_encode('agent'))->take(5)->orderBy('id', 'desc')->pluck('id');
+        // TEAM SELECT
+        $team_id = Teams::insertGetId([
+            'team_name' => 'Team HaIsZt_b3nteqUa4htRo0',
+            'team_id' => rand(1111, 9999),
+            'tl_id' => $user_tl,
+            'agent_code' => $user,
+        ]);
+
         // CLUSTER
         $users_teams = Teams::take(3)->orderBy('id', 'desc')->pluck('team_id');
-        Clusters::create([
+        $cluster_id = Clusters::insertGetId([
             'cluster_id' => rand(1111, 9999),
             'cluster_name' => 'Team m4pHaG_M4ha4L',
             'cl_id' => $user_cl,
             'team_ids' => $users_teams,
         ]);
 
-        $user = User::where('role', base64_encode('agent'))->take(5)->orderBy('id', 'desc')->pluck('id');
-        // TEAM SELECT
-        Teams::create([
-            'team_name' => 'Team HaIsZt_b3nteqUa4htRo0',
-            'team_id' => rand(1111, 9999),
-            'tl_id' => $user_tl,
-            'agent_code' => $user,
-        ]);
+        // CREATE ATTENDANCE SEEDER
+        // Attendance::create([
+        //     'cluster_id' => ,
+        //     'team_id' => $user,
+        //     'cluster_name' => 'Team m4pHaG_M4ha4L',
+        //     'cl_id' => $user_cl,
+        //     'team_ids' => $users_teams,
+        // ]);
     }
 }
