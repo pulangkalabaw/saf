@@ -16,7 +16,7 @@ class User extends Authenticatable
 	* @var array
 	*/
 	protected $fillable = [
-		'name', 'email', 'password', 'role', 'isActive', 'agent_code'
+		'name', 'email', 'password', 'role', 'isActive', 'target'
 	];
 
 	/**
@@ -51,8 +51,12 @@ class User extends Authenticatable
 	*
 	*/
 	public function getAvailableClusterLeader() {
-		$cl = Clusters::select('cl_id')->get();
-		return $this->where('role', base64_encode('cl'))->whereNotIn('id', $cl)->get();
+		$tl = Clusters::get()->pluck('cl_ids');
+		$cl_decoded = json_decode($tl);
+		if (empty($cl_decoded[0]))  return $this->get();
+		return $this->whereNotIn('id', $cl_decoded)->get();
+
+
 	}
 
 
@@ -62,8 +66,10 @@ class User extends Authenticatable
 	*/
 	public function getAvailableTeamLeader() {
 		// Get all tl created
-		$tl = Teams::select('tl_id')->get();
-		return $this->where('role', base64_encode('tl'))->whereNotIn('id', $tl)->get();
+		$tl = Teams::get()->pluck('tl_ids');
+		$tl_decoded = json_decode($tl);
+		if (empty($tl_decoded[0]))  return $this->get();
+		return $this->whereNotIn('id', $tl_decoded)->get();
 	}
 
 
@@ -72,10 +78,10 @@ class User extends Authenticatable
 	*
 	*/
 	public function getAvailableAgent() {
-		$agent = Teams::get()->pluck('agent_code'); // not really a agent code, it is a user.id
-		// $agent = json_decode($agent);
-
-		return $this->where('role', base64_encode('agent'))->whereNotIn('id', ...$agent)->get();
+		$agent = Teams::get()->pluck('agent_ids'); // not really a agent code, it is a user.id
+		$agent_decoded = json_decode($agent);
+		if (empty($agent_decoded[0]))  return $this->get();
+		return $this->whereNotIn('id', $agent_decoded)->get();
 	}
 
 	/*

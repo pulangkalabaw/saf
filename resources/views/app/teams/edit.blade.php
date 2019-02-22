@@ -37,7 +37,7 @@
 									</h3>
 								</div>
 								<div class="col-md-4 text-right">
-									<a href="{{ route('app.teams.show', $team->team_id) }}" class="btn btn-xs btn-default">
+									<a href="{{ route('app.teams.show', $team->id) }}" class="btn btn-xs btn-default">
 										<span class='fa fa-eye'></span>
 									</a>
 									<a href="{{ route('app.teams.index') }}" class="btn btn-xs btn-default">
@@ -47,13 +47,22 @@
 							</div>
 						</div>
 						<div class="panel-body">
-							<form action="{{ route('app.teams.update', $team->team_id) }}" method="POST">
+							<form action="{{ route('app.teams.update', $team->id) }}" method="POST">
 								@include('includes.notif')
 
 								{{ csrf_field() }}
 								{{ method_field('PUT') }}
 								<div class="row">
 									<div class="col-md-7">
+
+										<div>
+											<div class="col-md-3">Team code</div>
+											<div class="col-md-7">
+												<input type="text" name="team_id" id="" class="form-control" value="{{ $team->team_id }}" required>
+											</div>
+										</div>
+										<div class="clearfix"></div><br>
+
 
 										<div>
 											<div class="col-md-3">Team name</div>
@@ -66,17 +75,33 @@
 										<div>
 											<div class="col-md-3">Team Leader</div>
 											<div class="col-md-7">
-
-
-												<select name="tl_id" id="" class="form-control" required="">
-													<option selected value="{{ $team->tl_id }}">
-														{{ $team->getTeamLeader->fname }}
-														{{ $team->getTeamLeader->lname }}
-													</option>
-													@foreach ($users->getAvailableTeamLeader() as $tl)
-														<option {{ $team->getTeamLeader->id == $tl->id ? 'selected' : '' }} value="{{ $tl->id }}">{{ $tl->fname . ' ' . $tl->lname }}</option>
+												<select name="tl_ids[]" id="" class="form-control selectpicker" multiple>
+													{{-- Current --}}
+													@if (!empty($team->tl_ids))
+														@foreach ($team->getTeamLeader($team->tl_ids) as $key => $tl)
+															<option selected value="{{ $tl->id }}">
+																{{ $tl->fname }}
+																{{ $tl->lname }}
+															</option>
+														@endforeach
+													@else
+														-
+													@endif
+													{{-- Available --}}
+													@foreach ($team_leaders as $tl)
+														@if (!empty($team->agent_ids))
+															<option {{ in_array($tl->id, $team->tl_ids) ? 'selected' : '' }} value="{{ $tl->id }}">
+																{{ $tl->fname . ' ' . $tl->lname }}
+															</option>
+														@else
+															<option value="{{ $tl->id }}">
+																{{ $tl->fname . ' ' . $tl->lname }}
+															</option>
+														@endif
 													@endforeach
 												</select>
+
+
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
@@ -84,38 +109,54 @@
 										<div>
 											<div class="col-md-3">Agent</div>
 											<div class="col-md-7">
-												<select name="agent_code[]" id="" class="form-control selectpicker" required="" multiple>
 
+												<select name="agent_ids[]" id="" class="form-control selectpicker" multiple>
+													{{-- Current --}}
+													@if(!empty($team->agent_ids))
+														@foreach ($team->getAgents($team->agent_ids) as $key => $agent)
+															<option selected value="{{ $agent->id }}">
+																{{ $agent->fname . ' ' . $agent->lname }}
+															</option>
+														@endforeach
+													@endif
+
+													{{-- Available --}}
 													@foreach ($agents as $agent)
-														{{-- <option {{ $team->getAgentCode->agent_code == $agent->agent_code ? 'selected' : '' }} value="{{ $agent->agent_code }}">{{ $agent->fname . ' ' . $agent->lname }}</option> --}}
-														<option {{ in_array($agent->id, $team->agent_code) ? 'selected' : '' }}
-														value="{{ $agent->id }}">
-														{{ $agent->fname . ' ' . $agent->lname }}
-													</option>
-												@endforeach
+														@if (!empty($team->agent_ids))
+															<option {{ in_array($agent->id, $team->agent_ids) ? 'selected' : '' }}
+																value="{{ $agent->id }}">
+																{{ $agent->fname . ' ' . $agent->lname }}
+															</option>
+														@else
+															<option value="{{ $agent->id }}">
+																{{ $agent->fname . ' ' . $agent->lname }}
+															</option>
+														@endif
 
-											</select>
+													@endforeach
+
+												</select>
+											</div>
 										</div>
-									</div>
-									<div class="clearfix"></div><br>
+										<div class="clearfix"></div><br>
 
-									<div>
-										<div class="col-md-3"></div>
-										<div class="col-md-7 text-right">
-											<button class="btn btn-xs btn-success">Update changes <span class='fa fa-edit'></span> </button>
+										<div>
+											<div class="col-md-3"></div>
+											<div class="col-md-7 text-right">
+												<button class="btn btn-xs btn-success">Update changes <span class='fa fa-edit'></span> </button>
+											</div>
 										</div>
-									</div>
-									<div class="clearfix"></div><br>
+										<div class="clearfix"></div><br>
 
+									</div>
 								</div>
-							</div>
-						</form>
+							</form>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-</div>
 @endsection
 
 @section ('scripts')

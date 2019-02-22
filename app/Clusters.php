@@ -27,8 +27,10 @@ class Clusters extends Model
      * [ Get the Team Leader Information using tl_id ]
      *
      */
-    public function getClusterLeader() {
-        return $this->hasOne('App\User', 'id', 'cl_id');
+    public function getClusterLeader($cl_ids) {
+		$user = new User();
+		// $tl_ids = json_decode($tl_ids);
+		return $user->whereIn('id', $cl_ids)->get();
     }
 
     /*
@@ -38,7 +40,7 @@ class Clusters extends Model
     public function getTeams($team_id, $session = []) {
         $teams = new Teams();
         $ids = $team_id;
-        $teams = $teams->whereIn('team_id', $ids)->get();
+        $teams = $teams->whereIn('id', $ids)->get();
 
         if (count($session) != 0) {
             $teams = $teams->map(function($r) use ($session){
@@ -84,6 +86,17 @@ class Clusters extends Model
     }
 
     public function getTeamIdsAttribute($value)
+    {
+        return json_decode($value);
+    }
+
+
+	public function setClIdsAttribute($value)
+    {
+        $this->attributes['cl_ids'] = json_encode($value);
+    }
+
+    public function getClIdsAttribute($value)
     {
         return json_decode($value);
     }

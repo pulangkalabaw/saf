@@ -103,14 +103,14 @@ class UserController extends Controller
         $teams_model = new Teams();
         $clusters_model = new Clusters();
 
-        $data = searchTeamAndCluster($user);
-        $teams = $teams_model->whereIn('team_id', $data['_t'])->get();
-        $clusters = $clusters_model->whereIn('cluster_id', $data['_c'])->get();
+        // $data = searchTeamAndCluster($user);
+        // $teams = $teams_model->whereIn('team_id', $data['_t'])->get();
+        // $clusters = $clusters_model->whereIn('cluster_id', $data['_c'])->get();
 
         return view('app.users.show', [
             'user' => User::findOrFail($id),
-            'teams' => $teams,
-            'clusters' => $clusters
+            // 'teams' => $teams,
+            // 'clusters' => $clusters
         ]);
     }
 
