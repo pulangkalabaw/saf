@@ -15,11 +15,16 @@ class CreateAttendancesTable extends Migration
     {
         Schema::create('attendances', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('cluster_id')->unsigned();
+            $table->integer('team_id')->unsigned();
             $table->integer('user_id')->unsigned();
             $table->string('activities');
             $table->string('location');
             $table->string('remarks')->nullable();
-            $table->tinyInteger('status')->nullable();
+            $table->tinyInteger('status')->default(0);
+            $table->string('created_by');
+            $table->string('modified_by')->nullable();
+            $table->string('modified_remarks')->nullable();
             $table->timestamps();
         });
     }

@@ -168,7 +168,7 @@ function searchTeamAndCluster ($auth) {
         if (count($cluster) != 0) {
 
             // Save to Session
-            $_t_data2 = $cluster->map(function ($r) use ($auth, $clusters_model) {$r['team_ids'] = json_decode($r['team_ids']); return $clusters_model->teams($r['team_ids']); })->toArray();
+            $_t_data2 = $cluster->map(function ($r) use ($auth, $clusters_model) {$r['team_ids'] = $r['team_ids']; return $clusters_model->teams($r['team_ids']); })->toArray();
             $_c_data2 = collect($cluster)->map(function ($r) {return $r['cluster_id']; })->toArray();
 
             return [
