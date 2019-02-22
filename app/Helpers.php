@@ -286,7 +286,7 @@ function searchTeamAndCluster ($auth) {
         //             // search your id in encoders ids (array)
         //             if (in_array($auth->id, json_decode($r['encoder_ids']))) return $r;
 		//
-        //         });
+        //         });/
 		//
         //         // Filter all null if it has
         //         $get_teams  = array_filter($get_teams->toArray());
