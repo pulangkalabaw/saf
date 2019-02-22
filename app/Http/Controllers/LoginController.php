@@ -38,7 +38,7 @@ class LoginController extends Controller
 			$clusters_model = new Clusters();
 			$auth = Auth::user();
 
-			$_data = searchTeamAndCluster($auth);
+			$_data = getMyClusterAndTeam($auth);
 
 			// if user is admin then continue to dashboard
 			// if (base64_decode($auth->role) != 'administrator'){
@@ -62,6 +62,7 @@ class LoginController extends Controller
 
 			Session::put('_t', $_data['_t']);
 			Session::put('_c', $_data['_c']);
+			Session::put('_a', $_data['_a']);
 
 			// Authenticated
 			return redirect()->route('app.dashboard');

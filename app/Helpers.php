@@ -16,7 +16,6 @@ use App\Clusters;
  * but first you must be authenticated to be in this
  * method.
  *
- *
  */
 function getMyClusterAndTeam ($auth)
 {

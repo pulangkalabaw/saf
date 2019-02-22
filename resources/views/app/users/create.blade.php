@@ -77,11 +77,8 @@
                                             <select name="role" id="roles" class="form-control" required>
                                                 <option   value="" disabled="" selected="">Please select for role</option>
                                                 <option  {{ old('role') == 'administrator' ? 'selected': ''  }} value="administrator">Administrator</option>
-                                                <option  {{ old('role') == 'tl' ? 'selected': ''  }} value="tl">Team Leader</option>
-                                                <option  {{ old('role') == 'cl' ? 'selected': ''  }} value="cl">Cluster Leader</option>
                                                 <option  {{ old('role') == 'encoder' ? 'selected': ''  }} value="encoder">Encoder</option>
-                                                <option  {{ old('role') == 'agent' ? 'selected': ''  }} value="agent">Agent</option>
-                                                <option  {{ old('role') == 'agent_referral' ? 'selected': ''  }} value="agent_referral">Agent Referral</option>
+                                                <option  {{ old('role') == 'user' ? 'selected': ''  }} value="user">User</option>
                                             </select>
                                         </div>
                                     </div>
@@ -107,9 +104,9 @@
                                     <div class="clearfix"></div><br>
 
                                     <div class="code">
-                                        <div class="col-md-3">PAT</div>
+                                        <div class="col-md-3">Target</div>
                                         <div class="col-md-7">
-                                            <input type="text" name="pat" class="form-control" value="{{ old('pat') }}">
+                                            <input type="text" name="target" class="form-control" value="{{ old('target') }}">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>

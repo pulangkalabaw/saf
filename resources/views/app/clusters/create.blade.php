@@ -35,7 +35,7 @@
                             </div>
                             <div class="col-md-4 text-right">
                                 <a href="{{ route('app.clusters.index') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-th-list'></span> 
+                                    <span class='fa fa-th-list'></span>
                                 </a>
                             </div>
                         </div>
@@ -49,6 +49,14 @@
                                 <div class="col-md-7">
 
                                     <div>
+                                        <div class="col-md-3">Cluster code</div>
+                                        <div class="col-md-7">
+                                            <input type="text" name="cluster_id" id="" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
+									<div>
                                         <div class="col-md-3">Cluster name</div>
                                         <div class="col-md-7">
                                             <input type="text" name="cluster_name" id="" class="form-control" required>
@@ -59,7 +67,7 @@
                                     <div>
                                         <div class="col-md-3">Cluster Leader</div>
                                         <div class="col-md-7">
-                                            <select name="cl_id" id="" class="form-control" required="">
+                                            <select name="cl_ids[]" id="" class="form-control selectpicker" multiple>
                                                 @foreach ($users as $user)
                                                 <option value="{{ $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
                                                 @endforeach
@@ -71,9 +79,9 @@
                                     <div>
                                         <div class="col-md-3">Team(s)</div>
                                         <div class="col-md-7">
-                                            <select name="team_ids[]" id="" class="form-control selectpicker" multiple="" required="">
+                                            <select name="team_ids[]" id="" class="form-control selectpicker" multiple="">
                                                 @foreach ($teams as $team)
-                                                <option value="{{ $team->team_id }}">{{ $team->team_name }}</option>
+                                                <option value="{{ $team->id }}">{{ $team->team_name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>

@@ -17,13 +17,9 @@ class CreateClustersTable extends Migration
             $table->increments('id');
             $table->string('cluster_id');
             $table->string('cluster_name');
-            $table->integer('cl_id')->unsigned(); // cluster leader
-            $table->string('team_ids', 255); // json format
+            $table->string('cl_ids')->nullable(); // cluster leader
+            $table->string('team_ids'); // json format
             $table->timestamps();
-        });
-
-        Schema::table('clusters', function(Blueprint $table) {
-            $table->foreign('cl_id')->references('id')->on('users')->onDelete('cascade');
         });
 
     }
