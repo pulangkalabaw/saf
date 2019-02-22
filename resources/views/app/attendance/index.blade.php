@@ -31,7 +31,7 @@
                         </div>
                         <div class="panel-body">
                             <ul class="nav nav-tabs" role="tablist">
-                                <li class="active" role="presentation"><a href="#unpresent" aria-controls="unpresent" role="tab" data-toggle="tab">Roll call</a></li>
+                                <li class="active" role="presentation"><a href="#unpresent" aria-controls="unpresent" role="tab" data-toggle="tab">All</a></li>
                                 <li role="presentation"><a href="#present" aria-controls="present" role="tab" data-toggle="tab">Present</a></li>
                                 <li role="presentation"><a href="#absent" aria-controls="absent" role="tab" data-toggle="tab">Absents</a></li>
                             </ul>
@@ -44,7 +44,7 @@
                                                 <table class="table table-hovered table-striped">
                                                     <thead>
                                                         <tr>
-                                                            <th><input id="ch6" onchange="agentAttendance()" type="checkbox" onclick="toggle(this);"> Select all</th>
+                                                            <th><input id="ch6" type="checkbox" onclick="toggle(this);"> Select all</th>
                                                             <th>{{ Auth::user()->role == base64_encode('tl') ? 'Agents Name': (Auth::user()->role == base64_encode('cl') ? 'Teams Name' : '') }}</th>
                                                             <th>Activities</th>
                                                             <th>Location</th>
@@ -55,8 +55,13 @@
                                                         @foreach($attendance['unpresent'] as $index => $value)
                                                         <tr>
                                                             <td class="text-center">
-                                                                <input type="hidden" name="user[{{ $index }}][status]" class="setStatus" id="status_{{ $index }}">
-                                                                <button type="button" name="changeStatus" id="changeStatus_{{ $index }}" class="btn btn-default" onclick="changeButtonStatus('changeStatus_{{ $index }}', 'status_{{ $index }}')">Undecided</button>
+                                                                <div class="form-group">
+                                                                    <div class="col-sm-10">
+                                                                        <div class="checkbox">
+                                                                            <input id="chb1" type="checkbox" name="user[{{ $index }}][selected_row]">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             </td>
                                                             <td class="text-bg-light"><span class="margin-vertical">{{ $value['fname'] . ' ' . $value['lname'] }}</span></td>
                                                             <td>
@@ -73,6 +78,7 @@
                                                             </td>
                                                             <td>
                                                                 <input name="user[{{ $index }}][remarks]" class="form-control input-gray" type="text">
+                                                                <input type="hidden" name="user[{{ $index }}][status]" class="setStatus" id="status">
                                                             </td>
                                                         </tr>
                                                         @endforeach
@@ -82,9 +88,8 @@
                                         <br>
                                             <div class="panel-body">
                                                 {{-- <input type="hidden" id="status"> --}}
-                                                <button name="changeStatus" id="changeStatus" class="btn btn-md btn-success" >Submit</button>
-                                                <!-- <button class="btn btn-primary" onclick="$('.setStatus').val('1')" id="present" disabled>Present</button>
-                                                <button class="btn btn-danger" onclick="$('.setStatus').val('0') "id="absent" disabled>Absent</button> -->
+                                                <button class="btn btn-primary" onclick="$('.setStatus').val('1')">Present</button>
+                                                <button class="btn btn-danger" onclick="$('.setStatus').val('0') ">Absent</button>
                                             </div>
                                         </form>
                                         <div class="row">
@@ -169,46 +174,26 @@
                             </div>
                         </div>
                     </div>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 @endsection
 
 <script>
-$toggleButton = 0
-function changeButtonStatus(buttonName = "", status){
-    $buttonText = $('#' + buttonName).text();
-    if($buttonText == 'Undecided'){
-        $('#' + buttonName).removeClass('btn-default').addClass('btn-info');
-        $('#' + buttonName).text('Present');
-        $('#' + status).val(1);
-    } else if($buttonText == 'Present'){
-        $('#' + buttonName).removeClass('btn-success').addClass('btn-danger');
-        $('#' + buttonName).text('Absent');
-        $('#' + status).val(0);
-    } else if($buttonText == 'Absent'){
-        $('#' + buttonName).removeClass('btn-danger').addClass('btn-default');
-        $('#' + buttonName).text('Undecided');
-        $('#' + status).val();
-    }
-}
-
 function toggle(source) {
     var checkboxes = document.querySelectorAll('input[type="checkbox"]');
     for (var i = 0; i < checkboxes.length; i++) {
-        if (checkboxes[i] != source) checkboxes[i].checked = source.checked;
-    }
-}
-
-function agentAttendance(){
-    console.log($('#chb1').val() == "" && $('#ch6').val() == "");
-    if($('#chb1').val() != "" && $('#ch6').val() != ""){
-        $('#present').removeAttr('disabled');
-        $('#absent').removeAttr('disabled');
-    }else{
-        $('#present').attr('disabled');
-        $('#absent').attr('disabled');
+        if (checkboxes[i] != source)
+        checkboxes[i].checked = source.checked;
     }
 }
 </script>

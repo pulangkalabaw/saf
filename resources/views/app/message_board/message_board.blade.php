@@ -15,7 +15,7 @@
                 <div class="row text">
                     <div class="col-md">
                         <!--FORM FOR NEW POST  -->
-                        <form action="{{ route('app.messages.store') }}" method="post" enctype="multipart/form-data">
+                        <form action="{{ route('app.messages.store') }}" method="post">
                             {{csrf_field()}}
                             <div class="template template_texteditor">
                                 <div class="row">
@@ -42,9 +42,6 @@
                                                 <h5 class="text-left">BODY</h5>
                                                 <textarea class="summernotee" name="message">
                                                 </textarea>
-                                                <br>
-                                                <h5 class="text-left">ATTATCHMENT</h5>
-                                                <input type="file" name="img" >
                                                 <br>
                                                 <div class="text-right">
                                                     <input type="checkbox" id="pin"  name="pinned" value="1">
