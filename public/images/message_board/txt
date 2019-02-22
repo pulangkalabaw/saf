@@ -1,0 +1,526 @@
+download excel
+controller
+api
+
+time controller
+final edtr
+
+employee controller
+update
+
+time controller final edtr
+index holiday
+holiday controller
+timesheet edit
+
+
+
+
+
+
+<template>
+    <div class="main__cont">
+        <div class="main-heading">
+            <ol class="breadcrumb">
+                <li><label>Global Settings</label></li>
+                <li class="active">Holiday Management</li>
+            </ol>
+        </div>
+        <div class="container-fluid half-padding">
+            <div class="template template__blank">
+                <!-- Start of content here -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="panel panel-danger">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Holiday
+                                    <span v-if="index_holiday_loading">
+                                        <span class="fa fa-spin" :class="$store.state.page_load_icon"></span>
+                                    </span>
+                                    <span v-else @click="reloadHoliday()">
+                                        <span class='fa fa-refresh' data-toggle="tooltip" title="Refresh data"></span>
+                                    </span>
+                                </h3>
+                            </div>
+                            <div class="panel-body">
+
+                                <!-- start of nav tab -->
+                                <ul class="nav nav-tabs">
+                                    <li class="active">
+                                        <a data-toggle="tab" href="#pendingTab">
+                                            All
+                                            <span v-if="!index_holiday_loading">
+                                                <span class="label">{{ holidays.length }}</span>
+                                            </span> 
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a data-toggle="tab" href="#newTab">New</a>
+                                    </li>
+                                </ul>
+                                <!-- end of nav tab -->
+
+                                <div class="tab-content">                                   
+
+                                    <!-- Holidays -->
+                                    <div id="pendingTab" class="tab-pane fade in active">
+                                        <table class="table table-hover dthol1 table-sortable ">
+                                            <thead>
+                                                <tr>
+                                                    <th>Holiday Name</th>
+                                                    <th>Holiday Date</th>
+                                                    <th>Description</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-for="holiday in holidays" @click="modalBtn(holiday)">
+                                                    <td>{{ holiday.holiday_name }}</td>
+                                                    <td>{{ holiday.holiday_date }}</td>
+                                                    <td>{{ holiday.holiday_remarks }}</td>
+                                                </tr>
+                                            </tbody>
+
+                                        </table>
+
+                                        <!-- OLD TABLE -->
+                                    </div>
+
+                                    <!-- New -->
+                                    <div id="newTab" class="tab-pane fade">
+                                        <div class="row">
+
+                                            <notif :notif="notif"></notif>
+
+                                            <form action="" v-on:submit.prevent="addNewHoliday()">
+                                                <div class="col-md-6">                                 
+                                                    <div>
+                                                        <div class="col-md-3">
+                                                            <label for=""><strong>Holiday Name</strong></label>
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                            <input type="text" v-model="form.holiday_name" class="form-control" required="">  
+                                                        </div>
+                                                        <div class="clearfix"></div><br>
+                                                    </div>
+
+                                                    <div>
+                                                        <div class="col-md-3">
+                                                            <label for=""><strong>Date of holiday</strong></label>
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                            <input type="date" v-model="form.holiday_date" class="form-control" required="">                 
+                                                        </div>
+                                                        <div class="clearfix"></div><br>
+                                                    </div>        
+
+                                                    <div>
+                                                        <div class="col-md-3">
+                                                            <label for=""><strong>Holiday Type</strong></label>
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                            <select class="selectpicker" v-model="form.holiday_type" data-width="100%">
+                                                                <option value="">Select type</option>
+                                                                <option :value="type.holiday_type_code" v-for="type in holidaytype">{{ type.holiday_type_name }}</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="clearfix"></div><br>
+                                                    </div> 
+
+                                                    <div>
+                                                        <div class="col-md-3">
+                                                            <label for=""><strong>Specific locations only?</strong></label>
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                            <div class="checkbox">
+                                                                <input id="checkboxloc" type="checkbox" v-model="checkloc">
+                                                                <label for="checkboxloc">Yes</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="clearfix"></div><br>
+                                                    </div>  
+
+                                                    <div v-if="checkloc">
+                                                        <div class="col-md-3">
+                                                            <label for=""><strong>Locations affected</strong></label>
+                                                        </div>
+                                                        <div class="col-md-9">
+                                                            <span v-if="!index_location_loading">
+                                                                <select class="selectpickerMultiple" v-model="form.location" multiple required="" data-width="100%">
+                                                                    <option value="" disabled="" selected="">Select type</option>
+                                                                    <option :value="loc.branch_id" v-for="loc in locations">{{ loc.branch_name }}</option>
+                                                                </select>
+                                                            </span>
+                                                            <span v-else>
+                                                                Loading please wait..
+                                                            </span>
+                                                        </div>
+                                                        <div class="clearfix"></div><br>
+                                                    </div>                                   
+
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div>
+                                                        <div class="col-md-4">
+                                                            <label for=""><strong>Description</strong></label>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <textarea cols="2" rows="2" v-model="form.holiday_remarks" class="form-control" required=""></textarea>                                              
+                                                        </div>
+                                                        <div class="clearfix"></div><br>
+                                                    </div>
+
+                                                    <div>
+                                                        <div class="col-md-12 text-right">
+                                                            <span v-if="create_holiday_loading">
+                                                                <span class="fa fa-spin" :class="$store.state.page_load_icon"></span>
+                                                            </span>
+                                                            <button type="submit" :disabled="create_holiday_loading" class="btn btn-xs btn-primary" >Submit <span class='fa fa-plus-circle'></span> </button>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Start of modal -->
+                        <div class="modal fade" id="viewHolidayModal">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form action="" v-on:submit.prevent="updateHoliday()">
+                                        <div class="modal-header">
+                                            <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                            <h4 class="modal-title">Holiday details</h4>
+                                        </div>
+                                        <div class="modal-body">
+
+
+
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <button type="button" class="btn btn-default" v-if="!isEditing" @click="isEditing ^= true">Edit Holiday</button>
+                                                    <button type="button" class="btn btn-default" v-else @click="isEditing ^= true">Cancel edit</button>
+                                                </div>
+
+                                                <div class="col-md-12" v-if="notif.status">
+                                                    <br>
+                                                    <!-- alert -->
+                                                    <div v-if="notif.status">
+                                                        <div :class="notif.class">
+                                                            {{ notif.msg }}
+                                                        </div>
+                                                    </div> 
+                                                    <!-- end of alert -->
+                                                </div>
+                                            </div>
+
+                                            <br>
+
+                                            <div v-if="!isEditing">
+                                                <div class="row" v-if="modal">
+                                                    <div class="col-md-4"><label for=""><strong>Date:</strong></label><br>{{ modal.holiday_date }}</div>
+                                                    <div class="col-md-4"><label for=""><strong>Name:</strong></label><br>{{ modal.holiday_name }}</div>
+                                                    <div class="col-md-4"><label for=""><strong>Holiday type:</strong></label><br>{{ modal.holiday_type }}</div>
+                                                    <div class="clearfix"></div><br>
+
+                                                    <div class="col-md-6">
+                                                        <label for=""><strong>Locations:</strong></label><br>
+                                                        <span v-for="(loca,index) in modal.location" v-if="modal.location">
+                                                            <span v-if="loca">{{ loca.branch_name }}</span> 
+                                                            <span v-else>All</span>
+                                                            <span v-if="index != modal.location.length - 1">, </span> 
+                                                        </span>                                         
+                                                        <span v-else>None</span>
+                                                    </div>
+
+                                                    <div class="col-md-12"><br><label for=""><strong>Description:</strong></label><br><div class="breadcrumb">{{ modal.holiday_remarks }}</div></div>
+                                                </div>
+                                            </div>
+
+                                            <div v-else v-show="isEditing"><!-- do not change there is some error with the select picker  -->
+                                                <div class="row" v-if="modal">
+                                                    <div class="col-md-4"><label for=""><strong>Date:</strong></label><br><input type="date" class="form-control" v-model="modal.holiday_date"></div>
+                                                    <div class="col-md-4"><label for=""><strong>Name:</strong></label><br><input type="text" class="form-control" v-model="modal.holiday_name"></div>                                            
+                                                    <div class="col-md-4">
+                                                        <label for=""><strong>Holiday type:</strong></label><br>
+                                                        <select class="selectpicker" v-model="modal.holiday_type" data-width="100%">
+                                                            <option value="">Select type</option><option :value="type.holiday_type_code" v-for="type in holidaytype" >{{ type.holiday_type_name }}</option>
+                                                        </select>
+                                                    </div>                                            
+                                                    <div class="clearfix"></div><br>
+
+                                                    <div class="col-md-4">
+                                                        <label for=""><strong>Edit Holiday Location?</strong></label><br>
+                                                        <!-- <input class="bs-switch" type="checkbox" @change="changeCheckbox()" v-model="checkloc" value="true" data-on-text="Yes" data-off-text="No" data-size="small" data-on-color="success" data-off-color="danger">  -->
+                                                        <div class="checkbox" >
+                                                            <input id="checkboxloc" type="checkbox" v-model="checked">
+                                                            <label for="checkboxloc">Yes</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-8" v-if="checked==true">
+                                                        <label for=""><strong>Locations:</strong></label><br>
+                                                        <select class="selectpicker" multiple v-model="modal.location_id"  data-width="100%">
+                                                            <option :value="loc.branch_id" v-for="loc in locations">{{ loc.branch_name }}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-12"><br><label for=""><strong>Description:</strong></label><br><textarea cols="2" rows="2" class="form-control" v-model="modal.holiday_remarks"></textarea></div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <div class="row">
+                                                <div class="col-md-6 text-left">
+                                                    <button class="btn btn-default" type="button" data-dismiss="modal" @click="isEditing ^= true">Close</button>                                                           
+                                                </div>
+                                                <div class="col-md-6 text-right">
+                                                    <span v-if="update_holiday_loading">
+                                                        <span class="fa fa-spin" :class="$store.state.page_load_icon"></span>
+                                                    </span>
+                                                    <button type="submit" v-if="isEditing" :disabled="update_holiday_loading" class="btn btn-sm btn-success">Update changes <span class='fa fa-edit'></span> </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of modal -->
+
+                <!-- end of content here -->
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+
+    export default {
+
+        data(){
+            return {
+                holidays: [],
+                holidaytype: '',
+                locations: '',
+                modal: {
+                    locations: []
+                },
+                form: {
+                    location: []
+                },
+                checkloc: false,
+
+                notif: '',
+                isEditing: false,
+
+                index_location_loading: true,
+                index_holidaytype_loading: true,
+                index_holiday_loading: true,
+                create_holiday_loading: false,
+                update_holiday_loading: false,
+                checked:''
+
+            }
+        },
+
+        created(){
+            this.getLocations();        
+            this.getHolidayType();
+            this.getHoliday();
+        },
+
+        computed: {
+            locationTick () {
+                return this.index_location_loading
+            }
+        },
+
+        mounted(){
+            $('.datatable').DataTable();
+        },
+
+        updated () {
+            $('.datatable').DataTable()
+            $('.selectpicker').selectpicker('refresh');
+            if (this.holidays.length != 0) {
+                if (!$.fn.dataTable.isDataTable('.dthol1')) {
+                    $('.dthol1').dataTable({ ordering: true  });
+                }
+            }
+            if (this.locations) {
+                $('.selectpickerMultiple').selectpicker('refresh');
+            }
+        },
+
+        watch: {
+            locationTick: function (val) {
+                if (this.locations) {
+                    $('.selectpickerMultiple').selectpicker('refresh');
+                }
+                $('.selectpicker').selectpicker('refresh');
+            }
+
+        },
+
+        notifications: {
+            toastr: {
+                timeout: 2500,
+                title: '',
+                message: '',
+                type: 'success'
+            }
+        },
+
+        methods: {
+
+            reloadHoliday() {
+                this.getLocations();        
+                this.getHolidayType();
+                this.getHoliday();
+            },
+
+            getHoliday() {
+
+                this.index_holiday_loading = true
+                this.axiosRequest('get', this.$store.state.application_api+'/holiday', null, this.$session.get('headers'))
+                .then(res => {
+                    if(res.data.status == "success"){
+                        this.holidays = res.data.msg;
+                    }
+                    this.index_holiday_loading = false
+                })
+                .catch(err => console.log(err))
+            },
+
+            getHolidayType(){
+
+                this.index_holidaytype_loading = true
+                this.axiosRequest('get', this.$store.state.application_api+'/holiday-type', null, this.$session.get('headers'))
+                .then(res => {
+                    if(res.data.status == "success"){
+                        this.holidaytype = res.data.msg;
+                    }
+                    this.index_holidaytype_loading = false
+                })
+                .catch(err => console.log(err))
+            },
+
+            getLocations(){
+
+                this.index_location_loading = true
+                this.axiosRequest('get',  this.$store.state.application_api + '/location', '', this.$session.get('headers'))
+                .then(res => {
+                    if(res.data.status == 'success'){
+                        this.locations = res.data.msg
+                    }
+                    this.index_location_loading = false
+                })
+                .catch(err => {});
+            },
+
+            changeCheckbox(){
+                if(this.checkloc){
+                    this.checkloc = false; 
+                }else{
+                    this.checkloc = true; 
+                }
+            },
+
+            modalBtn(data){
+                this.modal = data;
+                this.checkloc = false;
+                $('#viewHolidayModal').modal('toggle');
+            },        
+
+            addNewHoliday(){
+                this.create_holiday_loading = true;
+
+               
+
+                let params = {
+                    holiday_name: this.form.holiday_name,
+                    holiday_date: this.form.holiday_date,
+                    holiday_remarks: this.form.holiday_remarks,
+                    holiday_type: this.form.holiday_type,
+                    location_id: this.form.location,                
+                    added_by: this.$session.get('auth')['user_id'],
+                }
+
+                this.axiosRequest('post', this.$store.state.application_api+'/holiday', params, this.$session.get('headers'))
+                .then(res => {
+                    if(res.data.status == "success"){
+                        this.toastr({ title: 'Holiday Management', message: 'Added new Holiday' })
+                        this.getHoliday();
+                console.log(params)
+
+                    }else{
+                        this.notif = {
+                            style: 'alert alert-danger',
+                            message: res.data.msg,
+                        }
+                    }
+                    this.create_holiday_loading = false
+                    // console.log(res.data)
+                console.log(params)
+                    
+                })
+                .catch(err => console.log(err))
+                console.log(params)
+            },
+
+            updateHoliday(){
+                //     if(this.modal.location == null){
+                //     this.modal.location = null
+                // }
+                let params = {
+                    holiday_name: this.modal.holiday_name,
+                    holiday_date: this.modal.holiday_date,
+                    holiday_remarks: this.modal.holiday_remarks,
+                    holiday_type: this.modal.holiday_type,
+                    location_id: this.modal.location_id,
+                    added_by: this.$session.get('auth')['user_id'],
+                    _method: 'put'
+                }
+
+                this.update_holiday_loading = true
+                this.axiosRequest('post', this.$store.state.application_api+'/holiday/' + this.modal.id , params, this.$session.get('headers'))
+                .then(res => {
+                    if(res.data.status == "success"){
+                        this.toastr({ title: 'Holiday Management', message: 'Holiday updated!' })
+                        this.getHoliday();
+                        console.log(res.data.msg)
+
+                    }
+                    else{
+                        this.notif = {
+                            style: 'alert alert-danger',
+                            message: res.data.msg,
+                            
+
+                        }
+                        console.log(res.data)
+
+                       
+                    }
+                    this.update_holiday_loading = false
+                })
+                .catch(err => console.log(err))
+            },
+
+
+        }
+
+    }
+
+
+
+</script>
+
