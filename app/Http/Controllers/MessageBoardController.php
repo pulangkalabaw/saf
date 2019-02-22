@@ -17,20 +17,18 @@ class MessageBoardController extends Controller
      */
     public function index($errors = null)
     {
-        $msgboard_tbl = new MessageBoard();
-        // $data = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]])->where('team_id', 'like', '%'.Session::get('_t')[0].'%')->with(['user'])->get();
 
-        if( !empty(Session::get('_c')[0]) ){
-            $data['allposts'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
-            $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
+        $msgboard_tbl = new MessageBoard();
+        // dd(Session::get('_c')[0]['id']);
+        // $data = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]])->where('team_id', 'like', '%'.Session::get('_t')[0].'%')->with(['user'])->get();
+        if( !empty(Session::get('_c')) ){
+            $data['allposts'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]['id']])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
+            $data['pinned'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]['id']])->where('pinned',1)->with(['user'])->first();
         }else{
             $data['allposts'] = $msgboard_tbl->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
             $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
         }
-
-
-        // dd(Session::get('_t'));
-        return view('app.message_board.message_board', [
+        return view('app.message_board.message_board',[
             'messages' => $data['allposts'],
             'pinned' => $data['pinned'],
         ])->withErrors($errors);
@@ -60,7 +58,6 @@ class MessageBoardController extends Controller
             'message' => 'required',
             'subject' => 'required',
         ]);
-
 
         if(!$validator->fails()){
             $msgboard_tbl = new MessageBoard();
@@ -99,14 +96,13 @@ class MessageBoardController extends Controller
 
             $detail = $dom->saveHTML();
             $msgboard_tbl->create([
-                'cluster_id' => (!empty(Session::get('_c'))) ? Session::get('_c')[0] : null,
+                'cluster_id' => (!empty(Session::get('_c'))) ? Session::get('_c')[0]['id'] : null,
                 'team_id' => (!empty(Session::get('_t'))) ? json_encode(Session::get('_t')) : null,
                 'subject' => $request->subject,
                 'message' => $detail,
                 'posted_by' => Auth()->user()->id,
                 'pinned' => (!empty($request->pinned)) ? $request->pinned : 0,
             ]);
-
             return $this->index();
         }else{
             // $request->session()->with('errors', $validator->errors());

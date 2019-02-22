@@ -7,8 +7,8 @@ $factory->define(App\Teams::class, function (Faker $faker) use ($factory) {
         //
         'team_name' => $faker->name,
         'team_id' => rand(1111, 9999),
-        // 'cl_id' => $factory->create(App\User::class)->id,
-        'tl_id' => $factory->create(App\User::class)->id,
-        'agent_code' => $factory->create(App\User::class)->agent_code,
+        // 'cl_ids' => [$factory->create(App\User::class)->id],
+        'tl_ids' => [$factory->create(App\User::class)->id],
+        'agent_ids' => [$factory->create(App\User::class)->agent_code],
     ];
 });

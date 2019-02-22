@@ -8,8 +8,10 @@ use App\Statuses;
 use App\Application;
 use App\ApplicationStatus;
 use App\Attendance;
+use App\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Session;
 
 class DashboardController extends Controller
 {
@@ -27,6 +29,7 @@ class DashboardController extends Controller
         $teams_model = new Teams();
         $clusters_model = new Clusters();
         $attendance_model = new Attendance();
+        $user_model = new User();
 
         //
         $no_of_status_that_used = $statuses_model->get(['id', 'status'])->map(function ($r) use ($application_model){
@@ -50,14 +53,48 @@ class DashboardController extends Controller
 
         // dd($application_counter_by_teams);
 
-        $attendance = $attendance_model->where('created_at','like', '%'.Carbon::today()->toDateString().'%')->get();
-        // $attendance = Carbon::today()->toDateString();
+        // FOR ADMIN
+        if( empty((Session::get('_c'))) && empty((Session::get('_t'))) && empty((Session::get('_a'))) ){
+          $cluster_query = $clusters_model->get();
+          $clusters = $cluster_query->pluck('cluster_name');
+          $teams = $teams_model->whereIn('id',$cluster_query[0]['team_ids'])->get()->map(function($res){
+              $res['total_agents'] = count($res['agent_ids']);
+              return $res;
+          });
+          // dd($cluster_query[0]['team_ids']);
+
+        }
+        // FOR CLUSTER HEAD
+        else if( !empty((Session::get('_c'))) ){
+          $clusters = collect(Session::get('_c'))->pluck('cluster_name');
+          $teams = $teams_model->whereIn('id',Session::get('_c')[0]['team_ids'])->get()->map(function($res){
+              $res['total_agents'] = count($res['agent_ids']);
+              return $res;
+          });
+
+        }
+        // FOR TEAM LEAD
+        else if( !empty((Session::get('_t'))) ){
+          $clusters = [null];
+          // $clusters = collect(Session::get('_t'))->pluck('team_name');
+          // $teams = collect(Session::get('_t'))->pluck('id');
+          $teams = $teams_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get()->map(function($res){
+              $res['total_agents'] = count($res['agent_ids']);
+              return $res;
+          });
+          // dd($teams);
+
+        }
+        else if( !empty((Session::get('_a'))) ){
+
+        }
 
         return view('app.dashboard', [
             'no_of_status_that_used' => $no_of_status_that_used,
             'application_counter_by_cluster' => $application_counter_by_cluster,
             'application_counter_by_teams' => $application_counter_by_teams,
-            'attendance' => $attendance,
+            'clusters' => (!empty($clusters)) ? $clusters : null,
+            'teams' => (!empty($teams)) ? $teams : null,
         ]);
     }
 }

@@ -17,7 +17,6 @@
 <div class="container-fluid half-padding">
     <div class="template template__blank">
 
-      {{ $attendance }}
       <!-- ATTENDANCE WIDGET  -->
       <div class="row">
         <div class="col-md-9">
@@ -33,37 +32,27 @@
                     <h5>As of <small>{{  now()->format('M d y g:i a') }}</small></h5>
                     <input type="date" class="form-control">
                   </div>
-                  <div class="col-md-12">
-                    <h4>Cluster One <small>Total Agents: 100</small></h4>
-                  </div>
-                  <!-- TEAMS  -->
-                  <div class="col-md-4">
-                    <div class="breadcrumb">
-                      <h5>Team one <small>Total Agents: 40</small></h5>
-                      <p>Present: <b class="text-success">31</b></p>
-                      <p>Absent: <b class="text-danger">8</b></p>
-                      <p>Unkown: <b class="text-warning">1</b></p>
+                  @if(isset($clusters))
+                    @foreach($clusters as $clus)
+                    <div class="col-md-12">
+                      <h4>{{ $clus }} <!--<small>Total Agents: 100</small>--></h4>
                     </div>
-                  </div>
-
-                  <div class="col-md-4">
-                    <div class="breadcrumb">
-                      <h5>Team two <small>Total Agents: 30</small></h5>
-                      <p>Present: <b class="text-success">26</b></p>
-                      <p>Absent: <b class="text-danger">2</b></p>
-                      <p>Unkown: <b class="text-warning">2</b></p>
-                    </div>
-                  </div>
-
-                  <div class="col-md-4">
-                    <div class="breadcrumb">
-                      <h5>Team three <small>Total Agents: 30</small></h5>
-                      <p>Present: <b class="text-success">29</b></p>
-                      <p>Absent: <b class="text-danger">1</b></p>
-                      <p>Unkown: <b class="text-warning">0</b></p>
-                    </div>
-                  </div>
-                  <!-- TEAMS -->
+                    <!-- TEAMS  -->
+                    @if(isset($teams))
+                      @foreach($teams as $team)
+                      <div class="col-md-4">
+                        <div class="breadcrumb">
+                          <h5>{{ $team->team_name }} <small>Total Agents: {{ $team->total_agents }}</small></h5>
+                          <p>Present: <b class="text-success">31</b></p>
+                          <p>Absent: <b class="text-danger">8</b></p>
+                          <p>Unkown: <b class="text-warning">1</b></p>
+                        </div>
+                      </div>
+                      @endforeach
+                    @endif
+                    <!-- TEAMS -->
+                    @endforeach
+                  @endif
                 </div>
                 <!-- CLUSTER -->
               </div>
