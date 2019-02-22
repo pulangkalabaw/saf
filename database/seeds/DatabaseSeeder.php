@@ -12,14 +12,14 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $this->call([
-            Application::class,
+            // Application::class,
             // Statuses::class,
-            Product::class,
-            Devices::class,
-            Plans::class,
+            // Product::class,
+            // Devices::class,
+            // Plans::class,
             User::class,
-            Teams::class,
-            AttendanceSeeder::class,
+            // Teams::class,
+            // AttendanceSeeder::class,
             // JiromesPersonalSeeder::class,
         ]);
     }

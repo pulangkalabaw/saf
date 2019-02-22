@@ -54,6 +54,6 @@ $factory->define(App\User::class, function (Faker $faker) {
         'isActive' => 1,
         'agent_code' => ($role == 'agent' || $role == 'agent_referral') ? rand(1111, 9999) : '',
         'remember_token' => str_random(10),
-        'pat' => ($role == 'agent' || $role == 'agent_referral') ? rand(1111, 9999) : '',
+        // 'pat' => ($role == 'agent' || $role == 'agent_referral') ? rand(1111, 9999) : '',
     ];
 });

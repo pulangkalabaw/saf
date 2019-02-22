@@ -61,7 +61,7 @@ class MessageBoardController extends Controller
         if(!empty($request->file('img'))){
             $image = $request->file('img');
             $name=$image->getClientOriginalName();
-                $image->move(public_path('/images/message_board'),$image);
+                $image->move(public_path('assets/images/message_board'),$image);
                 dd(file_exists(public_path('/images/message_board')));
 
                 // dd($image->move(public_path('/images/message_board'),$name));
