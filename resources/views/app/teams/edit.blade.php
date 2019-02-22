@@ -37,7 +37,7 @@
 									</h3>
 								</div>
 								<div class="col-md-4 text-right">
-									<a href="{{ route('app.teams.show', $team->team_id) }}" class="btn btn-xs btn-default">
+									<a href="{{ route('app.teams.show', $team->id) }}" class="btn btn-xs btn-default">
 										<span class='fa fa-eye'></span>
 									</a>
 									<a href="{{ route('app.teams.index') }}" class="btn btn-xs btn-default">
@@ -47,7 +47,7 @@
 							</div>
 						</div>
 						<div class="panel-body">
-							<form action="{{ route('app.teams.update', $team->team_id) }}" method="POST">
+							<form action="{{ route('app.teams.update', $team->id) }}" method="POST">
 								@include('includes.notif')
 
 								{{ csrf_field() }}
@@ -75,8 +75,8 @@
 										<div>
 											<div class="col-md-3">Team Leader</div>
 											<div class="col-md-7">
-												{{-- Current --}}
 												<select name="tl_ids[]" id="" class="form-control selectpicker" multiple>
+													{{-- Current --}}
 													@if (!empty($team->tl_ids))
 														@foreach ($team->getTeamLeader($team->tl_ids) as $key => $tl)
 															<option selected value="{{ $tl->id }}">
@@ -89,10 +89,16 @@
 													@endif
 													{{-- Available --}}
 													@foreach ($team_leaders as $tl)
-														<option {{ in_array($tl->id, $team->tl_ids) ? 'selected' : '' }} value="{{ $tl->id }}">
-															{{ $tl->fname . ' ' . $tl->lname }}
-														@endforeach
-													</option>
+														@if (!empty($team->agent_ids))
+															<option {{ in_array($tl->id, $team->tl_ids) ? 'selected' : '' }} value="{{ $tl->id }}">
+																{{ $tl->fname . ' ' . $tl->lname }}
+															</option>
+														@else
+															<option value="{{ $tl->id }}">
+																{{ $tl->fname . ' ' . $tl->lname }}
+															</option>
+														@endif
+													@endforeach
 												</select>
 
 
@@ -106,17 +112,27 @@
 
 												<select name="agent_ids[]" id="" class="form-control selectpicker" multiple>
 													{{-- Current --}}
-													@foreach ($team->getAgents($team->agent_ids) as $key => $agent)
-														<option selected value="{{ $agent->id }}">
-															{{ $agent->fname . ' ' . $agent->lname }}
-														</option>
-													@endforeach
+													@if(!empty($team->agent_ids))
+														@foreach ($team->getAgents($team->agent_ids) as $key => $agent)
+															<option selected value="{{ $agent->id }}">
+																{{ $agent->fname . ' ' . $agent->lname }}
+															</option>
+														@endforeach
+													@endif
+
 													{{-- Available --}}
 													@foreach ($agents as $agent)
-														<option {{ in_array($agent->id, $team->agent_ids) ? 'selected' : '' }}
-															value="{{ $agent->id }}">
-															{{ $agent->fname . ' ' . $agent->lname }}
-														</option>
+														@if (!empty($team->agent_ids))
+															<option {{ in_array($agent->id, $team->agent_ids) ? 'selected' : '' }}
+																value="{{ $agent->id }}">
+																{{ $agent->fname . ' ' . $agent->lname }}
+															</option>
+														@else
+															<option value="{{ $agent->id }}">
+																{{ $agent->fname . ' ' . $agent->lname }}
+															</option>
+														@endif
+
 													@endforeach
 
 												</select>

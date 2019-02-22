@@ -37,17 +37,17 @@
                                 </h3>
                             </div>
                             <div class="col-md-4 text-right">
-                                <a href="{{ route('app.clusters.show', $cluster->cluster_id) }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-eye'></span> 
+                                <a href="{{ route('app.clusters.show', $cluster->id) }}" class="btn btn-xs btn-default">
+                                    <span class='fa fa-eye'></span>
                                 </a>
                                 <a href="{{ route('app.clusters.index') }}" class="btn btn-xs btn-default">
-                                    <span class='fa fa-th-list'></span> 
+                                    <span class='fa fa-th-list'></span>
                                 </a>
                             </div>
                         </div>
                     </div>
                     <div class="panel-body">
-                        <form action="{{ route('app.clusters.update', $cluster->cluster_id) }}" method="POST">
+                        <form action="{{ route('app.clusters.update', $cluster->id) }}" method="POST">
                             @include('includes.notif')
 
                             {{ csrf_field() }}
@@ -56,6 +56,14 @@
                                 <div class="col-md-7">
 
                                     <div>
+                                        <div class="col-md-3">Cluster code</div>
+                                        <div class="col-md-7">
+                                            <input type="text" name="cluster_id" id="" class="form-control" value="{{ $cluster->cluster_id }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
+									<div>
                                         <div class="col-md-3">Cluster name</div>
                                         <div class="col-md-7">
                                             <input type="text" name="cluster_name" id="" class="form-control" value="{{ $cluster->cluster_name }}" required>
@@ -66,11 +74,21 @@
                                     <div>
                                         <div class="col-md-3">Cluster Leader</div>
                                         <div class="col-md-7">
-                                            <select name="cl_id" id="" class="form-control" required="">
-                                                @foreach ($users->getAvailableClusterLeader() as $cl)
-                                                <option {{ $cluster->getClusterLeader->id == $cl->id ? 'selected' : '' }} value="{{ $cl->id }}">{{ $cl->fname . ' ' . $cl->lname }}</option>
-                                                @endforeach
-                                            </select>
+											<select name="cl_ids[]" id="" class="form-control selectpicker" multiple>
+												{{-- Available --}}
+												@foreach ($cluster_leaders as $cl)
+													@if (!empty($cluster->cl_ids))
+														<option {{ in_array($cl->id, $cluster->cl_ids) ? 'selected' : '' }} value="{{ $cl->id }}">
+															{{ $cl->fname . ' ' . $cl->lname }}
+														</option>
+													@else
+														<option value="{{ $cl->id }}">
+															{{ $cl->fname . ' ' . $cl->lname }}
+														</option>
+													@endif
+												@endforeach
+											</select>
+
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -78,14 +96,18 @@
                                     <div>
                                         <div class="col-md-3">Team(s)</div>
                                         <div class="col-md-7">
-                                            <select name="team_ids[]" id="" class="form-control selectpicker" multiple="" required="">
-                                                @foreach ($teams as $team)
-                                                <option 
-                                                {{ in_array($team->team_id, $clusters->getTeams($cluster->team_ids)->map(function($r) {
-                                                    return $r['team_id'];
-                                                })->toArray()) ? 'selected' : '' }}
-                                                value="{{ $team->team_id }}">{{ $team->team_name }}</option>
-                                                @endforeach
+                                            <select name="team_ids[]" id="" class="form-control selectpicker" multiple>
+												@foreach ($teams as $team)
+													@if (!empty($cluster->team_ids))
+														<option {{ in_array($team->id, $cluster->team_ids) ? 'selected' : '' }} value="{{ $team->id }}">
+															{{ $team->team_name }}
+														</option>
+													@else
+														<option value="{{ $team->id }}">
+															{{ $team->team_name }}
+														</option>
+													@endif
+												@endforeach
                                             </select>
                                         </div>
                                     </div>

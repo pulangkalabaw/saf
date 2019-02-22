@@ -70,7 +70,7 @@ class ClustersController extends Controller
     public function create()
     {
         $users = new User();
-        $teams = new Teams();
+		$teams = new Teams();
         return view('app.clusters.create', [
             'users' => $users->get(), // clusters
             'teams' => $teams->get(),
@@ -86,17 +86,16 @@ class ClustersController extends Controller
     public function store(Request $request)
     {
         $v = Validator::make($request->all(), [
+            'cluster_id' => 'required|string',
             'cluster_name' => 'required|string',
-            'cl_id' => 'required',
-            'team_ids' => 'required',
+            'cl_ids' => 'nullable',
+            'team_ids' => 'nullable',
 
         ]);
 
         if ($v->fails()) return back()->withErrors($v->errors());
 
-        $request['cluster_id'] = rand(111,99999);
-        $request['team_ids'] = json_encode($request['team_ids']);
-        if (Clusters::insert($request->except('_token'))) {
+        if (Clusters::create($request->except('_token'))) {
             return back()->with([
                 'notif.style' => 'success',
                 'notif.icon' => 'plus-circle',
@@ -120,7 +119,12 @@ class ClustersController extends Controller
      */
     public function show($id)
     {
-        $cluster = Clusters::where('cluster_id', $id)->with([
+		$cluster = Clusters::where('id', $id)->firstOrFail();
+
+		return view('app.clusters.show', ['cluster' => $cluster]);
+
+
+        $cluster = Clusters::where('id', $id)->with([
             'getClusterLeader',
         ])->firstOrFail();
 
@@ -139,7 +143,15 @@ class ClustersController extends Controller
         $users = new User();
         $teams = new Teams();
         $clusters = new Clusters();
-        $cluster = Clusters::where('cluster_id', $id)->with([
+		$cluster = $clusters->findOrFail($id);
+
+		$cluster_leaders = $users->getAvailableClusterLeader();
+		$teams = $teams->get();
+
+		return view('app.clusters.edit', ['cluster' => $cluster, 'teams' => $teams, 'cluster_leaders' => $cluster_leaders]);
+
+
+        $cluster = Clusters::where('id', $id)->with([
             'getClusterLeader',
         ])->firstOrFail();
 
@@ -162,17 +174,20 @@ class ClustersController extends Controller
     public function update(Request $request, $id)
     {
         //
-        $clusters = Clusters::where('cluster_id', $id)->firstOrFail();
+        $clusters = Clusters::where('id', $id)->firstOrFail();
         $v = Validator::make($request->all(), [
+			'cluster_id' => 'required|string',
             'cluster_name' => 'required|string',
-            'cl_id' => 'required',
-            'team_ids' => 'required',
+            'cl_ids' => 'nullable',
+            'team_ids' => 'nullable',
 
         ]);
 
         if ($v->fails()) return back()->withErrors($v->errors());
 
-        $request['team_ids'] = json_encode($request['team_ids']);
+		$request['cl_ids'] = empty($request['cl_ids']) ? [] : $request['cl_ids'];
+		$request['team_ids'] = empty($request['team_ids']) ? [] : $request['team_ids'];
+
         if ($clusters->update($request->except(['_token', '_method']))) {
             return back()->with([
                 'notif.style' => 'success',

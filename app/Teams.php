@@ -15,15 +15,31 @@ class Teams extends Model
 
 
 	public function getCluster ($team_id) {
-		$clusters_model = new Clusters();
-		$cluster_search = $clusters_model->with('getClusterLeader')->get()->map(function ($r) use ($team_id) {
-			// decode the json
-			$r['team_ids'] = $r['team_ids'];
-			// then search your team id in team ids (array)
-			if (in_array($team_id, $r['team_ids'])) return $r;
-		});
-		$cluster_search  = array_filter($cluster_search->toArray());
-		return array_values($cluster_search);
+		// init
+		$cluster_ids = [];
+		$cluster_model = new Clusters();
+
+		// select team_ids and cluster_id
+		$clusters = $cluster_model->get(['team_ids', 'id'])->toArray();
+
+		// Loop thru clusters
+		foreach ($clusters as $cluster) {
+
+			// check first if teams_ids
+			// not null
+			if (!empty($cluster['team_ids'])) {
+
+				// if this team is in the teams_ids in clusters table
+				if (in_array($team_id, $cluster['team_ids'])) {
+
+					// save the cluster id to this variable
+					$cluster_ids[] = $cluster['id'];
+				}
+			}
+		}
+
+		return $cluster_model->whereIn('id', $cluster_ids)->get()->toArray();
+
 	}
 
 	/*
@@ -66,6 +82,19 @@ class Teams extends Model
 
 	}
 
+	/**
+	 *
+	 * Get available Teams
+	 *
+	 */
+	public function getAvailableTeams() {
+	 	// Get all tl created
+	 	$cl = Clusters::get()->pluck('team_ids');
+	 	$cl_decoded = json_decode($cl);
+	 	if (empty($cl_decoded[0]))  return $this->get();
+	 	return $this->whereNotIn('id', $cl_decoded)->get();
+	}
+
 
 	/*
 	* [ Get the Team Leader Information using tl_id ]
@@ -86,15 +115,6 @@ class Teams extends Model
 		return $user->whereIn('id', $agent_ids)->get();
 	}
 
-	/*
-	* [ Get all Encoder Information using encoder_ids ]
-	*
-	*/
-	public function getEncoder($id) {
-		$user = new User();
-		$ids = json_decode($id);
-		return $user->whereIn('id', $ids)->get();
-	}
 
 	/**
 	 * SET AND GET FOR AGENT ID

@@ -51,13 +51,10 @@ class User extends Authenticatable
 	*
 	*/
 	public function getAvailableClusterLeader() {
-		$cl = Clusters::select('cl_id')->get();
-		return $this-whereNotIn('id', $cl)->get();
-
-		$tl = Clusters::get()->pluck('tl_ids');
-		$tl_decoded = json_decode($tl);
-		if (empty($tl_decoded[0]))  return $this->get();
-		return $this->whereNotIn('id', $tl_decoded)->get();
+		$tl = Clusters::get()->pluck('cl_ids');
+		$cl_decoded = json_decode($tl);
+		if (empty($cl_decoded[0]))  return $this->get();
+		return $this->whereNotIn('id', $cl_decoded)->get();
 
 
 	}

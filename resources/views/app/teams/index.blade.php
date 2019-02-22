@@ -93,7 +93,7 @@
 															</td>
 															<td>
 																@if (count($team->getCluster($team->team_id)) != 0)
-																	<a href="{{ route('app.clusters.show', $team->getCluster($team->team_id)[0]['cluster_id']) }}">
+																	<a href="{{ route('app.clusters.show', $team->getCluster($team->team_id)[0]['id']) }}">
 																		{{  $team->getCluster($team->team_id)[0]['cluster_name'] }}
 																	</a>
 																@else
@@ -132,12 +132,11 @@
 																	Nothing selected
 																@endif
 
-
 															</td>
 															<td>
 
 																{{-- ***** AGENTS ***** --}}
-																@if(!empty($team->tl_ids))
+																@if(!empty($team->agent_ids))
 
 																	{{-- Input <BR> every 3 encoders --}}
 																	@php $counter = 0; @endphp {{-- Counter --}}
@@ -168,8 +167,8 @@
 
 															</td>
 															<td>
-																<a data-toggle="tooltip" title="View Team" href="{{ route('app.teams.show', $team->team_id) }}" class="btn btn-warning btn-xs"><span class='fa fa-eye'></span></a>
-																<a data-toggle="tooltip" title="Edit Team" href="{{ route('app.teams.edit', $team->team_id) }}" class="btn btn-success btn-xs"><span class='fa fa-edit'></span></a>
+																<a data-toggle="tooltip" title="View Team" href="{{ route('app.teams.show', $team->id) }}" class="btn btn-warning btn-xs"><span class='fa fa-eye'></span></a>
+																<a data-toggle="tooltip" title="Edit Team" href="{{ route('app.teams.edit', $team->id) }}" class="btn btn-success btn-xs"><span class='fa fa-edit'></span></a>
 															</td>
 														</tr>
 													@endforeach

@@ -89,17 +89,17 @@
                                 </div>
                                 <div class="clearfix"></div><br>
 
-                                @if($user->pat)
+                                @if($user->target)
                                 <div>
-                                    <div class="col-md-3">PAT:</div>
+                                    <div class="col-md-3">Target:</div>
                                     <div class="col-md-7">
-                                        {{ $user->pat }}
+                                        {{ $user->target }}
                                     </div>
                                 </div>
                                 <div class="clearfix"></div><br>
                                 @endif
 
-                                <div>
+                                {{-- <div>
                                     <div class="col-md-3">Cluster(s):</div>
                                     <div class="col-md-7">
                                         @foreach ($clusters as $key => $cluster)
@@ -119,7 +119,7 @@
                                         @endforeach
                                     </div>
                                 </div>
-                                <div class="clearfix"></div><br>
+                                <div class="clearfix"></div><br> --}}
 
                             </div>
                         </div>

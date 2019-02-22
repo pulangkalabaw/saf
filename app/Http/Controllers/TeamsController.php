@@ -84,7 +84,7 @@ class TeamsController extends Controller
 	public function show($id)
 	{
 		//
-		$teams = Teams::where('team_id', $id)->firstOrFail();
+		$teams = Teams::where('id', $id)->firstOrFail();
 
 		return view('app.teams.show', ['team' => $teams]);
 	}
@@ -98,7 +98,7 @@ class TeamsController extends Controller
 	public function edit($id)
 	{
 		$users = new User();
-		$teams = Teams::where('team_id', $id)->firstOrFail();
+		$teams = Teams::where('id', $id)->firstOrFail();
 
 		$agents = $users->getAvailableAgent();
 		$team_leaders = $users->getAvailableTeamLeader();
@@ -116,7 +116,7 @@ class TeamsController extends Controller
 	public function update(Request $request, $id)
 	{
 		//
-		$teams = Teams::where('team_id', $id)->firstOrFail();
+		$teams = Teams::where('id', $id)->firstOrFail();
 
 		$v = Validator::make($request->all(), [
 			'team_id' => 'required|string|max:4',

@@ -51,7 +51,7 @@
                                     <div>
                                         <div class="col-md-3">Cluster code</div>
                                         <div class="col-md-7">
-                                            <input type="text" name="cluster_code" id="" class="form-control" required>
+                                            <input type="text" name="cluster_id" id="" class="form-control" required>
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -67,7 +67,7 @@
                                     <div>
                                         <div class="col-md-3">Cluster Leader</div>
                                         <div class="col-md-7">
-                                            <select name="cl_ids[]" id="" class="form-control selectpicker">
+                                            <select name="cl_ids[]" id="" class="form-control selectpicker" multiple>
                                                 @foreach ($users as $user)
                                                 <option value="{{ $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
                                                 @endforeach
@@ -81,7 +81,7 @@
                                         <div class="col-md-7">
                                             <select name="team_ids[]" id="" class="form-control selectpicker" multiple="">
                                                 @foreach ($teams as $team)
-                                                <option value="{{ $team->team_id }}">{{ $team->team_name }}</option>
+                                                <option value="{{ $team->id }}">{{ $team->team_name }}</option>
                                                 @endforeach
                                             </select>
                                         </div>

@@ -1,4 +1,167 @@
 <?php
+use App\Teams;
+use App\User;
+use App\Clusters;
+
+/**
+ * GET CLUSTER AND TEAM (_C, _T)
+ *
+ * The idea of this is to get your
+ * Cluster id(s) and Team id(s)
+ * whether you are a cluster leader,
+ * a team leader or either you are agent.
+ *
+ * Requirements: the get your cluster and team IDs
+ * this method needed your User model or Auth Model
+ * but first you must be authenticated to be in this
+ * method.
+ *
+ */
+function getMyClusterAndTeam ($auth)
+{
+	/**
+	 * Search IF IT HAS Teams.tl_ids
+	 */
+	$r['_t'] = fetchTeams($auth);
+
+	/**
+	 * Search IF IT HAS Cluster.cl_ids
+	 *
+	 */
+	$r['_c'] = fetchCluster($auth);
+
+	/**
+	 * Search IF IT HAS Teams.agent_ids
+	 *
+	 */
+
+	$r['_a'] = fetchAgent($auth);
+
+	return $r;
+}
+
+
+/**
+ * Search your User
+ * to Cluster Table
+ *
+ * Requirements: User or Auth Model
+ */
+function fetchCluster ($auth)
+{
+	// init
+	$cluster_ids = [];
+	$cluster_model = new Clusters();
+
+	// select tl_ids and cluster_id
+	$clusters = $cluster_model->get(['cl_ids', 'id'])->toArray();
+
+	// Loop thru clusters
+	foreach ($clusters as $cluster) {
+		// check first if agent_ids
+		// not null
+		if (!empty($cluster['cl_ids'])) {
+			// check if you are one of
+			// the cluster leader of this tems
+			if (in_array($auth->id, $cluster['cl_ids'])) {
+
+				// save the cluster id to this variable
+				$cluster_ids[] = $cluster['id'];
+			}
+		}
+	}
+
+	return $cluster_model->whereIn('id', $cluster_ids)->get()->toArray();
+}
+
+
+/**
+ * Search your User
+ * to Teams Table
+ *
+ * Requirements: User or Auth Model
+ */
+function fetchTeams ($auth)
+{
+	// init
+	$team_ids = [];
+	$team_model = new Teams();
+
+	// select tl_ids and team_id
+	$teams = $team_model->get(['tl_ids', 'id'])->toArray();
+
+	// Loop thru teams
+	foreach ($teams as $team) {
+		// check first if agent_ids
+		// not null
+		if (!empty($team['tl_ids'])) {
+			// check if you are one of
+			// the team leader of this tems
+			if (in_array($auth->id, $team['tl_ids'])) {
+
+				// save the team id to this variable
+				$team_ids[] = $team['id'];
+			}
+		}
+	}
+
+	return $team_model->whereIn('id', $team_ids)->get()->toArray();
+}
+
+/**
+ * Search your User
+ * to Teams Table
+ *
+ * This method is only for checking
+ * if you are agent
+ *
+ * Requirements: User or Auth Model
+ */
+function fetchAgent ($auth)
+{
+	// init
+	$team_ids = [];
+	$team_model = new Teams();
+
+	// select tl_ids and team_id
+	$teams = $team_model->get(['agent_ids', 'id'])->toArray();
+
+	// Loop thru teams
+	foreach ($teams as $team) {
+		// check first if agent_ids
+		// not null
+		if (!empty($team['agent_ids'])) {
+			// check if you are one of
+			// the team leader of this tems
+			if (in_array($auth->id, $team['agent_ids'])) {
+
+				// save the team id to this variable
+				$team_ids[] = $team['id'];
+			}
+		}
+	}
+
+	return $team_model->whereIn('id', $team_ids)->get()->toArray();
+}
+
+
+function c_array_flatten($array) {
+	if (!is_array($array)) {
+		return FALSE;
+	}
+	$result = array();
+	foreach ($array as $key => $value) {
+		if (is_array($value)) {
+			$result = array_merge($result, array_flatten($value));
+		}
+		else {
+			$result[$key] = $value;
+		}
+	}
+	return $result;
+}
+
+
 function comma_separated_to_array($string, $separator = ',')
 {
   //Explode on comma

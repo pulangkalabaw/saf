@@ -27,7 +27,7 @@
 									</h3>
 								</div>
 								<div class="col-md-4 text-right">
-									<a href="{{ route('app.teams.edit', $team->team_id) }}" class="btn btn-xs btn-default">
+									<a href="{{ route('app.teams.edit', $team->id) }}" class="btn btn-xs btn-default">
 										<span class='fa fa-edit'></span>
 									</a>
 									<a href="{{ route('app.teams.index') }}" class="btn btn-xs btn-default">
