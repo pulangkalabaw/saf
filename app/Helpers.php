@@ -350,13 +350,14 @@ function searchTeamAndCluster ($auth) {
 
 }
 
-
+// FOR DASHBOARD GET CLSUTER WITH TEAMS AND AGENTS
 function getHeirarchy(){
 
 	$teams_model = new Teams();
 	$clusters_model = new Clusters();
 	$user_model = new User();
 
+	// ROLES WHICH WILL BE CHANGE IF THERE IS CHANGE ON ROLE
 	$roles = [
 		'administrator' => 'administrator',
 		'user' => 'user',
@@ -424,6 +425,7 @@ function getHeirarchy(){
 
 	}
 
+	// RETURN DATA BACK TO LARAVEL VIEW
 	return [
 		'clusters' => (!empty($clusters)) ? $clusters : [],
 		'teams' => (!empty($teams)) ? $teams : [],
