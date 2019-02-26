@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\MessageBoard;
+use App\Clusters;
 
 use Validator;
 use Session;
@@ -19,26 +20,23 @@ class MessageBoardController extends Controller
      */
     public function index($errors = null)
     {
-
         $msgboard_tbl = new MessageBoard();
-
         if( !empty(Session::get('_c')) ){
             $data['allposts'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]['id']])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
             $data['pinned'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]['id']])->where('pinned',1)->with(['user'])->first();
-            $data['role'] = 'CL';
         }elseif(!empty(Session::get('_t'))){
-            $data['allposts'] = $msgboard_tbl->where(['team_id' => Session::get('_c')[0]['id']])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
-            $data['pinned'] = $msgboard_tbl->where(['team_id' => Session::get('_c')[0]['id']])->where('pinned',1)->with(['user'])->first();
-            $data['role'] = 'TL';
+            $data['allposts'] = $msgboard_tbl->where(['team_id' => json_encode([Session::get('_t')[0]['id']])])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
+            $data['pinned'] = $msgboard_tbl->where(['team_id' => Session::get('_t')[0]['id']])->where('pinned',1)->with(['user'])->first();
+        }elseif(!empty(Session::get('_a'))){
+            $data['allposts'] = $msgboard_tbl->where(['team_id' => Session::get('_a')[0]['id']])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
+            $data['pinned'] = $msgboard_tbl->where(['team_id' => Session::get('_a')[0]['id']])->where('pinned',1)->with(['user'])->first();
         }else{
-            $data['allposts'] = $msgboard_tbl->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
-            $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
-            $data['role'] = 'A';
+            $data['allposts'] = [];
+            $data['pinned'] = [];
         }
         return view('app.message_board.message_board',[
             'messages' => $data['allposts'],
             'pinned' => $data['pinned'],
-            'role' => $data['role'],
         ])->withErrors($errors);
     }
 
@@ -60,6 +58,7 @@ class MessageBoardController extends Controller
      */
     public function store(Request $request)
     {
+
         // return $request->all();
         $validator = Validator::make($request->all(),[
             'message' => 'required',
@@ -112,10 +111,23 @@ class MessageBoardController extends Controller
 
             // *** END FOR IMAGES ***
 
+            if(!empty(Session::get('_c'))){
+                if(!empty(Session::get('_c')[0]['team_ids'])){
+                    // get team id
+                    $team_id = json_encode(Session::get('_c')[0]['team_ids']);
+                }
+            }elseif(!empty(Session::get('_t'))){
+                // if cluster is empty
+                $team_id = json_encode([Session::get('_t')[0]['id']]);
+                // find team cluster
+
+
+            }
+
             $detail = $dom->saveHTML();
             $msgboard_tbl->create([
                 'cluster_id' => (!empty(Session::get('_c'))) ? Session::get('_c')[0]['id'] : null,
-                'team_id' => (!empty(Session::get('_t'))) ? json_encode(Session::get('_t')) : null,
+                'team_id' => $team_id,
                 'subject' => $request->subject,
                 'message' => $detail,
                 'posted_by' => Auth()->user()->id,
