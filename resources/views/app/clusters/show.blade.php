@@ -80,7 +80,6 @@
 											@endif
 
 
-											{{-- <a href="{{ route('app.users.show', $cluster->getClusterLeader->id) }}">{{ $cluster->getClusterLeader->fname . ' ' . $cluster->getClusterLeader->lname }}</a> --}}
 										</div>
 									</div>
 									<div class="clearfix"></div><br>

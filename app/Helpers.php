@@ -9,9 +9,9 @@ use App\Clusters;
  * The idea of this is to get your
  * Cluster id(s) and Team id(s)
  * whether you are a cluster leader,
- * a team leader or either you are agent.
+ * a team leader or either you are an agent.
  *
- * Requirements: the get your cluster and team IDs
+ * Requirements: to get your cluster and team IDs
  * this method needed your User model or Auth Model
  * but first you must be authenticated to be in this
  * method.

@@ -13,7 +13,6 @@ class Teams extends Model
 	protected $guarded = [];
 	protected $dates = ['created_at', 'updated_at'];
 
-
 	public function getCluster ($team_id) {
 		// init
 		$cluster_ids = [];
