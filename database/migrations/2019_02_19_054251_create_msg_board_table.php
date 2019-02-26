@@ -21,6 +21,7 @@ class CreateMsgBoardTable extends Migration
             $table->tinyInteger('pinned')->default(0);
             $table->text('subject');
             $table->text('message');
+            $table->string('files')->nullable();
             $table->timestamps();
         });
 

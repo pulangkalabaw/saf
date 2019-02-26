@@ -81,13 +81,16 @@
                                     </div>
                                     <div class="col-md-12">
                                         {!! $pinned->message !!}
-                                        <h5 class="text-right">Posted by: <b>{{ $pinned->user->fname.' '.$pinned->user->lname }}</b></h5>
                                     </div>
+
                                     @if($pinned->files != null)
                                     @foreach(json_decode($pinned->files,true) as $asd)
-                                    <img src="{{ asset('assets/images/message_board/'.$asd)}}" alt="Smiley face" height="100" width="100">
+                                    <img src="{{ asset('assets/images/message_board/'.$asd)}}" alt="Smiley face" height="100" width="100" style="object-fit: cover;">
                                     @endforeach
                                     @endif
+                                    <div class="col-md-12">
+                                        <h5 class="text-right">Posted by: <b>{{ $pinned->user->fname.' '.$pinned->user->lname }}</b></h5>
+                                    </div>
                                 </div>
 
                             </div>
@@ -104,21 +107,26 @@
                                             <h5 class="text-left thissubject"><b>{{ $post->subject }}</b></h5>
                                         </div>
                                         <div class="col-md-6 text-right">
+                                            @if(empty(Session::get('_a')))
                                             <button  data-toggle="modal" data-target="#modal3" data-id="{{ $post->id }}" type="button" class="btn btn-xs pinnedbtn" name="button" ><i class="fa fa-thumb-tack" aria-hidden="true"></i></button>
                                             <button  data-toggle="modal" data-target="#modal2" type="button" class="btn btn-xs editbtn" data-id="{{ $post->id }}" data-subject="{!! $post->subject !!}" data-message="{{ $post->message }}" name="button" ><i class="fa fa-edit" aria-hidden="true"></i></button>
                                             <button  data-toggle="modal" data-target="#modal1" data-id="{{ $post->id }}" type="button" class="btn btn-xs deletebtn" name="button" ><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                            @endif
                                         </div>
                                     </div>
-
                                     <div class="col-md-12">
+
                                         <div class="thismessage">{!! $post->message !!}</div>
-                                        <h5 class="text-right">Posted by: <b>{{ $post->user->fname.' '.$post->user->lname }}</b></h5>
                                     </div>
+
                                     @if($post->files != null)
-                                    @foreach(json_decode($pinned->files,true) as $asd)
+                                    @foreach(json_decode($post->files,true) as $asd)
                                     <img src="{{ asset('assets/images/message_board/'.$asd)}}" alt="Smiley face" height="100" width="100">
                                     @endforeach
                                     @endif
+                                    <div class="col-md-12">
+                                        <h5 class="text-right">Posted by: <b>{{ $post->user->fname.' '.$post->user->lname }}</b></h5>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -147,7 +155,7 @@
             <!-- EDIT MODAL  -->
             <div class="modal fade" id="modal2">
                 <div class="modal-dialog modal-lg">
-                    <form action="{{ route('app.messages.update',1) }}" method="post">
+                    <form action="{{ route('app.messages.update',1) }}" method="post" enctype="multipart/form-data">
 
                         <div class="modal-content">
                             <div class="modal-header">
@@ -171,6 +179,8 @@
                                                         <br>
                                                         <input type="hidden" id="idInputModal" name="id">
                                                         <textarea id="messageInputModal" name="message" class="summernotee"></textarea>
+                                                        <br>
+                                                        <input type="file" name="img[]" multiple >
                                                     </div>
                                                 </div>
                                             </div>

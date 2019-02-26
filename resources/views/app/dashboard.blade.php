@@ -19,13 +19,12 @@
 
       <!-- ATTENDANCE WIDGET  -->
       <div class="row">
-        <div class="col-md-9">
+        <div class="{{ empty(Session::get('_a')) ? 'col-md-9' : 'col-md-12'  }}">
           <div class="panel panel-info">
               <div class="panel-heading">
                   <h3 class="panel-title">Attendance</h3>
               </div>
               <div class="panel-body">
-
                 <!-- CLUSTER -->
                 <div class="row">
                   <div class="col-md-3">
@@ -58,6 +57,7 @@
               </div>
           </div>
         </div>
+        @if(empty(Session::get('_a')))
         <div class="col-md-3">
           <!-- OVERVIEW -->
           <div class="panel panel-success">
@@ -106,6 +106,7 @@
             </div>
             <!-- OVERVIEW -->
         </div>
+        @endif
       </div>
       <!-- ATTENDANCE WIDGET -->
 
