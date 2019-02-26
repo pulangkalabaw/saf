@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
             // Devices::class,
             // Plans::class,
             User::class,
-            // Teams::class,
+            Teams::class,
             // AttendanceSeeder::class,
             // JiromesPersonalSeeder::class,
         ]);
