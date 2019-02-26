@@ -15,6 +15,9 @@
 	<link href="{{ asset('assets/libs/ionrangeslider/css/ion.rangeSlider.skinFlat.css') }}" rel="stylesheet">
 	<link href="{{ asset('assets/libs/summernote/summernote.css') }}" rel="stylesheet">
 	<link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
+	<meta content="stuff, to, help, search, engines, not" name="keywords">
+	<meta content="What this page is about." name="description">
+	<meta content="Display Webcam Stream" name="title">
 
 	<style>
 	input[type="search"]::-webkit-search-cancel-button {
@@ -25,6 +28,7 @@
 	}
 </style>
 @yield('styles')
+
 
 <link class="demo__css" href="{{ asset('assets/css/right.dark.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/css/demo.css') }}" rel="stylesheet">

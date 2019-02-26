@@ -40,26 +40,6 @@ class LoginController extends Controller
 
 			$_data = getMyClusterAndTeam($auth);
 
-			// if user is admin then continue to dashboard
-			// if (base64_decode($auth->role) != 'administrator'){
-			// 	// if user does not have a team or not a cluster leader return back to login page
-			// 	if(count($_data['_t']) == 0 || count($_data['_c']) == 0) {
-			// 		return back()->with([
-			// 			'notif.style' => 'danger',
-			// 			'notif.icon' => 'times-circle',
-			// 			'notif.message' => 'no teams or cluster leader found',
-			// 		]);
-			// 	}
-			// 	else {
-			//
-			// 		Session::put('_t', $_data['_t']);
-			// 		Session::put('_c', $_data['_c']);
-			//
-			// 		// Authenticated
-			// 		return redirect()->route('app.dashboard');
-			// 	}
-			// }
-
 			Session::put('_t', $_data['_t']);
 			Session::put('_c', $_data['_c']);
 			Session::put('_a', $_data['_a']);

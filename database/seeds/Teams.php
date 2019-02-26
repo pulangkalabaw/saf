@@ -12,7 +12,7 @@ class Teams extends Seeder
     public function run()
     {
         //
-        factory(App\Teams::class, 1)->create();
+        factory(App\Teams::class, 10)->create();
 
     }
 }
