@@ -357,9 +357,60 @@ function getHeirarchy(){
 	$clusters_model = new Clusters();
 	$user_model = new User();
 
+	$roles = [
+		'administrator' => 'administrator',
+		'user' => 'user',
+ 		'encoder' => 'encoder',
+	];
+
 	// FOR ADMIN
-	if( empty((Session::get('_c'))) && empty((Session::get('_t'))) && empty((Session::get('_a'))) ){
-		if(base64_decode(Auth()->user()->role) == 'administrator'){
+	if(base64_decode(Auth()->user()->role) == $roles['administrator']){
+		if( empty((Session::get('_c'))) && empty((Session::get('_t'))) && empty((Session::get('_a'))) ){
+			$cluster_query = $clusters_model->get();
+			if(!empty($cluster_query->toArray())){
+				$clusters = $cluster_query->pluck('cluster_name');
+				$teams = $teams_model->whereIn('id',$cluster_query[0]['team_ids'])->get()->map(function($res) use ($user_model){
+					$res['total_agents'] = count($res['agent_ids']);
+					$res['agents'] = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get();
+					return $res;
+				});
+			}
+		}
+
+	// FOR USER ROLE
+	}else if(base64_decode(Auth()->user()->role) == $roles['user']){
+
+		// FOR CLUSTER HEAD
+		if( !empty((Session::get('_c'))) ){
+			$clusters = collect(Session::get('_c'))->pluck('cluster_name');
+			$teams = $teams_model->whereIn('id',Session::get('_c')[0]['team_ids'])->get()->map(function($res) use ($user_model){
+				$res['total_agents'] = count($res['agent_ids']);
+				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_c'))->pluck('id'))->get();
+				return $res;
+			});
+		}
+		// FOR TEAM LEAD
+		else if( !empty((Session::get('_t'))) ){
+			$clusters = [null];
+			$teams = $teams_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get()->map(function($res) use ($user_model){
+				$res['total_agents'] = count($res['agent_ids']);
+				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get();
+				return $res;
+			});
+		}
+		else if( !empty((Session::get('_a'))) ){
+			$clusters = [null];
+			$teams = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model){
+				$res['total_agents'] = count($res['agent_ids']);
+				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get();
+				return $res;
+			});
+		}
+
+	// FOR ENCODER ROLE
+	}else if(base64_decode(Auth()->user()->role) == $roles['encoder']){
+
+		if( empty((Session::get('_c'))) && empty((Session::get('_t'))) && empty((Session::get('_a'))) ){
 			$cluster_query = $clusters_model->get();
 			if(!empty($cluster_query->toArray())){
 				$clusters = $cluster_query->pluck('cluster_name');
@@ -372,43 +423,12 @@ function getHeirarchy(){
 		}
 
 	}
-	// FOR CLUSTER HEAD
-	else if( !empty((Session::get('_c'))) ){
-		$clusters = collect(Session::get('_c'))->pluck('cluster_name');
-		$teams = $teams_model->whereIn('id',Session::get('_c')[0]['team_ids'])->get()->map(function($res) use ($user_model){
-			$res['total_agents'] = count($res['agent_ids']);
-			$res['agents'] = $user_model->whereIn('id',collect(Session::get('_c'))->pluck('id'))->get();
-			return $res;
-		});
-
-	}
-	// FOR TEAM LEAD
-	else if( !empty((Session::get('_t'))) ){
-		$clusters = [null];
-		$teams = $teams_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get()->map(function($res) use ($user_model){
-			$res['total_agents'] = count($res['agent_ids']);
-			$res['agents'] = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get();
-			return $res;
-		});
-
-
-
-	}
-	else if( !empty((Session::get('_a'))) ){
-		$clusters = [null];
-		$teams = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model){
-			$res['total_agents'] = count($res['agent_ids']);
-			$res['agents'] = $user_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get();
-			return $res;
-		});
-
-
-	}
 
 	return [
 		'clusters' => (!empty($clusters)) ? $clusters : [],
 		'teams' => (!empty($teams)) ? $teams : [],
 	];
+
 
 }
 
