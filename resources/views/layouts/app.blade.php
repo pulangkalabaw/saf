@@ -26,6 +26,7 @@
 </style>
 @yield('styles')
 
+
 <link class="demo__css" href="{{ asset('assets/css/right.dark.css') }}" rel="stylesheet">
 <link href="{{ asset('assets/css/demo.css') }}" rel="stylesheet">
 
