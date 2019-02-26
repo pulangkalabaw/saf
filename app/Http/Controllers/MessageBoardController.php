@@ -7,6 +7,8 @@ use App\MessageBoard;
 
 use Validator;
 use Session;
+use File;
+use Carbon\Carbon;
 
 class MessageBoardController extends Controller
 {
@@ -17,22 +19,26 @@ class MessageBoardController extends Controller
      */
     public function index($errors = null)
     {
-        $msgboard_tbl = new MessageBoard();
-        // $data = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]])->where('team_id', 'like', '%'.Session::get('_t')[0].'%')->with(['user'])->get();
 
-        if( !empty(Session::get('_c')[0]) ){
-            $data['allposts'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
-            $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
+        $msgboard_tbl = new MessageBoard();
+
+        if( !empty(Session::get('_c')) ){
+            $data['allposts'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]['id']])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
+            $data['pinned'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]['id']])->where('pinned',1)->with(['user'])->first();
+            $data['role'] = 'CL';
+        }elseif(!empty(Session::get('_t'))){
+            $data['allposts'] = $msgboard_tbl->where(['team_id' => Session::get('_c')[0]['id']])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
+            $data['pinned'] = $msgboard_tbl->where(['team_id' => Session::get('_c')[0]['id']])->where('pinned',1)->with(['user'])->first();
+            $data['role'] = 'TL';
         }else{
             $data['allposts'] = $msgboard_tbl->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
             $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
+            $data['role'] = 'A';
         }
-
-
-        // dd(Session::get('_t'));
-        return view('app.message_board.message_board', [
+        return view('app.message_board.message_board',[
             'messages' => $data['allposts'],
             'pinned' => $data['pinned'],
+            'role' => $data['role'],
         ])->withErrors($errors);
     }
 
@@ -54,13 +60,11 @@ class MessageBoardController extends Controller
      */
     public function store(Request $request)
     {
-        //
         // return $request->all();
         $validator = Validator::make($request->all(),[
             'message' => 'required',
             'subject' => 'required',
         ]);
-
 
         if(!$validator->fails()){
             $msgboard_tbl = new MessageBoard();
@@ -69,8 +73,19 @@ class MessageBoardController extends Controller
             }
             $dom = new \DomDocument();
             $dom->loadHtml($request->message, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-
             // *** FOR IMAGES ***
+            if(!empty($request->file('img'))){
+
+                foreach($request->file('img') as $image)
+                {
+                    $name=uniqid().'-'.Carbon::today()->format('Y-m-d').'.';
+                    $extension = $image->getClientOriginalExtension();
+                    $image->move('assets/images/message_board',$name.$extension);
+
+                    $data[] = $name.$extension;
+                }
+            }
+            $files = !empty($data)? json_encode($data): null;
 
             // $images = $dom->getElementsByTagName('img');
             // foreach($images as $k => $img){
@@ -99,14 +114,15 @@ class MessageBoardController extends Controller
 
             $detail = $dom->saveHTML();
             $msgboard_tbl->create([
-                'cluster_id' => (!empty(Session::get('_c'))) ? Session::get('_c')[0] : null,
+                'cluster_id' => (!empty(Session::get('_c'))) ? Session::get('_c')[0]['id'] : null,
                 'team_id' => (!empty(Session::get('_t'))) ? json_encode(Session::get('_t')) : null,
                 'subject' => $request->subject,
                 'message' => $detail,
                 'posted_by' => Auth()->user()->id,
                 'pinned' => (!empty($request->pinned)) ? $request->pinned : 0,
-            ]);
+                'files' => $files,
 
+            ]);
             return $this->index();
         }else{
             // $request->session()->with('errors', $validator->errors());
@@ -164,10 +180,26 @@ class MessageBoardController extends Controller
             ]);
 
             if(!$validator->fails()){
+                if(!empty($request->file('img'))){
+
+                    foreach($request->file('img') as $image)
+                    {
+                        $name = $image->getClientOriginalName();
+                        $image->move('assets/images/message_board',$name);
+
+                        $data[] = $name;
+                    }
+                    $files = json_encode($data);
+
+                }else{
+                    $files = $msgboard_tbl->where('id', $request->post('id'))->first();
+                    $files = $files['files'];
+                }
 
                 $msgboard_tbl->where('id', $request->post('id'))->update([
                     'subject' => $request->subject,
                     'message' => $request->message,
+                    'files' => $files,
                 ]);
 
                 // return 'success update message';
@@ -188,13 +220,22 @@ class MessageBoardController extends Controller
     {
 
     }
-   // delete specific post
+    // delete specific post
     public function delete(Request $request){
         //find id first
         $find_id = MessageBoard::findOrFail($request->post('id'));
         if($find_id){
             // delete post
-            MessageBoard::where('id',$request->post('id'))->delete();
+            $image= MessageBoard::where('id',$request->post('id'))->first();
+            if($image['files'] != null){
+                foreach(json_decode($image['files'],true) as $file)
+                {
+                    // delete photo from storage
+                    File::delete('assets/images/message_board/'.$file);
+                }
+            }
+            $image->delete();
+
             // return to index
             return $this->index();
         }
