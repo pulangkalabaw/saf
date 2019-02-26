@@ -15,7 +15,7 @@
                 <div class="row text">
                     <div class="col-md">
                         <!--FORM FOR NEW POST  -->
-                        @if(empty(Session::get('_a')))
+                        @if($role != 'A')
                         <form action="{{ route('app.messages.store') }}" method="post" enctype="multipart/form-data">
                             {{csrf_field()}}
                             <div class="template template_texteditor">
@@ -67,7 +67,7 @@
                                         <div class="col-md-6 text-left">
                                             <h4><i class="fa fa-thumb-tack" aria-hidden="true"></i> <b>Pinned Post</b></h4>
                                         </div>
-                                        @if(empty(Session::get('_a')))
+                                        @if($role != 'A')
                                         <div class="col-md-6 text-right">
                                             <!-- <button data-toggle="modal" data-target="#modal2" type="button" class="btn btn-xs editbtn" onclick="editModal('{{ $pinned->subject }}','{{ $pinned->message }}')" name="button" ><i class="fa fa-edit" aria-hidden="true"></i></button> -->
                                             <button data-toggle="modal" data-target="#modal2" type="button" class="btn btn-xs editbtn" data-id="{{ $pinned->id }}" data-subject="{!! $pinned->subject !!}" data-message="{{ $pinned->message }}" name="button" ><i class="fa fa-edit" aria-hidden="true"></i></button>
@@ -121,7 +121,7 @@
 
                                     @if($post->files != null)
                                     @foreach(json_decode($post->files,true) as $asd)
-                                    <img src="{{ asset('assets/images/message_board/'.$asd)}}" alt="Smiley face" height="100" width="100">
+                                    <img src="{{ asset('assets/images/message_board/'.$asd)}}" alt="Smiley face" height="100" width="100" style="object-fit: cover;">
                                     @endforeach
                                     @endif
                                     <div class="col-md-12">

@@ -7,6 +7,8 @@ use App\MessageBoard;
 
 use Validator;
 use Session;
+use File;
+use Carbon\Carbon;
 
 class MessageBoardController extends Controller
 {
@@ -19,7 +21,7 @@ class MessageBoardController extends Controller
     {
 
         $msgboard_tbl = new MessageBoard();
-        
+
         if( !empty(Session::get('_c')) ){
             $data['allposts'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]['id']])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
             $data['pinned'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]['id']])->where('pinned',1)->with(['user'])->first();
@@ -33,7 +35,6 @@ class MessageBoardController extends Controller
             $data['pinned'] = $msgboard_tbl->where('pinned',1)->with(['user'])->first();
             $data['role'] = 'A';
         }
-
         return view('app.message_board.message_board',[
             'messages' => $data['allposts'],
             'pinned' => $data['pinned'],
@@ -58,7 +59,6 @@ class MessageBoardController extends Controller
      */
     public function store(Request $request)
     {
-        //
         // return $request->all();
         $validator = Validator::make($request->all(),[
             'message' => 'required',
@@ -72,16 +72,16 @@ class MessageBoardController extends Controller
             }
             $dom = new \DomDocument();
             $dom->loadHtml($request->message, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-
             // *** FOR IMAGES ***
             if(!empty($request->file('img'))){
 
                 foreach($request->file('img') as $image)
                 {
-                    $name = $image->getClientOriginalName();
-                    $image->move('assets/images/message_board',$name);
+                    $name=uniqid().'-'.Carbon::today()->format('Y-m-d').'.';
+                    $extension = $image->getClientOriginalExtension();
+                    $image->move('assets/images/message_board',$name.$extension);
 
-                    $data[] = $name;
+                    $data[] = $name.$extension;
                 }
             }
             $files = !empty($data)? json_encode($data): null;
@@ -219,13 +219,22 @@ class MessageBoardController extends Controller
     {
 
     }
-   // delete specific post
+    // delete specific post
     public function delete(Request $request){
         //find id first
         $find_id = MessageBoard::findOrFail($request->post('id'));
         if($find_id){
             // delete post
-            MessageBoard::where('id',$request->post('id'))->delete();
+            $image= MessageBoard::where('id',$request->post('id'))->first();
+            if($image['files'] != null){
+                foreach(json_decode($image['files'],true) as $file)
+                {
+                    // delete photo from storage
+                    File::delete('assets/images/message_board/'.$file);
+                }
+            }
+            $image->delete();
+
             // return to index
             return $this->index();
         }

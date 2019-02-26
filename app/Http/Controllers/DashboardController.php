@@ -88,7 +88,7 @@ class DashboardController extends Controller
         }
         else if( !empty((Session::get('_a'))) ){
           $clusters = [null];
-          $teams = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res){
+          $teams = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model){
               $res['total_agents'] = count($res['agent_ids']);
               $res['agents'] = $user_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get();
               return $res;
@@ -102,9 +102,9 @@ class DashboardController extends Controller
             'no_of_status_that_used' => $no_of_status_that_used,
             'application_counter_by_cluster' => $application_counter_by_cluster,
             'application_counter_by_teams' => $application_counter_by_teams,
-            'clusters' => (!empty($clusters)) ? $clusters : null,
-            'teams' => (!empty($teams)) ? $teams : null,
-            'org' => getHeirarchy(),
+            // 'clusters' => (!empty($clusters)) ? $clusters : null,
+            // 'teams' => (!empty($teams)) ? $teams : null,
+            'heirarchy' => getHeirarchy(),
         ]);
     }
 }

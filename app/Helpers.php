@@ -366,9 +366,8 @@ function getHeirarchy(){
 				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get();
 				return $res;
 		});
-		// dd($cluster_query[0]['team_ids']);
 		return [
-			'cluster' => $clusters,
+			'clusters' => $clusters,
 			'teams' => $teams,
 		];
 	}
@@ -382,15 +381,13 @@ function getHeirarchy(){
 		});
 
 		return [
-			'cluster' => $clusters,
+			'clusters' => $clusters,
 			'teams' => $teams,
 		];
 	}
 	// FOR TEAM LEAD
 	else if( !empty((Session::get('_t'))) ){
 		$clusters = [null];
-		// $clusters = collect(Session::get('_t'))->pluck('team_name');
-		// $teams = collect(Session::get('_t'))->pluck('id');
 		$teams = $teams_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get()->map(function($res) use ($user_model){
 				$res['total_agents'] = count($res['agent_ids']);
 				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get();
@@ -398,22 +395,21 @@ function getHeirarchy(){
 		});
 
 		return [
-			'cluster' => $clusters,
+			'clusters' => $clusters,
 			'teams' => $teams,
 		];
-		// dd($teams);
 
 	}
 	else if( !empty((Session::get('_a'))) ){
 		$clusters = [null];
-		$teams = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res){
+		$teams = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model){
 				$res['total_agents'] = count($res['agent_ids']);
 				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get();
 				return $res;
 		});
 
 		return [
-			'cluster' => $clusters,
+			'clusters' => $clusters,
 			'teams' => $teams,
 		];
 	}
