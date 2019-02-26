@@ -15,7 +15,8 @@
                 <div class="row text">
                     <div class="col-md">
                         <!--FORM FOR NEW POST  -->
-                        <form action="{{ route('app.messages.store') }}" method="post">
+                        @if($role != 'A')
+                        <form action="{{ route('app.messages.store') }}" method="post" enctype="multipart/form-data">
                             {{csrf_field()}}
                             <div class="template template_texteditor">
                                 <div class="row">
@@ -40,9 +41,10 @@
                                                 </div>
                                                 @endif
                                                 <h5 class="text-left">BODY</h5>
-                                                <textarea class="summernotee" name="message">
+                                                <textarea class="summernotee" name="message" value="">
                                                 </textarea>
                                                 <br>
+                                                <input type="file" name="img[]" multiple >
                                                 <div class="text-right">
                                                     <input type="checkbox" id="pin"  name="pinned" value="1">
                                                     &nbsp;<label for="pin">Pin Post</label>&nbsp;
@@ -54,8 +56,8 @@
                                     </div>
                                 </div>
                             </div>
-
                         </form>
+                        @endif
                         <!--IF HAS PINNED POST  -->
                         @if(isset($pinned))
                         <div class="col-md">
@@ -65,18 +67,28 @@
                                         <div class="col-md-6 text-left">
                                             <h4><i class="fa fa-thumb-tack" aria-hidden="true"></i> <b>Pinned Post</b></h4>
                                         </div>
+                                        @if($role != 'A')
                                         <div class="col-md-6 text-right">
                                             <!-- <button data-toggle="modal" data-target="#modal2" type="button" class="btn btn-xs editbtn" onclick="editModal('{{ $pinned->subject }}','{{ $pinned->message }}')" name="button" ><i class="fa fa-edit" aria-hidden="true"></i></button> -->
                                             <button data-toggle="modal" data-target="#modal2" type="button" class="btn btn-xs editbtn" data-id="{{ $pinned->id }}" data-subject="{!! $pinned->subject !!}" data-message="{{ $pinned->message }}" name="button" ><i class="fa fa-edit" aria-hidden="true"></i></button>
                                             <button data-toggle="modal" data-target="#modal1" type="button" class="btn btn-xs deletebtn" data-id="{{ $pinned->id }}" name="button" ><i class="fa fa-trash" aria-hidden="true"></i></button>
 
                                         </div>
+                                        @endif
                                     </div>
                                     <div class="col-md-12 text-left">
                                         <h5 class="text-left"><b>{{ $pinned->subject }}</b></h5>
                                     </div>
                                     <div class="col-md-12">
                                         {!! $pinned->message !!}
+                                    </div>
+
+                                    @if($pinned->files != null)
+                                    @foreach(json_decode($pinned->files,true) as $asd)
+                                    <img src="{{ asset('assets/images/message_board/'.$asd)}}" alt="Smiley face" height="100" width="100" style="object-fit: cover;">
+                                    @endforeach
+                                    @endif
+                                    <div class="col-md-12">
                                         <h5 class="text-right">Posted by: <b>{{ $pinned->user->fname.' '.$pinned->user->lname }}</b></h5>
                                     </div>
                                 </div>
@@ -95,14 +107,24 @@
                                             <h5 class="text-left thissubject"><b>{{ $post->subject }}</b></h5>
                                         </div>
                                         <div class="col-md-6 text-right">
+                                            @if(empty(Session::get('_a')))
                                             <button  data-toggle="modal" data-target="#modal3" data-id="{{ $post->id }}" type="button" class="btn btn-xs pinnedbtn" name="button" ><i class="fa fa-thumb-tack" aria-hidden="true"></i></button>
                                             <button  data-toggle="modal" data-target="#modal2" type="button" class="btn btn-xs editbtn" data-id="{{ $post->id }}" data-subject="{!! $post->subject !!}" data-message="{{ $post->message }}" name="button" ><i class="fa fa-edit" aria-hidden="true"></i></button>
                                             <button  data-toggle="modal" data-target="#modal1" data-id="{{ $post->id }}" type="button" class="btn btn-xs deletebtn" name="button" ><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                            @endif
                                         </div>
                                     </div>
-
                                     <div class="col-md-12">
+
                                         <div class="thismessage">{!! $post->message !!}</div>
+                                    </div>
+
+                                    @if($post->files != null)
+                                    @foreach(json_decode($post->files,true) as $asd)
+                                    <img src="{{ asset('assets/images/message_board/'.$asd)}}" alt="Smiley face" height="100" width="100" style="object-fit: cover;">
+                                    @endforeach
+                                    @endif
+                                    <div class="col-md-12">
                                         <h5 class="text-right">Posted by: <b>{{ $post->user->fname.' '.$post->user->lname }}</b></h5>
                                     </div>
                                 </div>
@@ -133,7 +155,7 @@
             <!-- EDIT MODAL  -->
             <div class="modal fade" id="modal2">
                 <div class="modal-dialog modal-lg">
-                    <form action="{{ route('app.messages.update',1) }}" method="post">
+                    <form action="{{ route('app.messages.update',1) }}" method="post" enctype="multipart/form-data">
 
                         <div class="modal-content">
                             <div class="modal-header">
@@ -157,6 +179,8 @@
                                                         <br>
                                                         <input type="hidden" id="idInputModal" name="id">
                                                         <textarea id="messageInputModal" name="message" class="summernotee"></textarea>
+                                                        <br>
+                                                        <input type="file" name="img[]" multiple >
                                                     </div>
                                                 </div>
                                             </div>
@@ -196,11 +220,15 @@
                                                         <input type="hidden" id="deleteId" name="id">
 
                                                         <br>
-                                                        <div class="text-center">
-                                                            <button class="btn btn-danger" type="submit" name="button">Yes</button>
-
-                                                            <button  data-dismiss="modal"class="btn btn-success deletebtn"  name="button">No</button>
+                                                        <div class="row">
+                                                            <div class="col-md-6 text-left">
+                                                                <button class="btn btn-danger " type="submit" name="button">Yes</button>
+                                                            </div>
+                                                                <div class="col-md-6 text-right ">
+                                                                <button  data-dismiss="modal"class="btn btn-success deletebtn"  name="button">No</button>
+                                                            </div>
                                                         </div>
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -237,11 +265,15 @@
                                                         <input type="hidden" name="pin" value="1">
                                                         <input type="hidden" name="id" id="pinnedId">
                                                         <br>
-                                                        <div class="text-center">
-                                                            <button class="btn btn-danger" type="submit" name="button">Yes</button>
-                                                            <button  data-dismiss="modal"class="btn btn-success" type="button" name="button">No</button>
+                                                        <div class="row">
+                                                            <div class="col-md-6 text-left">
+                                                                <button class="btn btn-danger" type="submit" name="button">Yes</button>
+                                                            </div>
+                                                            <div class="col-md-6 text-right">
+
+                                                                <button  data-dismiss="modal"class="btn btn-success" type="button" name="button">No</button>
+                                                            </div>
                                                         </div>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

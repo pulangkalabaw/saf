@@ -349,4 +349,70 @@ function searchTeamAndCluster ($auth) {
     }
 
 }
+
+
+function getHeirarchy(){
+
+	$teams_model = new Teams();
+	$clusters_model = new Clusters();
+	$user_model = new User();
+
+	// FOR ADMIN
+	if( empty((Session::get('_c'))) && empty((Session::get('_t'))) && empty((Session::get('_a'))) ){
+		$cluster_query = $clusters_model->get();
+		$clusters = $cluster_query->pluck('cluster_name');
+		$teams = $teams_model->whereIn('id',$cluster_query[0]['team_ids'])->get()->map(function($res) use ($user_model){
+				$res['total_agents'] = count($res['agent_ids']);
+				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get();
+				return $res;
+		});
+		return [
+			'clusters' => $clusters,
+			'teams' => $teams,
+		];
+	}
+	// FOR CLUSTER HEAD
+	else if( !empty((Session::get('_c'))) ){
+		$clusters = collect(Session::get('_c'))->pluck('cluster_name');
+		$teams = $teams_model->whereIn('id',Session::get('_c')[0]['team_ids'])->get()->map(function($res) use ($user_model){
+				$res['total_agents'] = count($res['agent_ids']);
+				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_c'))->pluck('id'))->get();
+				return $res;
+		});
+
+		return [
+			'clusters' => $clusters,
+			'teams' => $teams,
+		];
+	}
+	// FOR TEAM LEAD
+	else if( !empty((Session::get('_t'))) ){
+		$clusters = [null];
+		$teams = $teams_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get()->map(function($res) use ($user_model){
+				$res['total_agents'] = count($res['agent_ids']);
+				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get();
+				return $res;
+		});
+
+		return [
+			'clusters' => $clusters,
+			'teams' => $teams,
+		];
+
+	}
+	else if( !empty((Session::get('_a'))) ){
+		$clusters = [null];
+		$teams = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model){
+				$res['total_agents'] = count($res['agent_ids']);
+				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get();
+				return $res;
+		});
+
+		return [
+			'clusters' => $clusters,
+			'teams' => $teams,
+		];
+	}
+
+}
 ?>
