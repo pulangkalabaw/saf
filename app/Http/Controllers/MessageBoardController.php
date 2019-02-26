@@ -38,6 +38,7 @@ class MessageBoardController extends Controller
         return view('app.message_board.message_board',[
             'messages' => $data['allposts'],
             'pinned' => $data['pinned'],
+            'role' => $data['role'],
         ])->withErrors($errors);
     }
 

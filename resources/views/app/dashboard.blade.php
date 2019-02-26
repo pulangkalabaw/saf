@@ -44,7 +44,7 @@
                           <h5>{{ $team->team_name }} <small>Total Agents: {{ $team->total_agents }}</small></h5>
                           <p>Present: <b class="text-success">31</b></p>
                           <p>Absent: <b class="text-danger">8</b></p>
-                          <p>Unkown: <b class="text-warning">1</b></p>
+                          <p>Unkown: <b class="text-warning">1</b></p>                          
                         </div>
                       </div>
                       @endforeach
