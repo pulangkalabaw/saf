@@ -32,11 +32,13 @@ $factory->define(App\Clusters::class, function (Faker $faker) use ($factory) {
     foreach(User::get() as $user){
         if(!in_array($user['id'], $get_clusters)){
             // IF THE USER IS ALREADY EXISTING ON TEAMS TABLE, THEN DON'T GET IT
+            // $get_users[] = $user['id'];
             array_push($get_users, $user['id']);
         }
     }
-    $cl_ids = $faker->randomElements($get_users, 2); // GET RANDOM USER ID FOR TL_IDS
-    $team_ids = $faker->randomElements(Teams::pluck('team_id'), $faker->numberBetween(1, 2)); // GET RANDOM USER ID FOR AGENT_IDS
+    $cl_ids = $faker->randomElements((array)$get_users, 2); // GET RANDOM USER ID FOR TL_IDS
+	// echo var_dump(Teams::pluck('id'));
+    $team_ids = $faker->randomElements(Teams::pluck('id'), $faker->numberBetween(1, 2)); // GET RANDOM USER ID FOR AGENT_IDS
 
 
     return [

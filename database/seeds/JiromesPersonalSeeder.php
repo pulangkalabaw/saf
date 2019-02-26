@@ -82,7 +82,7 @@ class JiromesPersonalSeeder extends Seeder
         ]);
 
         // CLUSTER
-        $users_teams = Teams::take(3)->orderBy('id', 'desc')->pluck('team_id');
+        $users_teams = Teams::take(3)->orderBy('id', 'desc')->pluck('id');
         Clusters::create([
             'cluster_id' => rand(1111, 9999),
             'cluster_name' => 'Team m4pHaG_M4ha4L',

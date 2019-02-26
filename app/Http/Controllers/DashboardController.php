@@ -22,6 +22,8 @@ class DashboardController extends Controller
     }
 
     public function dashboard (Request $request) {
+		return view ('welcome');
+		
 
         $application_status_model = new ApplicationStatus();
         $application_model = new Application();
