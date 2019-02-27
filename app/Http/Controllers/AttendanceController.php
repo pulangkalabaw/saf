@@ -22,9 +22,9 @@ class AttendanceController extends Controller
 	*/
 
 	public function __construct () {
-		$this->middleware('accesesControlMiddleware:administrator,user', ['only' => [
+		$this->middleware('access_control:administrator,user', ['only' => [
 			'index',
-		]])
+		]]);
 	}
 
 	public function sample(){
@@ -323,10 +323,10 @@ class AttendanceController extends Controller
 		foreach((array)$unpresent as $get_unpresent){
 			foreach((array)$get_unpresent as $un_present){
 				foreach(collect($un_present) as $key=>$value){
-					if(!isset($sortArray[$key])){
-						$sortArray[$key] = array();
+					if(!isset($sortArray[(int)$key])){
+						$sortArray[(int)$key] = array();
 					}
-					$sortArray[$key][] = $value;
+					$sortArray[(int)$key][] = $value;
 				}
 			}
 		}
@@ -334,7 +334,9 @@ class AttendanceController extends Controller
 		$orderby = "team_name"; //change this to whatever key you want from the array\
 		$unpresent = $unpresent->toArray();
 		// array_multisort($sortArray['id'],SORT_ASC, $unpresent);
-		array_multisort($sortArray[$orderby],SORT_ASC, $unpresent);
+		if($unpresent){
+			array_multisort($sortArray[$orderby],SORT_ASC, $unpresent);
+		}
 		// array_multisort($sortArray['tl'],SORT_ASC, $unpresent);
 		$attendance['unpresent'] = $unpresent;
 

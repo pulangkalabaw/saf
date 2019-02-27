@@ -70,7 +70,7 @@
 
 											<select name="tl_ids[]" id="" class="form-control selectpicker" multiple="">
                                                 @foreach ($users as $user)
-                                                <option value="{{ $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
+                                                <option value="{{ (int) $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
                                                 @endforeach
                                             </select>
 
@@ -84,7 +84,7 @@
 
                                             <select name="agent_ids[]" id="" class="form-control selectpicker" multiple="">
                                                 @foreach ($users as $user)
-                                                <option value="{{ $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
+                                                <option value="{{ ((int)$user->id) }}">{{ $user->fname . ' ' . $user->lname }}</option>
                                                 @endforeach
                                             </select>
 

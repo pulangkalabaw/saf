@@ -83,7 +83,7 @@
 									<div class="fa fa-fw fa-cog"></div>
 								</div>
 							@endif
-							@if(accesesControl(['administrator', 'user']) && in_array('tl', checkPosition(auth()->user())))
+							@if(accesesControl(['administrator', 'user']))
 								@if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl")
 									<div class="quickmenu__item {{ str_contains(url()->current(), ['attendance']) ? 'active' : '' }}">
 										<div class="fa fa-clock-o"></div>
@@ -184,7 +184,7 @@
 							</div>
 						@endif
                         {{-- USER ATTENDANCE --}}
-						@if(accesesControl(['administrator', 'user']) && in_array('tl', checkPosition(auth()->user())))
+						@if(accesesControl(['administrator', 'user']) )
                         <div class="sidebar__menu">
                             <div class="sidebar__title">Attendance</div>
                             <ul class="nav nav-menu">

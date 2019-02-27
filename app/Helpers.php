@@ -42,7 +42,7 @@ function checkPosition ($user) {
 }
 
 
-
+/*
 * GET CLUSTER AND TEAM (_C, _T)
 *
 * The idea of this is to get your
@@ -669,6 +669,7 @@ function getHeirarchy2(){
 					$res['teams'] = $teams_model->whereIn('id', $res['team_ids'])->get()->map(function($res) use ($teams_model,$user_model,$attendance_model,$team_ids){
 						if( in_array($res['id'],collect(Session::get('_t'))->pluck('id')->toArray()) ){
 							$agents = $user_model->whereIn('id',$res['agent_ids'])->get();
+							$res['total_agents'] = count($agents);
 							$res['agents'] = $agents;
 							// calculate present, absent, unkown
 							$count = [
@@ -706,6 +707,7 @@ function getHeirarchy2(){
 			$myattendance = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model,$attendance_model){
 				$agents = $user_model->where('id',Auth()->user()->id)->first();
 				$res['agents'] = $agents;
+				$res['total_agents'] = count($agents);				
 				// dd($res['id']);
 				$count = [
 					'present' => 0,
