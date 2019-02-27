@@ -98,6 +98,7 @@
                         @endif
                         <!--LIST OF POST  -->
                         <!--if has post  -->
+
                         @foreach($messages as $post)
                         <div class="col-md">
                             <div class="panel">

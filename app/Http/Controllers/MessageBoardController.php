@@ -26,10 +26,10 @@ class MessageBoardController extends Controller
             $data['pinned'] = $msgboard_tbl->where(['cluster_id' => Session::get('_c')[0]['id']])->where('pinned',1)->with(['user'])->first();
         }elseif(!empty(Session::get('_t'))){
             $data['allposts'] = $msgboard_tbl->where(['team_id' => json_encode([Session::get('_t')[0]['id']])])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
-            $data['pinned'] = $msgboard_tbl->where(['team_id' => Session::get('_t')[0]['id']])->where('pinned',1)->with(['user'])->first();
+            $data['pinned'] = $msgboard_tbl->where(['team_id' => json_encode([Session::get('_t')[0]['id']])])->where('pinned',1)->with(['user'])->first();
         }else{
-            $data['allposts'] = $msgboard_tbl->where(['team_id' => Session::get('_a')[0]['id']])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
-            $data['pinned'] = $msgboard_tbl->where(['team_id' => Session::get('_a')[0]['id']])->where('pinned',1)->with(['user'])->first();
+            $data['allposts'] = $msgboard_tbl->where(['team_id' => json_encode([Session::get('_a')[0]['id']])])->whereNotIn('pinned',[1])->orderBy('created_at','desc')->with(['user'])->paginate(10);
+            $data['pinned'] = $msgboard_tbl->where(['team_id' => json_encode([Session::get('_a')[0]['id']])])->where('pinned',1)->with(['user'])->first();
         }
         return view('app.message_board.message_board',[
             'messages' => $data['allposts'],

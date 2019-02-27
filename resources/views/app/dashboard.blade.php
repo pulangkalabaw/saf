@@ -31,26 +31,48 @@
                     <h5>As of <small>{{  now()->format('M d y g:i a') }}</small></h5>
                     <input type="date" class="form-control">
                   </div>
-                  @if(isset($heirarchy))
+                  @if(!empty($heirarchy))
                     @foreach($heirarchy['clusters'] as $clus)
-                    <div class="col-md-12">
-                      <h4>{{ $clus }} <!--<small>Total Agents: 100</small>--></h4>
-                    </div>
-                    <!-- TEAMS  -->
-                    @if(isset($heirarchy['teams']))
-                      @foreach($heirarchy['teams'] as $team)
-                      <div class="col-md-4">
-                        <div class="breadcrumb">
-                          <h5>{{ $team->team_name }} <small>Total Agents: {{ $team->total_agents }}</small></h5>
-                          <p>Present: <b class="text-success">31</b></p>
-                          <p>Absent: <b class="text-danger">8</b></p>
-                          <p>Unkown: <b class="text-warning">1</b></p>                          
-                        </div>
-                      </div>
-                      @endforeach
-                    @endif
-                    <!-- TEAMS -->
+                        @if(!empty($clus))
+                            <div class="col-md-12">
+                              <h4>{{ $clus->cluster_name }} <!--<small>Total Agents: 100</small>--></h4>
+                            </div>
+                            <!-- TEAMS  -->
+                            @if(!empty($clus->teams))
+                              @foreach($clus->teams as $team)
+                                  @if(!empty($team))
+                                      <div class="col-md-4">
+                                        <div class="breadcrumb">
+                                          <h5>{{ $team->team_name }} <small>Total Agents: {{ $team->total_agents }}</small></h5>
+                                          <p>Present: <b class="text-success">{{ $team->attendance['present'] }}</b></p>
+                                          <p>Absent: <b class="text-danger">{{ $team->attendance['absent'] }}</b></p>
+                                          <p>Unkown: <b class="text-warning">{{ $team->attendance['unkown'] }}</b></p>
+                                        </div>
+                                      </div>
+                                  @endif
+                              @endforeach
+                            @endif
+                            <!-- TEAMS -->
+                        @endif
                     @endforeach
+
+                    @if(!empty($heirarchy['myattendance']))
+                    <div class="col-md-12">
+                        <br>
+                        @foreach($heirarchy['myattendance'] as $team)
+                        <div class="col-md-4 mt-4 mb-4">
+                          <div class="breadcrumb">
+                            <h5>{{ $team->team_name }}</h5>
+                            <!-- <p>Present: <b class="text-success">30</b></p> -->
+                            <!-- <p>Absent: <b class="text-danger">2</b></p> -->
+                            <!-- <p>Unkown: <b class="text-warning">1</b></p> -->
+                            <p>Your attendance is <span class="text-warning">unkown</span> today.</p>
+                          </div>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    @endif
                   @endif
                 </div>
                 <!-- CLUSTER -->
