@@ -64,10 +64,6 @@
 							<li><a href="{{ route('logout') }}">Log Out</a></li>
 						</ul>
 					</li>
-					<li class="dropdown">
-
-							{{ base64_decode(auth()->user()->role) }}
-					</li>
 				</ul>
 			</div>
 		</nav>
