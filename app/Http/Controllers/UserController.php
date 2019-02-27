@@ -148,7 +148,7 @@ class UserController extends Controller
         else {
             unset($request['password']);
         }
-        if (User::findOrFail($id)->update($request->except(['_token', '_method']))) {
+        if (User::where('id', $id)->update($request->except(['_token', '_method']))) {
             return back()->with([
                 'notif.style' => 'success',
                 'notif.icon' => 'plus-circle',
@@ -178,7 +178,8 @@ class UserController extends Controller
 
 
         // ** CHECK FOR CLUSTERS TABLE
-        $clusters_search = $clusters->where('cl_id', $id)->first();
+        // if user is part of the cluster, login user will be prompt to remove the selected user in the cluster to be able to delete the selected user
+        $clusters_search = $clusters->where('cluster_id', $id)->first();
         if (!empty($clusters_search)) {
             return redirect()->back()->with([
                 'notif.style' => 'warning',
@@ -186,38 +187,43 @@ class UserController extends Controller
                 'notif.message' => 'This user is currently assigned to a cluster, you must remove this user to that cluster in order to delete',
             ]);
         }
-
         // ** CHECK FOR TEAMS TABLE
         // Search for CL, TL and Agent Code
-        $teams_search = $teams->orWhere('tl_id', $id)->orWhere('agent_code', $user->agent_code)->count();
+        // $teams_search = $teams->orWhere('team_id', $id)->orWhere('agent_ids', $id)->count();
+
+        // check if user is part of the team
+        return $teams = $teams->get()->map(function ($response) use ($id){
+            $response['agent_ids'] = (in_array($id, $response['agent_ids']) ? $id : 'false');
+            return $response;
+        });
 
         if ($teams_search == 0) {
             // Clean in CL, TL and Agent
             // Now, lets check the Encoders IDs
-            $teams_search = $teams->get(['encoder_ids'])->map(function ($r) use ($id) {
-
-                // json decode to make it array again
-                $r['encoder_ids'] = json_decode($r['encoder_ids']);
-
-                // Check if id is ENCODER ids
-                if (in_array($id, $r['encoder_ids'])) {
-                    return ['m' => $r, 'v' => false ];
-                }
-                else {
-                    return ['m' => $r, 'v' => true ];
-                }
-            });
+            // $teams_search = $teams->get(['encoder_ids'])->map(function ($r) use ($id) {
+            //
+            //     // json decode to make it array again
+            //     $r['encoder_ids'] = json_decode($r['encoder_ids']);
+            //
+            //     // Check if id is ENCODER ids
+            //     if (in_array($id, $r['encoder_ids'])) {
+            //         return ['m' => $r, 'v' => false ];
+            //     }
+            //     else {
+            //         return ['m' => $r, 'v' => true ];
+            //     }
+            // });
 
             // if theres valid false in collection
             // means it is in a team
             // Encoder specifically
-            if (in_array(false, $teams_search[0])) {
-                return redirect()->back()->with([
-                    'notif.style' => 'warning',
-                    'notif.icon' => 'warning',
-                    'notif.message' => 'This user is currently assigned to a team, you must remove this user to that team in order to delete',
-                ]);
-            }
+            // if (in_array(false, $teams_search[0])) {
+            //     return redirect()->back()->with([
+            //         'notif.style' => 'warning',
+            //         'notif.icon' => 'warning',
+            //         'notif.message' => 'This user is currently assigned to a team, you must remove this user to that team in order to delete',
+            //     ]);
+            // }
 
             // Everything is good to go, you may delete this user
             if ($user->delete()) {

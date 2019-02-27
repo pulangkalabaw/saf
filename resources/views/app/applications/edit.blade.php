@@ -37,7 +37,7 @@
 								@foreach ($application_model->allStatus($application->application_id) as $appli)
 									<tr>
 										<td>
-											{{ ucfirst($appli->status) }}
+											{{ ucfirst($appli->status_id) }}
 										</td>
 										<td>
 											{{ $application_status->addedBy($appli->application_id)->fname }}
@@ -90,14 +90,6 @@
 								{{ method_field('PUT') }}
 								<div class="row">
 									<div class="col-md-6">
-										<div>
-											<div class="col-md-3 col-xs-3">Application #:</div>
-											<div class="col-md-7 col-xs-7">
-												{{ $application->application_id }}
-											</div>
-										</div>
-										<div class="clearfix"></div><br>
-
 										<div>
 											<div class="col-md-3 col-xs-3">Status:</div>
 											<div class="col-md-7 col-xs-7">

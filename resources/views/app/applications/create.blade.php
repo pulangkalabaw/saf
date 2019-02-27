@@ -1,6 +1,5 @@
 @extends ('layouts.app')
 
-
 @section('content')
 
 	<div class="main-heading">
@@ -32,80 +31,125 @@
 								</div>
 							</div>
 						</div>
+						{{-- Body start --}}
+
 						<div class="panel-body">
-							<form action="{{ route('app.applications.store') }}" method="POST">
+	                        <form action="{{ route('app.applications.store') }}" method="POST">
+	                            @include('includes.notif')
 
-								@include('includes.notif')
-								{{ csrf_field() }}
+	                            {{ csrf_field() }}
+	                            <div class="row">
+	                                <div class="col-md-7">
 
-								<div style="overflow-x: auto;" class="table-reponsive">
-									<table class="table" style="width: 1405px">
-										<thead>
-											<tr>
-												<th width="5px"></th>
-												<th width="200px">Customer <span class="required">*</span></th>
-												<th width="200px">Contact <span class="required">*</span></th>
-												<th width="200px">Address <span class="required">*</span></th>
-												<th width="200px">Plan <span class="required">*</span></th>
-												<th width="200px">Sim</th>
-												<th width="200px">Device</th>
-												<th width="200px">Agent <span class="required">*</span></th>
-											</tr>
-										</thead>
-										<tbody>
-											@for($i = 0; $i <= 9; $i++)
-												<tr>
-													<td>{{ ($i < 10) ? ($i + 1) : $i }}.</td>
-													<td>
-														<input type="text" placeholder="Customer" name="customer_name[]" id="" class="form-control" value="{{ old('customer_name.'.$i) }}">
-													</td>
-													<td>
-														<input type="text" placeholder="Contact" name="contact[]" id="" class="form-control" value="{{ old('contact.'.$i) }}">
-													</td>
-													<td>
-														<input type="text" placeholder="Address" name="address[]" id="" class="form-control" value="{{ old('address.'.$i) }}">
-													</td>
-													<td>
-														<select name="plan_id[]" class="form-control">
-															@if (empty(old('plan_id.'.$i)))
-																<option value="" selected>Select plan (required)</option>
-															@endif
-															@foreach ($plans as $plan)
-																<option {{ old('plan_applied.'.$i) == $plan->id ? 'selected' : ''}} value="{{ $plan->id }}">{{ $plan->plan_name }}</option>
-															@endforeach
-														</select>
-													</td>
-													<td>
-														<input type="text" name="sim[]" placeholder="Sim" class="form-control" value="{{ old('sim.'.$i) }}">
-													</td>
-												</td>
-												<td>
-													<select name="device_id[]" class="form-control">
-														<option value="" selected></option>
-														@foreach ($devices as $device)
-															<option {{ old('device_id.'.$i) == $device->device_id ? 'selected' : ''}} value="{{ $device->device_id }}">{{ $device->device_name }}</option>
-														@endforeach
-													</select>
-												</td>
-												<td>
-													<select name="agent_id[]" class="form-control">
-														@if (empty(old('agent_id.'.$i)))
-															<option value="" selected>Select agent (required)</option>
-														@endif
-														@foreach ($agents as $agent)
-															<option {{ old('agent_id.'.$i) == $agent->id ? 'selected' : ''}}  value="{{ $agent->id }}">{{ $agent->fname . ' ' . $agent->lname }}</option>
-														@endforeach
-													</select>
-												</td>
-											</tr>
-										@endfor
-									</tbody>
-								</table>
-							</div>
-							<hr>
-							<button class="btn btn-primary">Submit <span class='fa fa-plus-circle'></span> </button>
-							<br>
-						</form>
+										<div>
+	                                        <div class="col-md-3">Team</div>
+											@if($errors->any())
+												<span class="required">*</span>
+											@endif
+	                                        <div class="col-md-7">
+												<select name="team_id" class="form-control">
+													@if (empty(old('team_id')))
+														<option value="" selected>Select Team (required)</option>
+													@endif
+													@foreach ($teams as $team)
+														<option {{ old('team_id') == $team->id ? 'selected' : ''}} value="{{ $team->id }}">{{ $team->team_name }}</option>
+													@endforeach
+												</select>
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div><br>
+
+	                                    <div>
+	                                        <div class="col-md-3">Customer</div>
+											@if($errors->any())
+												<span class="required">*</span>
+											@endif
+	                                        <div class="col-md-7">
+	                                            <input type="text" name="customer_name" id="" class="form-control" required value="{{ old('customer_name') }} ">
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div><br>
+
+										<div>
+	                                        <div class="col-md-3">Contact</div>
+											@if($errors->any())
+												<span class="required">*</span>
+											@endif
+	                                        <div class="col-md-7">
+	                                            <input type="text" name="contact" id="" class="form-control" required value="{{ old('contact') }}">
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div><br>
+
+										<div>
+	                                        <div class="col-md-3">Address</div>
+											@if($errors->any())
+												<span class="required">*</span>
+											@endif
+	                                        <div class="col-md-7">
+	                                            <input type="text" name="address" id="" class="form-control" required value="{{ old('address') }}">
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div><br>
+
+										<div>
+	                                        <div class="col-md-3">Plan</div>
+											@if($errors->any())
+												<span class="required">*</span>
+											@endif
+	                                        <div class="col-md-7">
+												<select name="plan_id" class="form-control">
+													@if (empty(old('plan_id')))
+														<option value="" selected>Select plan (required)</option>
+													@endif
+													@foreach ($plans as $plan)
+														<option {{ old('plan_applied') == $plan->id ? 'selected' : ''}} value="{{ $plan->id }}">{{ $plan->plan_name }}</option>
+													@endforeach
+												</select>
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div><br>
+
+										<div>
+	                                        <div class="col-md-3">Sim\Device</div>
+	                                        <div class="col-md-7">
+	                                            <input type="text" name="sim" id="" class="form-control" value="{{ old('sim') }}">
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div><br>
+
+										<div>
+	                                        <div class="col-md-3">Agent</div>
+											@if($errors->any())
+												<span class="required">*</span>
+											@endif
+	                                        <div class="col-md-7">
+												<select name="user_id" class="form-control">
+													@if (empty(old('id')))
+														<option value="" selected>Select agent (required)</option>
+													@endif
+													@foreach ($users as $user)
+														<option {{ old('id') == $user->id ? 'selected' : ''}}  value="{{ $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
+													@endforeach
+												</select>
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div><br>
+
+										<div>
+	                                        <div class="col-md-3"></div>
+	                                        <div class="col-md-7 text-right">
+	                                            <button class="btn btn-xs btn-primary">Submit <span class='fa fa-plus-circle'></span> </button>
+	                                        </div>
+	                                    </div>
+	                                    <div class="clearfix"></div><br>
+
+	                                </div>
+	                            </div>
+	                        </form>
+	                    </div>
+
+						{{-- Body end --}}
 					</div>
 				</div>
 			</div>

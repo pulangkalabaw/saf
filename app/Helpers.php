@@ -185,6 +185,54 @@ function fetchAgent ($auth)
 }
 
 
+
+
+/**
+ * Check Position
+ *
+ *
+ * This function will identify your Position
+ * whether user is TL, CL or agent
+ *
+ * PS: User can have a multiple position
+ *
+ * Requirements: User Model and a role with 'user'
+ *
+ * @return *tml, crl, agt or undefined
+ *
+ */
+
+ function checkPosition ($user, $can_access = [], $diff = false) {
+
+ 	// check first if this $user
+ 	// is has a role of 'user'
+ 	if (base64_decode($user->role) != 'user') return 'undefined';
+
+ 	// get the cluster and team (if any)
+ 	$r = getMyClusterAndTeam($user);
+
+ 	// hold the multiple position var
+ 	$pos = [];
+
+ 	// just count them
+ 	// and return the appropriate response
+ 	if (count($r['_a'])) array_push($pos, 'agent'); // Agent
+ 	if (count($r['_t'])) array_push($pos, 'tl'); // Team leader
+ 	if (count($r['_c'])) array_push($pos, 'cl'); // Cluster leader
+
+ 	if ($diff) {
+
+ 		// use array diff
+ 		$arr_diff = array_intersect($pos, $can_access);
+ 		return $arr_diff;
+ 	}
+
+ 	else return $pos;
+
+ }
+
+
+
 function c_array_flatten($array) {
 	if (!is_array($array)) {
 		return FALSE;
@@ -216,7 +264,15 @@ function comma_separated_to_array($string, $separator = ',')
 }
 
 // Access Control: were you can give an array of roles that can access
-// specific div
+function accesesControlMiddleware (...$can_access) {
+
+	// $can_access is a array of roles
+	if (!in_array(base64_decode(Auth::user()->role), $can_access)) {
+		return back();
+	}
+}
+
+// Access Control: were you can give an array of roles that can access specific div
 function accesesControl ($can_access) {
 
 	// $can_access is a array of roles

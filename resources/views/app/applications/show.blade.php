@@ -73,7 +73,7 @@
 									</h3>
 								</div>
 								<div class="col-md-4 text-right">
-									@if (accesesControl(['encoder', 'administrator']))
+									@if (accesesControl(['encoder']))
 										<a href="{{ route('app.applications.edit', $application->application_id) }}" class="btn btn-xs btn-default">
 											<span class='fa fa-edit'></span>
 										</a>

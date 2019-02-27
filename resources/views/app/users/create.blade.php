@@ -84,6 +84,17 @@
                                     </div>
                                     <div class="clearfix"></div><br>
 
+                                    <div>
+                                        <div class="col-md-3">Target</div>
+                                        <div class="col-md-7">
+                                            <input class="pull-left" type="checkbox" id="checkTarget" onclick="showTarget()">
+                                            <div class="col-sm-10">
+                                                <input type="text" name="target" class="form-control" id="target" style="display:none">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
                                     <div class="code">
                                         <div class="col-md-3">Agent Code</div>
                                         <div class="col-md-7">
@@ -99,14 +110,6 @@
                                                 <option {{ old('isActive') == '1' ? 'selected': ''  }} value="1">Activated</option>
                                                 <option {{ old('isActive') == '0' ? 'selected': ''  }} value="0">Deactivated</option>
                                             </select>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div><br>
-
-                                    <div class="code">
-                                        <div class="col-md-3">Target</div>
-                                        <div class="col-md-7">
-                                            <input type="text" name="target" class="form-control" value="{{ old('target') }}">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -148,5 +151,14 @@
         roleSwitcher();
     })
 
+    function showTarget() {
+      var checkBox = document.getElementById("checkTarget");
+      var target = document.getElementById("target");
+      if (checkBox.checked == true){
+        target.style.display = "block";
+      } else {
+        target.style.display = "none";
+      }
+    }
 </script>
 @endsection

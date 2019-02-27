@@ -27,21 +27,17 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     // Dashboard
     Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard');
     // Users
-    Route::resource('users', 'UserController')->middleware('admin_only');
+    Route::resource('users', 'UserController')->middleware('access_control:administrator');
     // Teams
-    Route::resource('teams', 'TeamsController')->middleware('admin_only');
+    Route::resource('teams', 'TeamsController');
     // Clusters
-    Route::resource('clusters', 'ClustersController')->middleware('admin_only');
+    Route::resource('clusters', 'ClustersController');
     // Applications
     Route::resource('applications', 'ApplicationController');
-    // Statuses
-    Route::resource('statuses', 'StatusesController')->middleware('admin_only');
-    // Product
-    Route::resource('product', 'ProductController')->middleware('admin_only');
     // Devices
-    Route::resource('devices', 'DevicesController')->middleware('admin_only');
+    Route::resource('devices', 'DevicesController');
     // Plan
-    Route::resource('plans', 'PlansController')->middleware('admin_only');
+    Route::resource('plans', 'PlansController')->middleware('access_control:administrator');
     // Message Board
     Route::resource('messages', 'MessageBoardController');
     // Route::get('message-board', 'MessageBoardController@messageBoard')->name('messageboard');

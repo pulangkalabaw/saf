@@ -23,10 +23,12 @@
 								</div>
 								<div class="col-md-4 text-right">
 
-									@if (accesesControl(['tl', 'administrator']))
+									@if (accesesControl(['user']))
+										@if (count(checkPosition(auth()->user(), ['tl', 'cl'], true)) != 0)
 										<a href="{{ route('app.applications.create') }}" class="btn btn-xs btn-default">
 											<span class='fa fa-plus-circle'></span> Add Application
 										</a>
+										@endif
 									@endif
 
 								</div>

@@ -112,14 +112,14 @@
                                     <td>
                                         <a data-toggle="tooltip" title="View User" href="{{ route('app.users.show', $user->id) }}" class="btn btn-warning btn-xs"><span class='fa fa-eye'></span></a>
                                         <a data-toggle="tooltip" title="Edit User" href="{{ route('app.users.edit', $user->id) }}" class="btn btn-success btn-xs"><span class='fa fa-edit'></span></a>
-                                        @if (base64_decode($user->role) != "administrator" || Auth::user()->id != $user->id)
+                                        {{-- @if (base64_decode($user->role) != "administrator" || Auth::user()->id != $user->id)
                                         <button data-toggle="tooltip" title="Delete User" class="btn btn-xs btn-danger" for="submit-form" tabindex="0" form="{{ $user->id }}myform"><span class='fa fa-trash'></span>
                                             <form class="delete" method="POST" action="{{ route('app.users.destroy', $user->id) }}" id="{{ $user->id }}myform">
                                                 {{ method_field('DELETE') }}
                                                 {{ csrf_field() }}
                                             </form>
                                         </button>
-                                        @endif
+                                        @endif --}}
                                     </td>
                                 </tr>
                                 @endforeach
@@ -139,10 +139,6 @@
             </div>
         </div>
     </div>
-</div>
-</div>
-</div>
-</div>
 </div>
 @endsection
 
