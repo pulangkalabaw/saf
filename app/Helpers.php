@@ -6,6 +6,43 @@ use App\Attendance;
 use Carbon\Carbon;
 
 /**
+* Check Position
+*
+*
+* This function will identify your Position
+* whether user is TL, CL or agent
+*
+* PS: User can have a multiple position
+*
+* Requirements: User Model and a role with 'user'
+*
+* @return *tml, crl, agt or undefined
+*
+*/
+
+function checkPosition ($user) {
+
+	// check first if this $user
+	// is has a role of 'user'
+	if (base64_decode($user->role) != 'user') return 'undefined';
+
+	// get the cluster and team (if any)
+	$r = getMyClusterAndTeam($user);
+
+	// hold the multiple position var
+	$pos = [];
+
+	// just count them
+	// and return the appropriate response
+	if (count($r['_a'])) array_push($pos, 'agnt'); // Agent
+	if (count($r['_t'])) array_push($pos, 'tl'); // Team leader
+	if (count($r['_c'])) array_push($pos, 'cl'); // Cluster leader
+
+	return $pos;
+}
+
+
+
 * GET CLUSTER AND TEAM (_C, _T)
 *
 * The idea of this is to get your
@@ -19,6 +56,7 @@ use Carbon\Carbon;
 * method.
 *
 */
+
 function getMyClusterAndTeam ($auth)
 {
 	/**

@@ -7,7 +7,6 @@ $factory->define(App\Attendance::class, function (Faker $faker) {
     // return $cluster_id['team_ids'];
     $team_id  = App\Teams::where('id', $faker->randomElement($cluster_id['team_ids']))->first();
     $user_id = App\User::where('id', $faker->randomElement($team_id['agent_ids']))->value('id');
-    // $cluster_id = App\Clusters::where('team_ids', 'like', '%' . $team_id['team_id'] . '%')->value('id');
     return [
         'cluster_id' => $cluster_id['id'],
         'team_id' => $team_id,
