@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Session;
+use Validator;
 use App\User;
 use App\Plans;
 use App\Teams;
@@ -16,9 +17,12 @@ use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
 {
+	// limits the access control of the user
 	public function __construct()
 	{
-		// $this->middleware('admin_only', ['only' => 'create']);
+		$this->middleware('access_control:encoder,administrator,user', ['only' => 'index', 'show']);
+		$this->middleware('access_control:administrator,user', ['only' => 'create']);
+		$this->middleware('access_control:encoder', ['only' => 'edit']);
 	}
 
 	/**
@@ -28,16 +32,19 @@ class ApplicationController extends Controller
 	*/
 	public function index(Request $request)
 	{
-		//
 		$applications = new Application();
 
-		if (Auth::user()->role != base64_encode("administrator")) $applications = $applications->where('insert_by', Auth::user()->id);
+		// Get the current login users cluster Id
+		if (base64_decode(Auth::user()->role) == 'user'){
+			$applications = $applications->where('insert_by', Auth::user()->id)
+			->orWhere('agent_id', Auth::user()->id);
+		}
+
 		if (!empty($request->get('search_string'))) {
 			// With search string parameter
 			$applications = $applications->search($request->get('search_string'));
 		}
 
-		// Count all before paginate
 		$total = $applications->count();
 
 		// Insert pagination
@@ -55,19 +62,20 @@ class ApplicationController extends Controller
 	*/
 	public function create()
 	{
-		$users = new User();
-		$teams = Teams::whereIn('team_id', Session::get('_t'))->get();
+		$users = User::get();
+		$teams = Teams::get();
 		$statuses = Statuses::get();
 		$plans = Plans::get();
 		$devices = Devices::get();
 		$products = Product::get();
 
 		return view('app.applications.create', [
-			'agents' => $users->whereIn('role', [base64_encode('agent'), base64_encode('agent_referral')])->get(), // Get agent only!
+			'users' => $users,
 			'plans' => $plans,
 			'devices' => $devices,
 			'products' => $products,
 			'statuses' => $statuses,
+			'teams' => $teams,
 		]);
 	}
 
@@ -79,70 +87,72 @@ class ApplicationController extends Controller
 	*/
 	public function store(Request $request)
 	{
+		$validate = Validator::make($request->all(),[
+				'customer_name' => 'required',
+				'contact' => 'required',
+				'address' => 'required',
+				'plan_id' => 'required',
+				'user_id' => 'required',
+				'team_id' => 'required'
+		],[
+			'plan_id.required' => 'Please select plan',
+			'user_id.required' => 'Please select user',
+			'team_id.required' => 'Please select team'
+		]);
 
-		// Count row for looping (for now, we will reference customer_name)
-		// how many row did he/she filled
-		$row_count = count(array_filter($request['customer_name']));
+		if($validate->fails()) return back()->withErrors($validate->errors())->withInput();
 
-		// if the row has a length of 0
-		if ($row_count == 0) {
-			return back()->with([
-				'notif.style' => 'danger',
-				'notif.icon' => 'times-circle',
-				'notif.message' =>
-				'All fields are required'
-			])
-			->withInput();
+		// Get plan data
+		$plan = Plans::findOrFail($request['plan_id']);
+
+		// Generate application_id
+		$application_id = rand(1111,9999);
+
+		// variable by default
+		// if sim / device field is empty default given value will be null
+		$sim = null;
+		$device = null;
+
+		// Checks if the given number is sim number or device number gives null on device if sim else gives null on sim if device is selected
+		if(substr($request['sim'],0,2) === '09' || substr($request['sim'],0,3) === '+63'){
+			$sim = $request['sim'];
+			$device = null;
+		} else {
+			$sim = null;
+			$device = $request['sim'];
 		}
 
-		// Loop through all rows
-		for ($i = 0; $i <= $row_count - 1; $i++) {
+		// Get cluster
+		$team_model = new Teams();
+		$team_model = $team_model->getCluster($request['team_id']);
 
-			if ($request['agent_id'][$i] == 0 || $request['plan_id'][$i] == 0) {
-				return back()->with([
-					'notif.style' => 'danger',
-					'notif.icon' => 'times-circle',
-					'notif.message' => 'Agent and Plan are also requried!',
-				])
-				->withInput();
-			}
+		// Data to be inserted to Application table
+		$application_data = [
+			'application_id' => $application_id,
+			'cluster_id' => $team_model[0]['cluster_id'],
+			'team_id' => $request['team_id'],
+			'customer_name' => $request['customer_name'],
+			'contact' => $request['contact'],
+			'address' => $request['address'],
+			'plan_id' => (int) $request['plan_id'],
+			'msf' => (float) $plan->msf,
+			'sim' => $sim,
+			'device_id' => $device,
+			'agent_id' => (int) $request['user_id'],
+			'status' => 'new',
+			'insert_by' => (int) Auth::user()->id,
+			'created_at' => now(),
+		];
 
-			// Get the amount of that plan
-			$plan = Plans::findOrFail($request['plan_id'][$i]);
-
-			// Generate application_id
-			$application_id = rand(1111, 99999);
-
-			// Data to insert in Application table
-			$application_data[$i] = [
-
-				'application_id' => $application_id,
-				'customer_name' => $this->replaceDashIfNull($request['customer_name'][$i]),
-				'insert_by' => Auth::user()->id,
-				'team_id' => Session::get('_t')[0],
-				'cluster_id' => Session::get('_c')[0],
-				'contact' => $this->replaceDashIfNull($request['contact'][$i]),
-				'address' => $this->replaceDashIfNull($request['address'][$i]),
-				'plan_id' => (int) $request['plan_id'][$i],
-				'msf' => (double) $plan->msf,
-				'sim' => $this->replaceDashIfNull($request['sim'][$i]),
-				'device_id' => $this->replaceDashIfNull($request['device_id'][$i]), // string
-				'agent_id' => (int) $request['agent_id'][$i],
-				'status' => 'new',
-				'created_at' => now(),
-
-			];
-
-			// Data to insert in Application Status table
-			$application_status_data[$i] = [
-				'application_id' => (string) $application_id,
-				'team_id' => Session::get('_t')[0],
-				'status_id' => 'new', // change this to status
-				'active' => 1, // Active means it is the current status ;)
-				'added_by' => Auth::user()->id,
-				'created_at' =>now(),
-			];
-		}
+		// Data to be inserted to Application Status table
+		$application_status_data = [
+			'application_id' => $application_id,
+			'team_id' => $request['team_id'],
+			'status_id' => 'new',
+			'active' => 1,
+			'added_by' => Auth::user()->id,
+			'created_at' => now(),
+		];
 
 		if (Application::insert($application_data)) {
 
@@ -164,7 +174,6 @@ class ApplicationController extends Controller
 				'notif.message' => 'Failed to add',
 			]);
 		}
-
 	}
 
 	/**
@@ -215,7 +224,7 @@ class ApplicationController extends Controller
 				'application' => $application,
 				'application_model' => $application_model,
 				'application_status' => $application_status,
-				'agents' => $users->whereIn('role', [base64_encode('agent_referral'), base64_encode('agent')])->get(),
+				'agents' => $users->get(),
 				'teams' => $teams,
 				'plans' => $plans,
 				'devices' => $devices,
@@ -235,6 +244,7 @@ class ApplicationController extends Controller
 		{
 			$application_model = new Application();
 			$application = $application_model->where('application_id', $id)->firstOrFail();
+			$msf = Plans::where('id',$request['plan_id'])->value('msf');
 
 			// Place to $data variable
 			$data['customer_name'] = $request->post('customer_name');
@@ -244,13 +254,13 @@ class ApplicationController extends Controller
 			$data['sim'] = $request->post('sim');
 			$data['device_id'] = empty($request->post('device_id')) ? '-' : $request->post('device_id');
 			$data['agent_id'] = (int) $request->post('agent_id');
+			$data['msf'] = (float) $msf;
 			$data['sr_no'] = $request->post('sr_no');
 			$data['so_no'] = $request->post('so_no');
 			$data['status'] = $request->post('status');
 			$data['encoder_id'] = Auth::user()->id;
 			$data['encoded_at'] = now();
 			$data['updated_at'] = now();
-
 
 			if ($application->update($data)) {
 
@@ -264,8 +274,6 @@ class ApplicationController extends Controller
 						'team_id' => (int) $request->post('team_id'),
 						'created_at' => now(),
 					]);
-
-
 
 					return back()->with([
 						'notif.style' => 'success',

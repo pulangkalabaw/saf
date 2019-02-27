@@ -81,17 +81,15 @@
                                         <div class="col-md-3">Role</div>
                                         <div class="col-md-7">
                                             <select name="role" id="roles" class="form-control" required>
-                                                <option {{ (base64_decode($user->role) == 'spiderman') ? 'selected' : '' }}value="spiderman">Administrator</option>
-                                                <option {{ (base64_decode($user->role) == 'tl') ? 'selected' : '' }} value="tl">Team Leader</option>
-                                                <option {{ (base64_decode($user->role) == 'cl') ? 'selected' : '' }} value="cl">Cluster Leader</option>
-                                                <option {{ (base64_decode($user->role) == 'encoder') ? 'selected' : '' }} value="encoder">Encoder</option>
-                                                <option {{ (base64_decode($user->role) == 'agent') ? 'selected' : '' }} value="agent">Agent</option>
-                                                <option {{ (base64_decode($user->role) == 'agent_referral') ? 'selected' : '' }} value="agent_referral">Agent Referral</option>
+                                                <option {{ $user->role == base64_encode("administrator") ? 'selected' : '' }} value="administrator">Administrator</option>
+                                                <option {{ $user->role == base64_encode("encoder") ? 'selected' : '' }} value="encoder">Encoder</option>
+                                                <option {{ $user->role == base64_encode("user") ? 'selected' : '' }} value="user">User</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
-                                    @if ($user->agent_code)
+
+                                    {{-- @if ($user->agent_code)
                                     <div class="code">
                                         <div class="col-md-3">Agent Code</div>
                                         <div class="col-md-7">
@@ -99,7 +97,7 @@
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
-                                    @endif
+                                    @endif --}}
 
                                     <div>
                                         <div class="col-md-3">Status</div>
@@ -112,11 +110,24 @@
                                     </div>
                                     <div class="clearfix"></div><br>
 
-                                    @if($user->pat)
+                                    @if(empty($user->target))
+                                        <div>
+                                            <div class="col-md-3">Add Target</div>
+                                            <div class="col-md-7">
+                                                <input class="pull-left" type="checkbox" id="checkTarget" onclick="showTarget()">
+                                                <div class="col-sm-10">
+                                                    <input type="text" name="target" class="form-control" id="target" style="display:none">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div><br>
+                                    @endif
+
+                                    @if($user->target)
                                     <div>
-                                        <div class="col-md-3">PAT</div>
+                                        <div class="col-md-3">Target</div>
                                         <div class="col-md-7">
-                                            <input type="text" name="pat" class="form-control" value="{{ $user->pat }}">
+                                            <input type="text" name="target" class="form-control" value="{{ $user->target }}">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -159,5 +170,14 @@
         roleSwitcher();
     })
 
+    function showTarget() {
+      var checkBox = document.getElementById("checkTarget");
+      var target = document.getElementById("target");
+      if (checkBox.checked == true){
+        target.style.display = "block";
+      } else {
+        target.style.display = "none";
+      }
+    }
 </script>
 @endsection
