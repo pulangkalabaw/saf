@@ -79,7 +79,7 @@
 													{{-- Current --}}
 													@if (!empty($team->tl_ids))
 														@foreach ($team->getTeamLeader($team->tl_ids) as $key => $tl)
-															<option selected value="{{ $tl->id }}">
+															<option selected value="{{ (int) $tl->id }}">
 																{{ $tl->fname }}
 																{{ $tl->lname }}
 															</option>
@@ -90,11 +90,11 @@
 													{{-- Available --}}
 													@foreach ($team_leaders as $tl)
 														@if (!empty($team->agent_ids))
-															<option {{ in_array($tl->id, $team->tl_ids) ? 'selected' : '' }} value="{{ $tl->id }}">
+															<option {{ in_array($tl->id, $team->tl_ids) ? 'selected' : '' }} value="{{ (int) $tl->id }}">
 																{{ $tl->fname . ' ' . $tl->lname }}
 															</option>
 														@else
-															<option value="{{ $tl->id }}">
+															<option value="{{ (int)$tl->id }}">
 																{{ $tl->fname . ' ' . $tl->lname }}
 															</option>
 														@endif
@@ -114,7 +114,7 @@
 													{{-- Current --}}
 													@if(!empty($team->agent_ids))
 														@foreach ($team->getAgents($team->agent_ids) as $key => $agent)
-															<option selected value="{{ $agent->id }}">
+															<option selected value="{{ (int) $agent->id }}">
 																{{ $agent->fname . ' ' . $agent->lname }}
 															</option>
 														@endforeach
@@ -124,11 +124,11 @@
 													@foreach ($agents as $agent)
 														@if (!empty($team->agent_ids))
 															<option {{ in_array($agent->id, $team->agent_ids) ? 'selected' : '' }}
-																value="{{ $agent->id }}">
+																value="{{ (int)$agent->id }}">
 																{{ $agent->fname . ' ' . $agent->lname }}
 															</option>
 														@else
-															<option value="{{ $agent->id }}">
+															<option value="{{ (int)$agent->id }}">
 																{{ $agent->fname . ' ' . $agent->lname }}
 															</option>
 														@endif

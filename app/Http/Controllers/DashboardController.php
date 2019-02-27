@@ -22,8 +22,7 @@ class DashboardController extends Controller
     }
 
     public function dashboard (Request $request) {
-		return view ('welcome');
-		
+
 
         $application_status_model = new ApplicationStatus();
         $application_model = new Application();
@@ -63,7 +62,7 @@ class DashboardController extends Controller
             'application_counter_by_teams' => $application_counter_by_teams,
             // 'clusters' => (!empty($clusters)) ? $clusters : null,
             // 'teams' => (!empty($teams)) ? $teams : null,
-            'heirarchy' => getHeirarchy(),
+            'heirarchy' => getHeirarchy2(),
         ]);
     }
 }

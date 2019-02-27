@@ -2,21 +2,61 @@
 use App\Teams;
 use App\User;
 use App\Clusters;
+use App\Attendance;
+use Carbon\Carbon;
 
 /**
- * GET CLUSTER AND TEAM (_C, _T)
- *
- * The idea of this is to get your
- * Cluster id(s) and Team id(s)
- * whether you are a cluster leader,
- * a team leader or either you are an agent.
- *
- * Requirements: to get your cluster and team IDs
- * this method needed your User model or Auth Model
- * but first you must be authenticated to be in this
- * method.
- *
- */
+* Check Position
+*
+*
+* This function will identify your Position
+* whether user is TL, CL or agent
+*
+* PS: User can have a multiple position
+*
+* Requirements: User Model and a role with 'user'
+*
+* @return *tml, crl, agt or undefined
+*
+*/
+
+function checkPosition ($user) {
+
+	// check first if this $user
+	// is has a role of 'user'
+	if (base64_decode($user->role) != 'user') return 'undefined';
+
+	// get the cluster and team (if any)
+	$r = getMyClusterAndTeam($user);
+
+	// hold the multiple position var
+	$pos = [];
+
+	// just count them
+	// and return the appropriate response
+	if (count($r['_a'])) array_push($pos, 'agnt'); // Agent
+	if (count($r['_t'])) array_push($pos, 'tl'); // Team leader
+	if (count($r['_c'])) array_push($pos, 'cl'); // Cluster leader
+
+	return $pos;
+}
+
+
+/*
+* GET CLUSTER AND TEAM (_C, _T)
+*
+* The idea of this is to get your
+* Cluster id(s) and Team id(s)
+* whether you are a cluster leader,
+* a team leader or either you are an agent.
+*
+* Requirements: to get your cluster and team IDs
+* this method needed your User model or Auth Model
+* but first you must be authenticated to be in this
+* method.
+*
+*/
+
 function getMyClusterAndTeam ($auth)
 {
 	/**
@@ -412,12 +452,13 @@ function getHeirarchy(){
 	$teams_model = new Teams();
 	$clusters_model = new Clusters();
 	$user_model = new User();
+	$attendance_model = new Attendance();
 
 	// ROLES WHICH WILL BE CHANGE IF THERE IS CHANGE ON ROLE
 	$roles = [
 		'administrator' => 'administrator',
 		'user' => 'user',
- 		'encoder' => 'encoder',
+		'encoder' => 'encoder',
 	];
 
 	// FOR ADMIN
@@ -426,45 +467,138 @@ function getHeirarchy(){
 			$cluster_query = $clusters_model->get();
 			if(!empty($cluster_query->toArray())){
 				$clusters = $cluster_query->pluck('cluster_name');
-				$teams = $teams_model->whereIn('id',$cluster_query[0]['team_ids'])->get()->map(function($res) use ($user_model){
+				$count = [
+					'present' => 0,
+					'absent' => 0,
+					'unkown' => 0,
+				];
+				$teams = $teams_model->whereIn('id',$cluster_query[0]['team_ids'])->get()->map(function($res) use ($user_model, $attendance_model,&$count){
 					$res['total_agents'] = count($res['agent_ids']);
-					$res['agents'] = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get();
+					// $res['agents'] = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get();
+					// calculate present, absent, unkown
+					$agents = $user_model->whereIn('id',$res['agent_ids'])->get();
+					$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
+						if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
+							++$count['present'];
+						}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) > 1){
+							++$count['absent'];
+						}else{
+							++$count['unkown'];
+						}
+						return [
+							'present' => $count['present'],
+							'absent' => $count['absent'],
+							'unkown' => $count['unkown'],
+						];
+					});
+					$res['attendance'] = $res['attendance']->values()->last();
+					// end of calculate present, absent, unkown
 					return $res;
 				});
+				// dd($teams);
 			}
 		}
 
-	// FOR USER ROLE
+		// FOR USER ROLE
 	}else if(base64_decode(Auth()->user()->role) == $roles['user']){
 
 		// FOR CLUSTER HEAD
 		if( !empty((Session::get('_c'))) ){
 			$clusters = collect(Session::get('_c'))->pluck('cluster_name');
-			$teams = $teams_model->whereIn('id',Session::get('_c')[0]['team_ids'])->get()->map(function($res) use ($user_model){
+			$count = [
+				'present' => 0,
+				'absent' => 0,
+				'unkown' => 0,
+			];
+			$teams = $teams_model->whereIn('id',Session::get('_c')[0]['team_ids'])->get()->map(function($res) use ($user_model,$attendance_model,&$count){
 				$res['total_agents'] = count($res['agent_ids']);
-				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_c'))->pluck('id'))->get();
+				// $res['agents'] = $user_model->whereIn('id',collect(Session::get('_c'))->pluck('id'))->get();
+				// calculate present, absent, unkown
+				$agents = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('agent_ids')[0])->get();
+				$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
+					if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
+						++$count['present'];
+					}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) > 1){
+						++$count['absent'];
+					}else{
+						++$count['unkown'];
+					}
+					return [
+						'present' => $count['present'],
+						'absent' => $count['absent'],
+						'unkown' => $count['unkown'],
+					];
+				});
+				$res['attendance'] = $res['attendance']->values()->last();
+				// end of calculate present, absent, unkown
 				return $res;
 			});
 		}
 		// FOR TEAM LEAD
 		else if( !empty((Session::get('_t'))) ){
 			$clusters = [null];
-			$teams = $teams_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get()->map(function($res) use ($user_model){
+			$count = [
+				'present' => 0,
+				'absent' => 0,
+				'unkown' => 0,
+			];
+			// $count = 0;
+			$teams = $teams_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get()->map(function($res) use ($user_model, $attendance_model,&$count){
 				$res['total_agents'] = count($res['agent_ids']);
-				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('id'))->get();
+				// calculate present, absent, unkown
+				$agents = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('agent_ids')[0])->get();
+				$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
+					if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
+						++$count['present'];
+					}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) > 1){
+						++$count['absent'];
+					}else{
+						++$count['unkown'];
+					}
+					return [
+						'present' => $count['present'],
+						'absent' => $count['absent'],
+						'unkown' => $count['unkown'],
+					];
+				});
+				$res['attendance'] = $res['attendance']->values()->last();
+				// end of calculate present, absent, unkown
 				return $res;
 			});
 		}
 		else if( !empty((Session::get('_a'))) ){
 			$clusters = [null];
-			$teams = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model){
+			$count = [
+				'present' => 0,
+				'absent' => 0,
+				'unkown' => 0,
+			];
+			$teams = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model,$attendance_model,&$count){
 				$res['total_agents'] = count($res['agent_ids']);
-				$res['agents'] = $user_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get();
+				// $res['agents'] = $user_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get();
+				// calculate present, absent, unkown
+				$agents = $user_model->whereIn('id',collect(Session::get('_t'))->pluck('agent_ids')[0])->get();
+				$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
+					if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
+						++$count['present'];
+					}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) > 1){
+						++$count['absent'];
+					}else{
+						++$count['unkown'];
+					}
+					return [
+						'present' => $count['present'],
+						'absent' => $count['absent'],
+						'unkown' => $count['unkown'],
+					];
+				});
+				$res['attendance'] = $res['attendance']->values()->last();
+				// end of calculate present, absent, unkown
 				return $res;
 			});
 		}
 
-	// FOR ENCODER ROLE
+		// FOR ENCODER ROLE
 	}else if(base64_decode(Auth()->user()->role) == $roles['encoder']){
 
 		if( empty((Session::get('_c'))) && empty((Session::get('_t'))) && empty((Session::get('_a'))) ){
@@ -485,6 +619,177 @@ function getHeirarchy(){
 	return [
 		'clusters' => (!empty($clusters)) ? $clusters : [],
 		'teams' => (!empty($teams)) ? $teams : [],
+	];
+
+
+}
+
+function getHeirarchy2(){
+
+	$teams_model = new Teams();
+	$clusters_model = new Clusters();
+	$user_model = new User();
+	$attendance_model = new Attendance();
+
+	// ROLES WHICH WILL BE CHANGE IF THERE IS CHANGE ON ROLE
+	$roles = [
+		'administrator' => 'administrator',
+		'user' => 'user',
+		'encoder' => 'encoder',
+	];
+
+	// FOR ADMIN
+	if(base64_decode(Auth()->user()->role) == $roles['administrator']){
+		if( empty((Session::get('_c'))) && empty((Session::get('_t'))) && empty((Session::get('_a'))) ){
+			$clusters = $clusters_model->get()->map(function($res) use ($teams_model, $user_model,$attendance_model){
+				$res['teams'] = $teams_model->whereIn('id', $res['team_ids'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model){
+					$agents = $user_model->whereIn('id', $res['agent_ids'])->get();
+					$res['total_agents'] = count($agents);
+					$res['agents'] = $agents;
+					// calculate present, absent, unkown
+					$count = [
+						'present' => 0,
+						'absent' => 0,
+						'unkown' => 0,
+					];
+					$agents = $user_model->whereIn('id',$res['agent_ids'])->get();
+					$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
+						if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
+							++$count['present'];
+						}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) > 1){
+							++$count['absent'];
+						}else{
+							++$count['unkown'];
+						}
+						return [
+							'present' => $count['present'],
+							'absent' => $count['absent'],
+							'unkown' => $count['unkown'],
+						];
+					});
+					$res['attendance'] = $res['attendance']->values()->last();
+					// end of calculate present, absent, unkown
+					return $res;
+				});
+				return $res;
+			});
+			// dd($clusters[0]->teams[0]->total_agents);
+		}
+
+		// FOR USER ROLE
+	}else if(base64_decode(Auth()->user()->role) == $roles['user']){
+
+		// FOR CLUSTER HEAD
+		if( !empty((Session::get('_c'))) ){
+			$clusters = $clusters_model->whereIn('id',collect(Session::get('_c'))->pluck('id'))->get()->map(function($res) use ($teams_model,$user_model,$attendance_model){
+				$res['teams'] = $teams_model->whereIn('id',Session::get('_c')[0]['team_ids'])->get()->map(function($res) use ($teams_model,$user_model,$attendance_model){
+					$agents = $user_model->whereIn('id',$res['agent_ids'])->get();
+					$res['total_agents'] = count($agents);
+					$res['agents'] = $agents;
+					// calculate present, absent, unkown
+					$count = [
+						'present' => 0,
+						'absent' => 0,
+						'unkown' => 0,
+					];
+					$agents = $user_model->whereIn('id',$res['agent_ids'])->get();
+					$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
+						if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
+							++$count['present'];
+						}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) > 1){
+							++$count['absent'];
+						}else{
+							++$count['unkown'];
+						}
+						return [
+							'present' => $count['present'],
+							'absent' => $count['absent'],
+							'unkown' => $count['unkown'],
+						];
+					});
+					$res['attendance'] = $res['attendance']->values()->last();
+					// end of calculate present, absent, unkown
+					return $res;
+				});
+				return $res;
+			});
+			// dd($clusters);
+		}
+		// FOR TEAM LEAD
+		else if( !empty((Session::get('_t'))) ){
+			// dd(collect(Session::get('_t'))->pluck('id'));
+			$clusters = $clusters_model->get()->map(function($res) use ($teams_model,$user_model,$attendance_model){
+				if(array_intersect(collect(Session::get('_t'))->pluck('id')->toArray(),$res['team_ids'])){
+					// dd(Session::get('_t'));
+					$team_ids = $res['team_ids'];
+					$res['teams'] = $teams_model->whereIn('id', $res['team_ids'])->get()->map(function($res) use ($teams_model,$user_model,$attendance_model,$team_ids){
+						if( in_array($res['id'],collect(Session::get('_t'))->pluck('id')->toArray()) ){
+							$agents = $user_model->whereIn('id',$res['agent_ids'])->get();
+							$res['total_agents'] = count($agents);
+							$res['agents'] = $agents;
+							// calculate present, absent, unkown
+							$count = [
+								'present' => 0,
+								'absent' => 0,
+								'unkown' => 0,
+							];
+							$agents = $user_model->whereIn('id',$res['agent_ids'])->get();
+							$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
+								if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
+									++$count['present'];
+								}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) > 1){
+									++$count['absent'];
+								}else{
+									++$count['unkown'];
+								}
+								return [
+									'present' => $count['present'],
+									'absent' => $count['absent'],
+									'unkown' => $count['unkown'],
+								];
+							});
+							$res['attendance'] = $res['attendance']->values()->last();
+							// end of calculate present, absent, unkown
+							return $res;
+						}
+					});
+					return $res;
+				}
+			});
+			// dd($clusters);
+		}
+		else if( !empty((Session::get('_a'))) ){
+
+			$myattendance = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model,$attendance_model){
+				$agents = $user_model->where('id',Auth()->user()->id)->first();
+				$res['agents'] = $agents;
+				$res['total_agents'] = count($agents);				
+				// dd($res['id']);
+				$count = [
+					'present' => 0,
+					'absent' => 0,
+					'unkown' => 0,
+				];
+				// please add now date
+				$res['attendance'] = $attendance_model->where([ 'user_id' => Auth()->user()->id, 'team_id' => $res['id']])->where('created_at', '>=', Carbon::today())->get()->map(function($res){
+					return $res;
+				});
+
+				return $res;
+			});
+
+		}
+
+		// FOR ENCODER ROLE
+	}else if(base64_decode(Auth()->user()->role) == $roles['encoder']){
+
+	}
+
+	// RETURN DATA BACK TO LARAVEL VIEW
+	return [
+		'clusters' => (!empty($clusters)) ? $clusters : [],
+		'teams' => (!empty($teams)) ? $teams : [],
+		'myattendance' => (!empty($myattendance)) ? $myattendance : [],
 	];
 
 

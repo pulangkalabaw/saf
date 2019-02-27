@@ -37,7 +37,6 @@ $factory->define(App\Clusters::class, function (Faker $faker) use ($factory) {
         }
     }
     $cl_ids = $faker->randomElements((array)$get_users, 2); // GET RANDOM USER ID FOR TL_IDS
-	// echo var_dump(Teams::pluck('id'));
     $team_ids = $faker->randomElements(Teams::pluck('id'), $faker->numberBetween(1, 2)); // GET RANDOM USER ID FOR AGENT_IDS
 
 
