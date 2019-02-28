@@ -640,7 +640,6 @@ function getHeirarchy2(){
 
 	// FOR ADMIN
 	if(base64_decode(Auth()->user()->role) == $roles['administrator']){
-		if( empty((Session::get('_c'))) && empty((Session::get('_t'))) && empty((Session::get('_a'))) ){
 			$clusters = $clusters_model->get()->map(function($res) use ($teams_model, $user_model,$attendance_model){
 				$res['teams'] = $teams_model->whereIn('id', $res['team_ids'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model){
 					$agents = $user_model->whereIn('id', $res['agent_ids'])->get();
@@ -674,7 +673,6 @@ function getHeirarchy2(){
 				return $res;
 			});
 			// dd($clusters[0]->teams[0]->total_agents);
-		}
 
 		// FOR USER ROLE
 	}else if(base64_decode(Auth()->user()->role) == $roles['user']){

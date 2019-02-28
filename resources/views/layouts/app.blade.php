@@ -118,12 +118,12 @@
 
 								{{-- YOUR NON ADMIN --}}
 								@if (session()->get('_c'))
-									<li>
+									<!-- <li>
 										<a href="{{ route('app.your.clusters') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-building"></i></div>
 											<div class="nav-menu__text"><span>Your Clusters</span></div>
 										</a>
-									</li>
+									</li> -->
 								@endif
 								{{--  --}}
 							</ul>

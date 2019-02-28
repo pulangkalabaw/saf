@@ -19,7 +19,7 @@
 
       <!-- ATTENDANCE WIDGET  -->
       <div class="row">
-        <div class="{{ !empty(Session::get('_a') || !empty(Session::get('_t'))) ? 'col-md-12' : 'col-md-9'  }}">
+        <div class="{{ !empty(Session::get('_a') || !empty(Session::get('_t'))) ? 'col-md-12' : 'col-md-12'  }}">
           <div class="panel panel-info">
               <div class="panel-heading">
                   <h3 class="panel-title">Attendance</h3>
@@ -27,10 +27,12 @@
               <div class="panel-body">
                 <!-- CLUSTER -->
                 <div class="row">
+                  @if(!empty($heirarchy) && $heirarchy['clusters'])
                   <div class="col-md-3">
                     <h5>As of <small>{{  now()->format('M d y g:i a') }}</small></h5>
-                    <input type="date" class="form-control">
+                    <!-- <input type="date" class="form-control"> -->
                   </div>
+                  @endif
                   @if(!empty($heirarchy))
                     @foreach($heirarchy['clusters'] as $clus)
                         @if(!empty($clus))
@@ -83,6 +85,7 @@
         @if( (empty(Session::get('_t')) && empty(Session::get('_a'))) || !empty(Session::get('_c')) )
         <div class="col-md-3">
           <!-- OVERVIEW -->
+          @if(0)
           <div class="panel panel-success">
               <div class="panel-heading">
                 <h3 class="panel-title">Overview</h3>
@@ -127,6 +130,7 @@
                 </div>
               </div>
             </div>
+            @endif
             <!-- OVERVIEW -->
         </div>
         @endif

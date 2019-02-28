@@ -15,7 +15,7 @@
                 <div class="row text">
                     <div class="col-md">
                         <!--FORM FOR NEW POST  -->
-                @if((!empty(session::get('_t')) || !empty(session::get('_c'))) || empty(session::get('_t')) && empty(session::get('_c')) && empty(session::get('_a'))  )
+                        @if(!empty(session::get('_t')) || !empty(session::get('_c')) || (base64_decode(Auth()->user()->role) == 'administrator') )
                         <form action="{{ route('app.messages.store') }}" method="post" enctype="multipart/form-data">
                             {{csrf_field()}}
                             <div class="template template_texteditor">
@@ -301,10 +301,10 @@
             </div>
             <div class="modal-body">
                 <img class="showimage img-responsive img-md" style="object-fit: cover; margin: auto;"  >
-                </div>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 
@@ -322,6 +322,7 @@ $(document).ready(function(e) {
 
     $('.summernotee').summernote({
         placeholder:'Write a text here...',
+        disableDragAndDrop: true,
         height: 150,
         toolbar: [
             ['style', ['style']],
