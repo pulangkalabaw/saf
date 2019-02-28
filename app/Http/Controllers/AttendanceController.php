@@ -295,6 +295,13 @@ class AttendanceController extends Controller
 							$r['value_btn'] = ['class' => 'btn-danger', 'label' => 'Absent'];
 						}
 					}
+					// else {
+					// 	$r['value_activity'] = null;
+					// 	$r['value_location'] = null;
+					// 	$r['value_remarks'] = null;
+					// 	$r['value_status'] = null;
+					// 	$r['value_btn'] = null;
+					// }
 					// return $get_attendance;
 				}
 			}
@@ -314,27 +321,41 @@ class AttendanceController extends Controller
 					// return 'sad';
 					$r['tl'] = 1;
 				}
+				else {
+					// $r['tl'] = 0;
+				}
 			}
 			return $r;
 		});
-		// return $unpresent;
-		$sortArray = array();
+		if(count(Session::get('_c')) != 0){
+			// return $unpresent;
+			$sortArray = array();
 
-		foreach((array)$unpresent as $get_unpresent){
-			foreach((array)$get_unpresent as $un_present){
-				foreach(collect($un_present) as $key=>$value){
-					if(!isset($sortArray[(int)$key])){
-						$sortArray[(int)$key] = array();
+			foreach((array)$unpresent as $get_unpresent){
+				// return $get_unpresent;
+				foreach((array)$get_unpresent as $un_present){
+					// return $un_present;
+					$x = 0;
+					foreach(collect($un_present) as $key=>$value){
+						// if($x == 3){
+						// 	return $key;
+						// }
+						// return $value;
+						// return $x;
+						// return $value;
+						if(!isset($sortArray[$key])){
+							$sortArray[$key] = array();
+						}
+						$sortArray[$key][] = $value;
+						// $x++;
 					}
-					$sortArray[(int)$key][] = $value;
+					// return $sortArray;
 				}
 			}
-		}
-		// return $sortArray;
-		$orderby = "team_name"; //change this to whatever key you want from the array\
-		$unpresent = $unpresent->toArray();
-		// array_multisort($sortArray['id'],SORT_ASC, $unpresent);
-		if(count(Session::get('_c')) != 0){
+			// return $sortArray;
+			$orderby = "team_name"; //change this to whatever key you want from the array\
+			$unpresent = $unpresent->toArray();
+			// array_multisort($sortArray['id'],SORT_ASC, $unpresent);
 			array_multisort($sortArray[$orderby],SORT_ASC, $unpresent);
 		}
 		// array_multisort($sortArray['tl'],SORT_ASC, $unpresent);
