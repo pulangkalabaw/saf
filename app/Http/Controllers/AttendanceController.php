@@ -439,8 +439,14 @@ class AttendanceController extends Controller
 				'alt' => $name,
 			];
 		}
+		if($request->mobile_version == null){
+			$get_user = $request->only('user')['user'];
+		} else {
+			$get_user = $request->only('users')['users'];
+		}
+		// return $get_user;
 		$data = [];
-		foreach($request->only('user')['user'] as $user){
+		foreach($get_user as $user){
 			// return $request->all();
 			if($user['status'] != null){
 				$team_id;

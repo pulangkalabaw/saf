@@ -191,13 +191,13 @@
                                         <form enctype="multipart/form-data" action="{{ route('attendance.store') }}" method="POST">
                                             {{ csrf_field() }}
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-success" onclick="removeAttr()()">Submit</button>
+                                                <button type="submit" class="btn btn-success">Submit</button>
                                             </div>
                                             <div class="form-group">
                                                 @include('app.attendance.mobile-view')
                                             </div>
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-success" id="">Submit</button>
+                                                <button type="submit" class="btn btn-success">Submit</button>
                                             </div>
                                         </form>
                                     </div>
@@ -270,11 +270,7 @@
 
 @section('scripts')
 <script>
-$toggleButton = 0
-
-function removeThisAttr(){
-    // $('input[type="text"]').removeAttr('required');
-}
+$toggleButton = 0;
 
 function changeButtonStatus(view = "desktop",buttonName = "", status, activities, location, remarks, footer = null){
     // alert(status);
@@ -309,7 +305,7 @@ function changeButtonStatus(view = "desktop",buttonName = "", status, activities
         if($buttonText == 'Undecided'){
             $('#' + buttonName).removeClass('btn-default').addClass('btn-info');
             $('#' + buttonName).text('Present');
-            $('#' + status).val(1);
+            $('#user_mobile_status_' + footer).val(1);
             $('#user_mobile_activity_' + footer).prop('disabled', false);
             $('#user_mobile_location_' + footer).prop('disabled', false);
             $('#user_mobile_remarks_' + footer).prop('disabled', false);
@@ -317,7 +313,7 @@ function changeButtonStatus(view = "desktop",buttonName = "", status, activities
         } else if($buttonText == 'Present'){
             $('#' + buttonName).removeClass('btn-info').addClass('btn-danger');
             $('#' + buttonName).text('Absent');
-            $('#' + status).val(0);
+            $('#user_mobile_status_' + footer).val(0);
             $('#user_mobile_activity_' + footer).prop('disabled', false);
             $('#user_mobile_location_' + footer).prop('disabled', false);
             $('#user_mobile_remarks_' + footer).prop('disabled', false);
@@ -325,7 +321,7 @@ function changeButtonStatus(view = "desktop",buttonName = "", status, activities
         } else if($buttonText == 'Absent'){
             $('#' + buttonName).removeClass('btn-danger').addClass('btn-default');
             $('#' + buttonName).text('Undecided');
-            $('#' + status).val(null);
+            $('#user_mobile_status_' + footer).val(null);
             $('#panel-footer-' + footer).hide();
             $('#user_mobile_activity_' + footer).prop('disabled', true);
             $('#user_mobile_location_' + footer).prop('disabled', true);

@@ -13,7 +13,8 @@
                             <label class="text-light">Team: {{ $value['team_name']}}</label>
                         </div>
                         <div class="col-sm-2">
-                            <input type="hidden" name="user[{{ $index }}][status]" class="setStatus" id="user_mobile_status_{{ $index }}"
+                            <input type="hidden" name="mobile_version" value="1">
+                            <input type="hidden" name="users[{{ $index }}][status]" class="setStatus" id="user_mobile_status_{{ $index }}"
                             @if(!empty($value['value_btn']))
                                 @if($value['value_btn']['class'] == 'btn-info')
                                     value="1"
@@ -32,8 +33,8 @@
                     <div class="row">
                         <div class="col-4">
                             <label class="text-light">Activity</label>
-                            <input name="user[{{ $index }}][user_id]" id="user_mobile_userid_{{ $index }}" class="form-control" type="hidden" value={{ $value['id'] }}>
-                            <select class="form-control text-light" name="user[{{ $index }}][activities]" id="user_mobile_activity_{{ $index }}"
+                            <input name="users[{{ $index }}][user_id]" id="user_mobile_userid_{{ $index }}" class="form-control" type="hidden" value={{ $value['id'] }}>
+                            <select class="form-control text-light" name="users[{{ $index }}][activities]" id="user_mobile_activity_{{ $index }}"
                                 @if(empty($value['value_activity']))
                                     {{-- disabled --}}
                                 @endif
@@ -56,7 +57,7 @@
                         </div>
                         <div class="col-4">
                             <label class="text-light">Location</label>
-                            <input name="user[{{ $index }}][location]" id="user_mobile_location_{{ $index }}" class="form-control" type="text" required disabled
+                            <input name="users[{{ $index }}][location]" id="user_mobile_location_{{ $index }}" class="form-control" type="text" required disabled
                                 @if(!empty($value['value_location']))
                                     value="{{ $value['value_location'] }}"
                                 @else
@@ -66,8 +67,8 @@
                         </div>
                         <div class="col-4">
                             <label class="text-light">Remarks</label>
-                            <input name="user[{{ $index }}][remarks]" id="user_mobile_remarks_{{ $index }}" class="form-control" type="text" required disabled>
-                            {{-- <input name="user[{{ $index }}][remarks]" id="user_mobile_remarks_{{ $index }}" class="form-control" required type="text" --}}
+                            <input name="users[{{ $index }}][remarks]" id="user_mobile_remarks_{{ $index }}" class="form-control" type="text" required disabled>
+                            {{-- <input name="users[{{ $index }}][remarks]" id="user_mobile_remarks_{{ $index }}" class="form-control" required type="text" --}}
                                 @if(!empty($value['value_remarks']))
                                     value="{{ $value['value_remarks'] }}"
                                 @else
