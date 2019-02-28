@@ -22,11 +22,16 @@ $factory->define(App\Teams::class, function (Faker $faker) use ($factory) {
         foreach(User::get() as $user){
             if(!in_array($user['id'], $get_teams)){
                 // IF THE USER IS ALREADY EXISTING ON TEAMS TABLE, THEN DON'T GET IT
-                array_push($get_users, $user['id']);
+                // echo var_dump((string) $user['id']);
+                array_push($get_users, (string) $user['id']);
             }
         }
         $tl_ids = $faker->randomElements($get_users, 1); // GET RANDOM USER ID FOR TL_IDS
         $agent_ids = $faker->randomElements($get_users, $faker->numberBetween(1, 3)); // GET RANDOM USER ID FOR AGENT_IDS
+        // collect($agent_ids)->map(function($r){
+        //     $r = (string)$r;
+        //     return $r;
+        // });
     // } else {
     //     $users = User::orderBy('id', 'desc')->pluck('id');
     //     $tl_ids = $faker->randomElements($users, 1);
