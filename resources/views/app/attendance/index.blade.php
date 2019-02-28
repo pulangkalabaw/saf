@@ -1,6 +1,5 @@
 @extends ('layouts.app')
 @section('content')
-bkit pre?
     <div class="main-heading">
         <ol class="breadcrumb">
             <li class="">{{ strtoupper(env('APP_NAME')) }}</li>
