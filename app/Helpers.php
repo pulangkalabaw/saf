@@ -20,27 +20,6 @@ use Carbon\Carbon;
 *
 */
 
-function checkPosition ($user) {
-
-	// check first if this $user
-	// is has a role of 'user'
-	if (base64_decode($user->role) != 'user') return 'undefined';
-
-	// get the cluster and team (if any)
-	$r = getMyClusterAndTeam($user);
-
-	// hold the multiple position var
-	$pos = [];
-
-	// just count them
-	// and return the appropriate response
-	if (count($r['_a'])) array_push($pos, 'agnt'); // Agent
-	if (count($r['_t'])) array_push($pos, 'tl'); // Team leader
-	if (count($r['_c'])) array_push($pos, 'cl'); // Cluster leader
-
-	return $pos;
-}
-
 
 /*
 * GET CLUSTER AND TEAM (_C, _T)
@@ -763,7 +742,7 @@ function getHeirarchy2(){
 			$myattendance = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model,$attendance_model){
 				$agents = $user_model->where('id',Auth()->user()->id)->first();
 				$res['agents'] = $agents;
-				$res['total_agents'] = count($agents);				
+				$res['total_agents'] = count($agents);
 				// dd($res['id']);
 				$count = [
 					'present' => 0,
