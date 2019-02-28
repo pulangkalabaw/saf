@@ -48,7 +48,7 @@
 				<div class="header-navbar-mobile__title"><span>Blank</span></div>
 				<div class="header-navbar-mobile__settings dropdown"><a class="btn dropdown-toggle" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-power-off"></i></a>
 					<ul class="dropdown-menu dropdown-menu-right">
-						<li><a href="#">Log Out</a></li>
+						<li><a href="{{ route('logout') }}">Log Out</a></li>
 					</ul>
 				</div>
 			</div>
