@@ -79,7 +79,7 @@
                                             {{ csrf_field() }}
                                             {{-- <input type="hidden" name="cl_id" value="{{  }}"> --}}
                                             <div class="panel-body">
-                                                <button class="btn btn-primary pull-right">Submit</button>
+                                                <button class="btn btn-primary pull-right" id="buttonTop">Submit</button>
                                             </div>
                                             <div class="panel-body">
                                                 <div class="table-responsive">
@@ -107,13 +107,13 @@
                                                                             @endif
                                                                         @endif
                                                                         >
-                                                                        <button type="button" name="changeStatus" id="changeStatus_{{ $index }}" onclick="changeButtonStatus('changeStatus_{{ $index }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]')"
+                                                                        <button type="button" name="changeStatus" id="changeStatus_{{ $index }}" onclick="changeButtonStatus('desktop', 'changeStatus_{{ $index }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]')"
                                                                         class="btn
                                                                         @if(!empty($value['value_btn']))
                                                                             {{ $value['value_btn']['class'] }}
                                                                         @else
                                                                             btn-default
-                                                                        @endif
+                                                                        @endif atendance
                                                                         ">@php
                                                                         if(!empty($value['value_btn'])){
                                                                             echo $value['value_btn']['label'];
@@ -177,18 +177,29 @@
                                             </div>
                                             <div class="panel-body">
                                                 <div class="form-group">
-                                                    <button class="btn btn-primary pull-right">Submit</button>
+                                                    <button class="btn btn-primary pull-right" id="buttonButtom">Submit</button>
                                                 </div>
                                                 <div class="form-group">
                                                     <h4>Attach Image: </h4>
-                                                    <input type="file" name="empImg">
+                                                    <input type="file" name="empImg" id="browseImg">
                                                 </div>
                                             </div>
                                         </form>
                                         @endif
                                     </div>
                                     <div id="mobile-view">
-                                        @include('app.attendance.mobile-view')
+                                        <form enctype="multipart/form-data" action="{{ route('attendance.store') }}" method="POST">
+                                            {{ csrf_field() }}
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-success">Submit</button>
+                                            </div>
+                                            <div class="form-group">
+                                                @include('app.attendance.mobile-view')
+                                            </div>
+                                            <div class="form-group">
+                                                <button type="submit" class="btn btn-success">Submit</button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                                 <div class="tab-pane" id="present" role="tabpanel">
@@ -259,33 +270,68 @@
 
 @section('scripts')
 <script>
-$toggleButton = 0
-function changeButtonStatus(buttonName = "", status, activities, location, remarks){
-    // alert(buttonName);
+$toggleButton = 0;
+
+function changeButtonStatus(view = "desktop",buttonName = "", status, activities, location, remarks, footer = null){
+    // alert(status);
     $buttonText = $('#' + buttonName).text();
-    if($buttonText == 'Undecided'){
-        $('#' + buttonName).removeClass('btn-default').addClass('btn-info');
-        $('#' + buttonName).text('Present');
-        $('#' + status).val(1);
-        $('select[name="' + activities + '"]').prop("disabled", false);
-        $('input[name="' + location + '"]').prop("disabled", false);
-        $('input[name="' + remarks + '"]').prop("disabled", false);
-    } else if($buttonText == 'Present'){
-        $('#' + buttonName).removeClass('btn-info').addClass('btn-danger');
-        $('#' + buttonName).text('Absent');
-        $('#' + status).val(0);
-        $('select[name="' + activities + '"]').prop("disabled", false);
-        $('input[name="' + location + '"]').prop("disabled", false);
-        $('input[name="' + remarks + '"]').prop("disabled", false);
-    } else if($buttonText == 'Absent'){
-        $('#' + buttonName).removeClass('btn-danger').addClass('btn-default');
-        $('#' + buttonName).text('Undecided');
-        $('#' + status).val(null);
-        $('select[name="' + activities + '"]').prop("disabled", true);
-        $('input[name="' + location + '"]').prop("disabled", true);
-        $('input[name="' + location + '"]').val(null);
-        $('input[name="' + remarks + '"]').prop("disabled", true);
-        $('input[name="' + remarks + '"]').val(null);
+    if(view == "desktop"){
+        if($buttonText == 'Undecided'){
+            $('#' + buttonName).removeClass('btn-default').addClass('btn-info');
+            $('#' + buttonName).text('Present');
+            $('#' + status).val(1);
+            $('select[name="' + activities + '"]').prop("disabled", false);
+            $('input[name="' + location + '"]').prop("disabled", false);
+            $('input[name="' + remarks + '"]').prop("disabled", false);
+        } else if($buttonText == 'Present'){
+            $('#' + buttonName).removeClass('btn-info').addClass('btn-danger');
+            $('#' + buttonName).text('Absent');
+            $('#' + status).val(0);
+            $('select[name="' + activities + '"]').prop("disabled", false);
+            $('input[name="' + location + '"]').prop("disabled", false);
+            $('input[name="' + remarks + '"]').prop("disabled", false);
+        } else if($buttonText == 'Absent'){
+            $('#' + buttonName).removeClass('btn-danger').addClass('btn-default');
+            $('#' + buttonName).text('Undecided');
+            $('#' + status).val(null);
+            $('select[name="' + activities + '"]').prop("disabled", true);
+            $('input[name="' + location + '"]').prop("disabled", true);
+            $('input[name="' + location + '"]').val(null);
+            $('input[name="' + remarks + '"]').prop("disabled", true);
+            $('input[name="' + remarks + '"]').val(null);
+        }
+    } else {
+        // alert(footer);
+        if($buttonText == 'Undecided'){
+            $('#' + buttonName).removeClass('btn-default').addClass('btn-info');
+            $('#' + buttonName).text('Present');
+            $('#user_mobile_status_' + footer).val(1);
+            $('#user_mobile_activity_' + footer).prop('disabled', false);
+            $('#user_mobile_location_' + footer).prop('disabled', false);
+            $('#user_mobile_remarks_' + footer).prop('disabled', false);
+            $('#panel-footer-' + footer).show();
+        } else if($buttonText == 'Present'){
+            $('#' + buttonName).removeClass('btn-info').addClass('btn-danger');
+            $('#' + buttonName).text('Absent');
+            $('#user_mobile_status_' + footer).val(0);
+            $('#user_mobile_activity_' + footer).prop('disabled', false);
+            $('#user_mobile_location_' + footer).prop('disabled', false);
+            $('#user_mobile_remarks_' + footer).prop('disabled', false);
+            $('#panel-footer-' + footer).show();
+        } else if($buttonText == 'Absent'){
+            $('#' + buttonName).removeClass('btn-danger').addClass('btn-default');
+            $('#' + buttonName).text('Undecided');
+            $('#user_mobile_status_' + footer).val(null);
+            $('#panel-footer-' + footer).hide();
+            $('#user_mobile_activity_' + footer).prop('disabled', true);
+            $('#user_mobile_location_' + footer).prop('disabled', true);
+            $('#user_mobile_remarks_' + footer).prop('disabled', true);
+            $('#user_mobile_activity_' + footer).val('Blitz');
+            $('#user_mobile_location_' + footer).val(null);
+            $('#user_mobile_remarks_' + footer).val(null);s
+            $('#user_mobile_status_' + footer).val(null);s
+            $('#user_mobile_userid_' + footer).val(null);s
+        }
     }
 }
 
@@ -312,10 +358,18 @@ var timein = 10 + ":" + 30 + ":" + 00;
 
 // alert(time + ">=" +  timein + " = " + time >= timein);
 // alert(time);
+// if(time <= timein){
+//     $('#hidepanel').hide();
+//     $('#showpanel').show();
+//     $('#mutliplebtn').attr('disabled', true);
+// }
+
 if(time <= timein){
-    $('#hidepanel').hide();
-    $('#showpanel').show();
-    $('#mutliplebtn').attr('disabled', true);
+    $('#buttonButtom').attr('disabled', true);
+    $('#buttonTop').attr('disabled', true);
+    $('.atendance').attr('disabled', true);
+    $('#browseImg').attr('disabled', true);
 }
+
 </script>
 @endsection
