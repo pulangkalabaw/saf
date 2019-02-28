@@ -1,6 +1,6 @@
 @extends ('layouts.app')
 @section('content')
-
+bkit pre?
     <div class="main-heading">
         <ol class="breadcrumb">
             <li class="">{{ strtoupper(env('APP_NAME')) }}</li>
@@ -197,6 +197,10 @@
                                                 @include('app.attendance.mobile-view')
                                             </div>
                                             <div class="form-group">
+                                                <h4>Attach Image: </h4>
+                                                <input type="file" name="empImg" id="browseImg">
+                                            </div>
+                                            <div class="form-group">
                                                 <button type="submit" class="btn btn-success">Submit</button>
                                             </div>
                                         </form>
@@ -274,6 +278,8 @@ $toggleButton = 0;
 
 function changeButtonStatus(view = "desktop",buttonName = "", status, activities, location, remarks, footer = null){
     // alert(status);
+    // how to count elements with same class in jquery
+    $('.buttonStatus')
     $buttonText = $('#' + buttonName).text();
     if(view == "desktop"){
         if($buttonText == 'Undecided'){
