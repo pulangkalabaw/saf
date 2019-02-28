@@ -66,7 +66,7 @@
                             <!-- <p>Present: <b class="text-success">30</b></p> -->
                             <!-- <p>Absent: <b class="text-danger">2</b></p> -->
                             <!-- <p>Unkown: <b class="text-warning">1</b></p> -->
-                            <p>Your attendance is <span class="text-warning">unkown</span> today.</p>
+                            <p>Your attendance is <span class="{{ ($team->attendance == 'Present') ? 'text-success' : (($team->attendance == 'Absent') ? 'text-danger' : 'text-warning') }}">{{ $team->attendance }}</span> today.</p>
                           </div>
                         </div>
                         @endforeach

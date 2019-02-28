@@ -334,9 +334,9 @@ class AttendanceController extends Controller
 		$orderby = "team_name"; //change this to whatever key you want from the array\
 		$unpresent = $unpresent->toArray();
 		// array_multisort($sortArray['id'],SORT_ASC, $unpresent);
-		if($unpresent){
-			array_multisort($sortArray[$orderby],SORT_ASC, $unpresent);
-		}
+		// if($unpresent){
+		// 	array_multisort($sortArray[$orderby],SORT_ASC, $unpresent);
+		// }
 		// array_multisort($sortArray['tl'],SORT_ASC, $unpresent);
 		$attendance['unpresent'] = $unpresent;
 

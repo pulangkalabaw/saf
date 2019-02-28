@@ -20,26 +20,26 @@ use Carbon\Carbon;
 *
 */
 
-function checkPosition ($user) {
-
-	// check first if this $user
-	// is has a role of 'user'
-	if (base64_decode($user->role) != 'user') return 'undefined';
-
-	// get the cluster and team (if any)
-	$r = getMyClusterAndTeam($user);
-
-	// hold the multiple position var
-	$pos = [];
-
-	// just count them
-	// and return the appropriate response
-	if (count($r['_a'])) array_push($pos, 'agnt'); // Agent
-	if (count($r['_t'])) array_push($pos, 'tl'); // Team leader
-	if (count($r['_c'])) array_push($pos, 'cl'); // Cluster leader
-
-	return $pos;
-}
+// function checkPosition ($user) {
+//
+// 	// check first if this $user
+// 	// is has a role of 'user'
+// 	if (base64_decode($user->role) != 'user') return 'undefined';
+//
+// 	// get the cluster and team (if any)
+// 	$r = getMyClusterAndTeam($user);
+//
+// 	// hold the multiple position var
+// 	$pos = [];
+//
+// 	// just count them
+// 	// and return the appropriate response
+// 	if (count($r['_a'])) array_push($pos, 'agnt'); // Agent
+// 	if (count($r['_t'])) array_push($pos, 'tl'); // Team leader
+// 	if (count($r['_c'])) array_push($pos, 'cl'); // Cluster leader
+//
+// 	return $pos;
+// }
 
 
 /*
@@ -656,7 +656,7 @@ function getHeirarchy2(){
 					$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
 						if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
 							++$count['present'];
-						}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) > 1){
+						}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) >= 1){
 							++$count['absent'];
 						}else{
 							++$count['unkown'];
@@ -696,7 +696,7 @@ function getHeirarchy2(){
 					$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
 						if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
 							++$count['present'];
-						}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) > 1){
+						}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) >= 1){
 							++$count['absent'];
 						}else{
 							++$count['unkown'];
@@ -719,7 +719,8 @@ function getHeirarchy2(){
 		else if( !empty((Session::get('_t'))) ){
 			// dd(collect(Session::get('_t'))->pluck('id'));
 			$clusters = $clusters_model->get()->map(function($res) use ($teams_model,$user_model,$attendance_model){
-				if(array_intersect(collect(Session::get('_t'))->pluck('id')->toArray(),$res['team_ids'])){
+				// dd($res['team_ids']);
+				if( array_intersect(collect(Session::get('_t'))->pluck('id')->toArray(),$res['team_ids']) ){
 					// dd(Session::get('_t'));
 					$team_ids = $res['team_ids'];
 					$res['teams'] = $teams_model->whereIn('id', $res['team_ids'])->get()->map(function($res) use ($teams_model,$user_model,$attendance_model,$team_ids){
@@ -737,7 +738,7 @@ function getHeirarchy2(){
 							$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
 								if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
 									++$count['present'];
-								}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) > 1){
+								}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) >= 1){
 									++$count['absent'];
 								}else{
 									++$count['unkown'];
@@ -763,7 +764,7 @@ function getHeirarchy2(){
 			$myattendance = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model,$attendance_model){
 				$agents = $user_model->where('id',Auth()->user()->id)->first();
 				$res['agents'] = $agents;
-				$res['total_agents'] = count($agents);				
+				// $res['total_agents'] = count($agents);
 				// dd($res['id']);
 				$count = [
 					'present' => 0,
@@ -771,12 +772,12 @@ function getHeirarchy2(){
 					'unkown' => 0,
 				];
 				// please add now date
-				$res['attendance'] = $attendance_model->where([ 'user_id' => Auth()->user()->id, 'team_id' => $res['id']])->where('created_at', '>=', Carbon::today())->get()->map(function($res){
-					return $res;
-				});
-
+				$temp_myatt = $attendance_model->where([ 'user_id' => Auth()->user()->id, 'team_id' => $res['id']])->where('created_at', '>=', Carbon::today())->value('status');
+				$res['attendance'] = ($temp_myatt === null) ? 'Unkown' : (($temp_myatt == 1) ? 'Present' : 'Absent');
+				// dd($res['attendance']);
 				return $res;
 			});
+
 
 		}
 

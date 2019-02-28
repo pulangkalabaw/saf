@@ -297,7 +297,7 @@ var timein = 10 + ":" + 30 + ":" + 00;
 
 // alert(time + ">=" +  timein + " = " + time >= timein);
 // alert(time);
-if(time <= timein){
+if(time >= timein){
     $('#hidepanel').hide();
     $('#showpanel').show();
     $('#mutliplebtn').attr('disabled', true);
