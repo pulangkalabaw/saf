@@ -40,6 +40,14 @@ class ApplicationController extends Controller
 			->orWhere('agent_id', Auth::user()->id);
 		}
 
+		// Check if the login user is a cluster leader
+		// Outputs the application data of all the teams under the cluster
+		$cluster_data = getMyClusterAndTeam(Auth::user());
+		if(!empty($cluster_data['_c'][0])){
+			$cluster_id = $cluster_data['_c'][0]['cluster_id'];
+			$applications = $applications->where('cluster_id', $cluster_id);
+		}
+
 		if (!empty($request->get('search_string'))) {
 			// With search string parameter
 			$applications = $applications->search($request->get('search_string'));

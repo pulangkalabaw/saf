@@ -24,21 +24,28 @@ class MessageBoardController extends Controller
         $msgboard_tbl = new MessageBoard();
         // get cluster id of the accounts owner
         $get_cluster = Clusters::get(['id','team_ids'])->map(function($cl){
+            if($cl['team_ids'] != null){
+                // if account owner is team leader
+                if(!empty(Session::get('_t'))){
+                    // check its cluster
+                    if(in_array(Session::get('_t')[0]['id'],$cl['team_ids'])){
+                        $cl['cl_id'] = $cl['id'];
+                    }
+                }
+                // if account owner
+                if(!empty(Session::get('_a'))){
+                    // check its cluster
+                    if(in_array(Session::get('_a')[0]['id'],$cl['team_ids'])){
+                        $cl['cl_id'] = $cl['id'];
+                    }
+                }
 
-            // if account owner is team leader
-            if(!empty(Session::get('_t'))){
-                // check its cluster
-                if(in_array(Session::get('_t')[0]['id'],$cl['team_ids'])){
-                    $cl['cl_id'] = $cl['id'];
-                }
+            }else{
+                $cl['cl_id'] = null;
+
             }
-            // if account owner
-            if(!empty(Session::get('_a'))){
-                // check its cluster
-                if(in_array(Session::get('_a')[0]['id'],$cl['team_ids'])){
-                    $cl['cl_id'] = $cl['id'];
-                }
-            }
+
+
             return $cl;
         });
         // get team id
@@ -46,6 +53,9 @@ class MessageBoardController extends Controller
             if(!empty(Session::get('_c')[0]['team_ids'])){
                 // get team id
                 $team_id = json_encode(Session::get('_c')[0]['team_ids']);
+            }else{
+                $team_id = json_encode([null]);
+
             }
         }elseif(!empty(Session::get('_t'))){
             // if cluster is empty

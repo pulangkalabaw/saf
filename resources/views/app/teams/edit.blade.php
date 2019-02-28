@@ -112,13 +112,14 @@
 
 												<select name="agent_ids[]" id="" class="form-control selectpicker" multiple>
 													{{-- Current --}}
-													@if(!empty($team->agent_ids))
+													<!-- @if(!empty($team->agent_ids))
 														@foreach ($team->getAgents($team->agent_ids) as $key => $agent)
 															<option selected value="{{ (int) $agent->id }}">
 																{{ $agent->fname . ' ' . $agent->lname }}
 															</option>
 														@endforeach
-													@endif
+													@endif -->
+
 
 													{{-- Available --}}
 													@foreach ($agents as $agent)

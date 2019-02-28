@@ -27,7 +27,7 @@
 									</h3>
 								</div>
 								<div class="col-md-4 text-right">
-									<a href="{{ route('app.clusters.edit', $cluster->cluster_id) }}" class="btn btn-xs btn-default">
+									<a href="{{ route('app.clusters.edit', $cluster->id) }}" class="btn btn-xs btn-default">
 										<span class='fa fa-edit'></span>
 									</a>
 									<a href="{{ route('app.clusters.index') }}" class="btn btn-xs btn-default">
@@ -90,7 +90,7 @@
 											@if(!empty($cluster->team_ids))
 												@foreach ($cluster->getTeams($cluster->team_ids) as $key => $team)
 
-													<a href="{{ route('app.teams.show', $team->team_id) }}">
+													<a href="{{ route('app.teams.show', $team->id) }}">
 														{{ $team->team_name }}
 													</a>
 													{{ ($key != (count($cluster->getTeams($cluster->team_ids)) - 1)) ? ',' : '' }}
