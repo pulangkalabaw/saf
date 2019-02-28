@@ -18,6 +18,7 @@
     <div class="template template__blank">
 
       <!-- ATTENDANCE WIDGET  -->
+      @if(!empty($heirarchy) && $heirarchy['clusters'])
       <div class="row">
         <div class="{{ !empty(Session::get('_a') || !empty(Session::get('_t'))) ? 'col-md-12' : 'col-md-12'  }}">
           <div class="panel panel-info">
@@ -135,6 +136,7 @@
         </div>
         @endif
       </div>
+      @endif
       <!-- ATTENDANCE WIDGET -->
 
         <div class="row">
