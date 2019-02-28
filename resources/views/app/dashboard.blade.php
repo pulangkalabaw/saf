@@ -18,8 +18,9 @@
     <div class="template template__blank">
 
       <!-- ATTENDANCE WIDGET  -->
+      @if(!empty($heirarchy) && $heirarchy['clusters'])
       <div class="row">
-        <div class="{{ !empty(Session::get('_a') || !empty(Session::get('_t'))) ? 'col-md-12' : 'col-md-9'  }}">
+        <div class="{{ !empty(Session::get('_a') || !empty(Session::get('_t'))) ? 'col-md-12' : 'col-md-12'  }}">
           <div class="panel panel-info">
               <div class="panel-heading">
                   <h3 class="panel-title">Attendance</h3>
@@ -27,10 +28,12 @@
               <div class="panel-body">
                 <!-- CLUSTER -->
                 <div class="row">
+                  @if(!empty($heirarchy) && $heirarchy['clusters'])
                   <div class="col-md-3">
                     <h5>As of <small>{{  now()->format('M d y g:i a') }}</small></h5>
-                    <input type="date" class="form-control">
+                    <!-- <input type="date" class="form-control"> -->
                   </div>
+                  @endif
                   @if(!empty($heirarchy))
                     @foreach($heirarchy['clusters'] as $clus)
                         @if(!empty($clus))
@@ -66,7 +69,7 @@
                             <!-- <p>Present: <b class="text-success">30</b></p> -->
                             <!-- <p>Absent: <b class="text-danger">2</b></p> -->
                             <!-- <p>Unkown: <b class="text-warning">1</b></p> -->
-                            <p>Your attendance is <span class="text-warning">unkown</span> today.</p>
+                            <p>Your attendance is <span class="{{ ($team->attendance == 'Present') ? 'text-success' : (($team->attendance == 'Absent') ? 'text-danger' : 'text-warning') }}">{{ $team->attendance }}</span> today.</p>
                           </div>
                         </div>
                         @endforeach
@@ -83,6 +86,7 @@
         @if( (empty(Session::get('_t')) && empty(Session::get('_a'))) || !empty(Session::get('_c')) )
         <div class="col-md-3">
           <!-- OVERVIEW -->
+          @if(0)
           <div class="panel panel-success">
               <div class="panel-heading">
                 <h3 class="panel-title">Overview</h3>
@@ -127,10 +131,12 @@
                 </div>
               </div>
             </div>
+            @endif
             <!-- OVERVIEW -->
         </div>
         @endif
       </div>
+      @endif
       <!-- ATTENDANCE WIDGET -->
 
         <div class="row">

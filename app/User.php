@@ -67,7 +67,11 @@ class User extends Authenticatable
 	public function getAvailableTeamLeader() {
 		// Get all tl created
 		$tl = Teams::get()->pluck('tl_ids');
-		$tl_decoded = json_decode($tl);
+
+		// decode and filter
+		$tl_decoded = collect(json_decode($tl))->filter();
+
+		// dd(collect($tl_decoded)->filter());
 		if (empty($tl_decoded[0]))  return $this->get();
 		return $this->whereNotIn('id', $tl_decoded)->get();
 	}
