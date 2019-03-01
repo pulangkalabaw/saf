@@ -16,8 +16,10 @@ class AccessControl
      */
     public function handle($request, Closure $next, ...$can_access)
     {
+		getSessions();
+
         if (!in_array(base64_decode(Auth::user()->role), $can_access)) {
-          return back();
+          abort(404);
         }
         return $next($request);
     }

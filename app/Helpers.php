@@ -6,41 +6,22 @@ use App\Attendance;
 use Carbon\Carbon;
 
 /**
-* Check Position
-*
-*
-* This function will identify your Position
-* whether user is TL, CL or agent
-*
-* PS: User can have a multiple position
-*
-* Requirements: User Model and a role with 'user'
-*
-* @return *tml, crl, agt or undefined
+* Update Sessions
 *
 */
 
-// function checkPosition ($user) {
-//
-// 	// check first if this $user
-// 	// is has a role of 'user'
-// 	if (base64_decode($user->role) != 'user') return 'undefined';
-//
-// 	// get the cluster and team (if any)
-// 	$r = getMyClusterAndTeam($user);
-//
-// 	// hold the multiple position var
-// 	$pos = [];
-//
-// 	// just count them
-// 	// and return the appropriate response
-// 	if (count($r['_a'])) array_push($pos, 'agnt'); // Agent
-// 	if (count($r['_t'])) array_push($pos, 'tl'); // Team leader
-// 	if (count($r['_c'])) array_push($pos, 'cl'); // Cluster leader
-//
-// 	return $pos;
-// }
+function getSessions () {
+	$auth = Auth::user();
 
+	if (!empty($auth)) {
+
+		$_data = getMyClusterAndTeam($auth);
+		Session::put('_t', $_data['_t']);
+		Session::put('_c', $_data['_c']);
+		Session::put('_a', $_data['_a']);
+	}
+
+}
 
 /*
 * GET CLUSTER AND TEAM (_C, _T)
@@ -188,48 +169,48 @@ function fetchAgent ($auth)
 
 
 /**
- * Check Position
- *
- *
- * This function will identify your Position
- * whether user is TL, CL or agent
- *
- * PS: User can have a multiple position
- *
- * Requirements: User Model and a role with 'user'
- *
- * @return *tml, crl, agt or undefined
- *
- */
+* Check Position
+*
+*
+* This function will identify your Position
+* whether user is TL, CL or agent
+*
+* PS: User can have a multiple position
+*
+* Requirements: User Model and a role with 'user'
+*
+* @return *tml, crl, agt or undefined
+*
+*/
 
- function checkPosition ($user, $can_access = [], $diff = false) {
+function checkPosition ($user, $can_access = [], $diff = false) {
 
- 	// check first if this $user
- 	// is has a role of 'user'
- 	if (base64_decode($user->role) != 'user') return 'undefined';
+	// check first if this $user
+	// is has a role of 'user'
+	if (base64_decode($user->role) != 'user') return 'undefined';
 
- 	// get the cluster and team (if any)
- 	$r = getMyClusterAndTeam($user);
+	// get the cluster and team (if any)
+	$r = getMyClusterAndTeam($user);
 
- 	// hold the multiple position var
- 	$pos = [];
+	// hold the multiple position var
+	$pos = [];
 
- 	// just count them
- 	// and return the appropriate response
- 	if (count($r['_a'])) array_push($pos, 'agent'); // Agent
- 	if (count($r['_t'])) array_push($pos, 'tl'); // Team leader
- 	if (count($r['_c'])) array_push($pos, 'cl'); // Cluster leader
+	// just count them
+	// and return the appropriate response
+	if (count($r['_a'])) array_push($pos, 'agent'); // Agent
+	if (count($r['_t'])) array_push($pos, 'tl'); // Team leader
+	if (count($r['_c'])) array_push($pos, 'cl'); // Cluster leader
 
- 	if ($diff) {
+	if ($diff) {
 
- 		// use array diff
- 		$arr_diff = array_intersect($pos, $can_access);
- 		return $arr_diff;
- 	}
+		// use array diff
+		$arr_diff = array_intersect($pos, $can_access);
+		return $arr_diff;
+	}
 
- 	else return $pos;
+	else return $pos;
 
- }
+}
 
 
 
@@ -640,39 +621,39 @@ function getHeirarchy2(){
 
 	// FOR ADMIN
 	if(base64_decode(Auth()->user()->role) == $roles['administrator']){
-			$clusters = $clusters_model->get()->map(function($res) use ($teams_model, $user_model,$attendance_model){
-				$res['teams'] = $teams_model->whereIn('id', $res['team_ids'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model){
-					$agents = $user_model->whereIn('id', $res['agent_ids'])->get();
-					$res['total_agents'] = count($agents);
-					$res['agents'] = $agents;
-					// calculate present, absent, unkown
-					$count = [
-						'present' => 0,
-						'absent' => 0,
-						'unkown' => 0,
+		$clusters = $clusters_model->get()->map(function($res) use ($teams_model, $user_model,$attendance_model){
+			$res['teams'] = $teams_model->whereIn('id', $res['team_ids'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model){
+				$agents = $user_model->whereIn('id', $res['agent_ids'])->get();
+				$res['total_agents'] = count($agents);
+				$res['agents'] = $agents;
+				// calculate present, absent, unkown
+				$count = [
+					'present' => 0,
+					'absent' => 0,
+					'unkown' => 0,
+				];
+				$agents = $user_model->whereIn('id',$res['agent_ids'])->get();
+				$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
+					if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
+						++$count['present'];
+					}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) >= 1){
+						++$count['absent'];
+					}else{
+						++$count['unkown'];
+					}
+					return [
+						'present' => $count['present'],
+						'absent' => $count['absent'],
+						'unkown' => $count['unkown'],
 					];
-					$agents = $user_model->whereIn('id',$res['agent_ids'])->get();
-					$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
-						if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
-							++$count['present'];
-						}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) >= 1){
-							++$count['absent'];
-						}else{
-							++$count['unkown'];
-						}
-						return [
-							'present' => $count['present'],
-							'absent' => $count['absent'],
-							'unkown' => $count['unkown'],
-						];
-					});
-					$res['attendance'] = $res['attendance']->values()->last();
-					// end of calculate present, absent, unkown
-					return $res;
 				});
+				$res['attendance'] = $res['attendance']->values()->last();
+				// end of calculate present, absent, unkown
 				return $res;
 			});
-			// dd($clusters[0]->teams[0]->total_agents);
+			return $res;
+		});
+		// dd($clusters[0]->teams[0]->total_agents);
 
 		// FOR USER ROLE
 	}else if(base64_decode(Auth()->user()->role) == $roles['user']){
