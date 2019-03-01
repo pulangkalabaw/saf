@@ -58,8 +58,6 @@ class User extends Authenticatable
 		$cl_decoded = json_decode($tl);
 		if (empty($cl_decoded[0]))  return $this->get();
 		return $this->whereNotIn('id', $cl_decoded)->get();
-
-
 	}
 
 

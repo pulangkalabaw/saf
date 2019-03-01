@@ -103,8 +103,8 @@
                                         <div class="col-md-3">Status</div>
                                         <div class="col-md-7">
                                             <select name="isActive" class="form-control" required>
-                                                <option {{ ($user->isActive == 1) ? 'selected' : '' }} value="1">Activated</option>
-                                                <option {{ ($user->isActive == 0) ? 'selected' : '' }} value="0">Deactivated</option>
+                                                <option {{ ($user->isActive == 1) ? 'selected' : '' }} value="{{ (int) 1 }}">Activated</option>
+                                                <option {{ ($user->isActive == 0) ? 'selected' : '' }} value="{{ (int) 0 }}">Deactivated</option>
                                             </select>
                                         </div>
                                     </div>

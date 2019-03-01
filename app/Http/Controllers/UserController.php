@@ -136,7 +136,7 @@ class UserController extends Controller
             'lname' => 'required|string',
             'email' => 'required|string|email|unique:users,email,'.$id,
             'role' => 'required|string',
-            'isActive' => 'required|integer',
+            'isActive' => 'required|boolean',
         ]);
 
         if ($v->fails()) return back()->withErrors($v->errors());
@@ -148,6 +148,7 @@ class UserController extends Controller
         else {
             unset($request['password']);
         }
+
         if (User::where('id', $id)->update($request->except(['_token', '_method']))) {
             return back()->with([
                 'notif.style' => 'success',

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Schema;
 use Illuminate\Database\Eloquent\Model;
 
 class Application extends Model
@@ -10,6 +11,20 @@ class Application extends Model
     protected $table = "saf_applications";
     protected $guarded = [];
     protected $dates = ['created_at', 'updated_at'];
+
+	/*
+     * [ Sorting Module ]
+     * [ search: team_name ]
+     *
+     */
+	public function scopeSort ($query, $request) {
+
+		// Check first if sort_in (database column) is exists!
+		if (!Schema::hasColumn('saf_applications', $request->get('sort_in'))) return $query;
+
+		// If everything is good
+		return $query->orderBy($request->get('sort_in'), $request->get('sort_by'));
+	}
 
 
     /*

@@ -23,6 +23,10 @@ class ClustersController extends Controller
 		// Count all before paginate
 		$clusters_total = $clusters->count();
 
+		// Sorting
+		// params: sort_in & sort_by
+		if (!empty($request->get('sort_in') && !empty($request->get('sort_by')))) $clusters = $clusters->sort($request);
+
 		// Search
         if (!empty($request->get('search_string'))) $clusters = $clusters->search($request->get('search_string'));
 

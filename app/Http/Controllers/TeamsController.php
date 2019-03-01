@@ -22,6 +22,12 @@ class TeamsController extends Controller
 		// Count all before paginate
 		$teams_total = $teams->count();
 
+		// Sorting
+        // params: sort_in & sort_by
+        if (!empty($request->get('sort_in') && !empty($request->get('sort_by')))) {
+			$teams = $teams->sort($request);
+		}
+
 		// Search
         if (!empty($request->get('search_string'))) $teams = $teams->search($request->get('search_string'));
 
