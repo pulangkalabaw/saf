@@ -34,7 +34,7 @@
 						</div>
 						<div class="panel-body">
 							<div class="row">
-								<div class="col-md-4 col-xs-4">
+								<div class="col-md-4 col-xs-12">
 									<div class="form-inline">
 										<div class="form-group">
 											<label>Number of rows: </label>
@@ -49,11 +49,12 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-md-2 col-xs-2"></div>
-								<div class="col-md-6 col-xs-6">
+								<div class="col-md-2 col-xs-12"></div>
+								<div class="col-md-6 col-xs-12">
 									<form action="{{ url()->current() }}" method="GET">
 										<div class="input-group">
-											<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control" placeholder="Search for Application #, Encoder, Team, Customer and SR #">
+											<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control"
+											placeholder="Search for customer, teams, sr and so">
 											<span class="input-group-btn">
 												<button class="btn btn-primary"><span class='fa fa-search'></span> </button>
 											</span>

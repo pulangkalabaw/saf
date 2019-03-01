@@ -71,10 +71,8 @@ class Teams extends Model
 
 		// Search from the user table first
 		// Use this id to search for the cl, tl, encoder, agent_code
-		$return_query = $query->where('teams.team_name', 'LIKE', "%".$val."%")
-		->orWhere('tl.fname', 'LIKE', "%".$val."%")->orWhere('tl.lname', 'LIKE', "%".$val."%")
-		->orWhere('ac.fname', 'LIKE', "%".$val."%")->orWhere('ac.lname', 'LIKE', "%".$val."%")
-		->orWhere('ac.agent_code', 'LIKE', "%".$val."%");
+		$return_query = $query->where('team_name', 'LIKE', "%".$val."%")
+		->orWhere('team_id', 'LIKE', "%".$val."%");
 
 		// Then try to search to teams
 		return $return_query;
