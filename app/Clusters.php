@@ -66,14 +66,8 @@ class Clusters extends Model
 
         // Search from the user table first
         // Use this id to search for the cl, tl, encoder, agent_code
-        $return_query = $query->where('cluster_name', 'LIKE', "%".$val."%");
-
-        if (!empty($user->search($val)->first())) {
-            $user_id = $user->search($val)->first()->id;
-            $agent_code = $user->search($val)->first()->agent_code;
-            $return_query = $return_query
-            ->orWhere('cl_id', $user_id);
-        }
+        $return_query = $query->where('cluster_id', 'LIKE', "%".$val."%")
+		->orWhere('cluster_name', 'LIKE', "%".$val."%");
 
         // Then try to search to teams
         return $return_query;

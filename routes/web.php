@@ -22,22 +22,27 @@ Route::get('/logout', 'LoginController@logout')->name('logout');
 
 // App Routes
 Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], function () {
+
     // Dashboard
-    Route::get('/dashboard', 'DashboardController@dashboard')->name('dashboard');
+    Route::get('dashboard', 'DashboardController@dashboard')->name('dashboard')->middleware('access_control:administrator,user,encoder');
+
     // Users
     Route::resource('users', 'UserController')->middleware('access_control:administrator');
+
     // Teams
-    Route::resource('teams', 'TeamsController');
+    Route::resource('teams', 'TeamsController')->middleware('access_control:administrator');
+
     // Clusters
-    Route::resource('clusters', 'ClustersController');
+    Route::resource('clusters', 'ClustersController')->middleware('access_control:administrator');
+
     // Applications
-    Route::resource('applications', 'ApplicationController');
-    // Devices
-    Route::resource('devices', 'DevicesController');
+    Route::resource('applications', 'ApplicationController')->middleware('access_control:administrator,user,encoder');
+
     // Plan
     Route::resource('plans', 'PlansController')->middleware('access_control:administrator');
+
     // Message Board
-    Route::resource('messages', 'MessageBoardController');
+    Route::resource('messages', 'MessageBoardController')->middleware('access_control:administrator,user,encoder');
     // Route::get('message-board', 'MessageBoardController@messageBoard')->name('messageboard');
     // delete specific post
     Route::post('delete-post', 'MessageBoardController@delete')->name('delete-post');

@@ -16,13 +16,13 @@
 					<div class="panel panel-primary">
 						<div class="panel-heading">
 							<div class="row">
-								<div class="col-md-8">
+								<div class="col-md-8 col-xs-8">
 									<h3 class="panel-title">
 										Teams
 									</h3>
 								</div>
-								<div class="col-md-4 text-right">
-									<a href="{{ route('app.teams.create') }}" class="btn btn-xs btn-default">
+								<div class="col-md-4 col-xs-4 text-right">
+									<a href="{{ route('app.teams.create') }}" class="btn btn-sm btn-primary">
 										<span class='fa fa-plus-circle'></span>
 									</a>
 								</div>
@@ -51,7 +51,8 @@
 												<div class="col-md-5 col-xs-5">
 													<form action="{{ url()->current() }}" method="GET">
 														<div class="input-group">
-															<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control" placeholder="Search for Team name, TL and Agent">
+															<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control"
+															placeholder="Search for team name and team code">
 															<span class="input-group-btn">
 																<button class="btn btn-primary"><span class='fa fa-search'></span> </button>
 															</span>
@@ -67,8 +68,8 @@
 											<table class="table table-hovered table-striped">
 												<thead>
 													<tr>
-														<th>Cluster name</th>
 														<th>Team code</th>
+														<th>Cluster name</th>
 														<th>
 															Team name
 															<a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'team-name', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
@@ -176,10 +177,10 @@
 											</table>
 											<br>
 											<div class="row">
-												<div class="col-md-10">
+												<div class="col-md-8 col-xs-8">
 													{{ $teams->appends(request()->input())->links() }}
 												</div>
-												<div class="col-md-2 text-right">
+												<div class="col-md-4 col-xs-4 text-right">
 													Total <b>{{ $teams_total }}</b> result(s)
 												</div>
 											</div>
