@@ -65,4 +65,11 @@ class DashboardController extends Controller
             'heirarchy' => getHeirarchy2(),
         ]);
     }
+
+    // Method for attendance Dashboard
+    public function attendanceDashboard(){
+        return view('app.attendance.dashboard', [
+            'heirarchy' => getHeirarchy2(),
+        ]);
+    }
 }
