@@ -456,7 +456,7 @@ function getHeirarchy2(){
 			$res['teams'] = $teams_model->whereIn('id', $res['team_ids'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,$application_model,&$count_applications){
 
 				// calcualting applications and saf
-				// dd($res['id']);
+				dd( Carbon::parse('first day of February 2019')." ".Carbon::parse('last day of February 2019')->endOfMonth() );				
 				$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications){
 					if($res['status'] == 'new'){
 						(float)$count_applications['new'] += (float)$res['msf'];
@@ -465,6 +465,7 @@ function getHeirarchy2(){
 					}else if($res['status'] == 'paid'){
 						$count_applications['paid'] += $res['msf'];
 					}
+					$count_applications['target'] += (float)$res['msf'];
 					return [
 						'new' => $count_applications['new'],
 						'activated' => $count_applications['activated'],
@@ -473,7 +474,6 @@ function getHeirarchy2(){
 					];
 				});
 				$res['getallsafthiscutoff'] = $res['getallsafthiscutoff']->values()->last();
-				// dd($res['getallsafthiscutoff']);
 				// end of calculating applications and saf
 
 				$agents = $user_model->whereIn('id', $res['agent_ids'])->get();
@@ -484,6 +484,7 @@ function getHeirarchy2(){
 					'present' => 0,
 					'absent' => 0,
 					'unkown' => 0,
+					'totaltarget' => 0, // ADD THIS
 				];
 				$agents = $user_model->whereIn('id',$res['agent_ids'])->get();
 				$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
@@ -494,14 +495,19 @@ function getHeirarchy2(){
 					}else{
 						++$count['unkown'];
 					}
+					$count['totaltarget'] += (float)$res['target']; // ADD THIS
 					return [
 						'present' => $count['present'],
 						'absent' => $count['absent'],
 						'unkown' => $count['unkown'],
+						'totaltarget' => $count['totaltarget'], // ADD THIS
 					];
 				});
 				$res['attendance'] = $res['attendance']->values()->last();
 				// end of calculate present, absent, unkown
+
+				// for percentage of this cutoff
+				$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/$res['attendance']['totaltarget']) * 100); // ADD THIS
 				return $res;
 			});
 			return $res;

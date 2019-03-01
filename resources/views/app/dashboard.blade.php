@@ -44,7 +44,7 @@
                                             <p>New: <b>{{ (float)$team->getallsafthiscutoff['new'] }}</b></p>
                                             <p>Activated: <b class="text-info">{{ (float)$team->getallsafthiscutoff['activated'] }}</b></p>
                                             <p>Paid: <b class="text-primary">{{ (float)$team->getallsafthiscutoff['paid'] }}</b></p>
-                                            <p>Target %: <b class="text-success">69%</b></p>
+                                            <p>Target %: <b class="text-success">{{ (float)$team->pat }}%</b></p>
                                         </div>
                                     </div>
                                     @endif
