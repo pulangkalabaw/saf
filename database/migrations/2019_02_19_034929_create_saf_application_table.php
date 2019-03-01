@@ -31,7 +31,7 @@ class CreateSafApplicationTable extends Migration
 			$table->string('status');
 			$table->integer('insert_by')->unsigned()->nullable();
 			$table->integer('encoder_id')->unsigned()->nullable();
-			$table->integer('encoded_at')->unsigned()->nullable();
+			$table->string('encoded_at');
             $table->timestamps();
         });
 

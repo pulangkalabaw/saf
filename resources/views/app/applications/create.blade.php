@@ -19,13 +19,13 @@
 					<div class="panel panel-primary">
 						<div class="panel-heading">
 							<div class="row">
-								<div class="col-md-8">
+								<div class="col-md-8 col-xs-8">
 									<h3 class="panel-title">
 										Application Form
 									</h3>
 								</div>
-								<div class="col-md-4 text-right">
-									<a href="{{ route('app.applications.index') }}" class="btn btn-xs btn-default">
+								<div class="col-md-4 col-xs-4 text-right">
+									<a href="{{ route('app.applications.index') }}" class="btn btn-sm btn-default">
 										<span class='fa fa-th-list'></span>
 									</a>
 								</div>
@@ -139,7 +139,7 @@
 										<div>
 	                                        <div class="col-md-3"></div>
 	                                        <div class="col-md-7 text-right">
-	                                            <button class="btn btn-xs btn-primary">Submit <span class='fa fa-plus-circle'></span> </button>
+	                                            <button class="btn btn-sm btn-primary">Submit <span class='fa fa-plus-circle'></span> </button>
 	                                        </div>
 	                                    </div>
 	                                    <div class="clearfix"></div><br>

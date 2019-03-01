@@ -96,12 +96,12 @@ class ApplicationController extends Controller
 	public function store(Request $request)
 	{
 		$validate = Validator::make($request->all(),[
-				'customer_name' => 'required',
-				'contact' => 'required',
-				'address' => 'required',
-				'plan_id' => 'required',
-				'user_id' => 'required',
-				'team_id' => 'required'
+			'customer_name' => 'required',
+			'contact' => 'required',
+			'address' => 'required',
+			'plan_id' => 'required',
+			'user_id' => 'required',
+			'team_id' => 'required'
 		],[
 			'plan_id.required' => 'Please select plan',
 			'user_id.required' => 'Please select user',
@@ -200,117 +200,119 @@ class ApplicationController extends Controller
 			'getDevice',
 			'getPlan',
 			'getProduct',
+			'getInsertBy',
 		])
 		->where('application_id', $id)
 		->firstOrFail();
 
 		return view('app.applications.show', [
 			'application' => $application,
-			'application_model' => $application_model, 'application_status' => $application_status]);
-		}
+			'application_model' => $application_model, 'application_status' => $application_status
+		]);
+	}
 
-		/**
-		* Show the form for editing the specified resource.
-		*
-		* @param  \App\Application  $application
-		* @return \Illuminate\Http\Response
-		*/
-		public function edit($id)
-		{
-			//
-			$users = new User();
-			$teams = Teams::whereIn('team_id', Session::get('_t'))->get();
-			$application_model = new Application();
-			$application_status = new ApplicationStatus();
-			$plans = Plans::get();
-			$devices = Devices::get();
-			$products = Product::get();
+	/**
+	* Show the form for editing the specified resource.
+	*
+	* @param  \App\Application  $application
+	* @return \Illuminate\Http\Response
+	*/
+	public function edit($id)
+	{
+		//
+		$users = new User();
+		$teams = Teams::whereIn('team_id', Session::get('_t'))->get();
+		$application_model = new Application();
+		$application_status = new ApplicationStatus();
+		$plans = Plans::get();
+		$devices = Devices::get();
+		$products = Product::get();
 
-			$application = $application_model->where('application_id', $id)->firstOrFail();
+		$application = $application_model->where('application_id', $id)->firstOrFail();
 
-			return view('app.applications.edit', [
-				'application' => $application,
-				'application_model' => $application_model,
-				'application_status' => $application_status,
-				'agents' => $users->get(),
-				'teams' => $teams,
-				'plans' => $plans,
-				'devices' => $devices,
-				'products' => $products,
+		return view('app.applications.edit', [
+			'application' => $application,
+			'application_model' => $application_model,
+			'application_status' => $application_status,
+			'agents' => $users->get(),
+			'teams' => $teams,
+			'plans' => $plans,
+			'devices' => $devices,
+			'products' => $products,
+		]);
+
+	}
+
+	/**
+	* Update the specified resource in storage.
+	*
+	* @param  \Illuminate\Http\Request  $request
+	* @param  \App\Application  $application
+	* @return \Illuminate\Http\Response
+	*/
+	public function update(Request $request, $id)
+	{
+		$application_model = new Application();
+		$application = $application_model->where('application_id', $id)->firstOrFail();
+		$msf = Plans::where('id',$request['plan_id'])->value('msf');
+
+		// Place to $data variable
+		$data['customer_name'] = $request->post('customer_name');
+		$data['contact'] = $request->post('contact');
+		$data['address'] = $request->post('address');
+		$data['plan_id'] = (int) $request->post('plan_id');
+		$data['sim'] = $request->post('sim');
+		$data['device_id'] = empty($request->post('device_id')) ? '-' : $request->post('device_id');
+		$data['agent_id'] = (int) $request->post('agent_id');
+		$data['msf'] = (float) $msf;
+		$data['sr_no'] = $request->post('sr_no');
+		$data['so_no'] = $request->post('so_no');
+		$data['status'] = $request->post('status');
+		$data['encoder_id'] = Auth::user()->id;
+		$data['encoded_at'] = now();
+		$data['updated_at'] = now();
+
+		if ($application->update($data)) {
+
+			ApplicationStatus::where('id', $id)->update(['active' => 0]);
+
+			ApplicationStatus::insert([
+				'application_id' => (string) $id,
+				'status_id' => $data['status'], // change this to status
+				'added_by' => Auth::user()->id,
+				'active' => 1,
+				'team_id' => (int) $request->post('team_id'),
+				'created_at' => now(),
 			]);
 
+			return back()->with([
+				'notif.style' => 'success',
+				'notif.icon' => 'plus-circle',
+				'notif.message' => 'Update successful!',
+			]);
 		}
-
-		/**
-		* Update the specified resource in storage.
-		*
-		* @param  \Illuminate\Http\Request  $request
-		* @param  \App\Application  $application
-		* @return \Illuminate\Http\Response
-		*/
-		public function update(Request $request, $id)
-		{
-			$application_model = new Application();
-			$application = $application_model->where('application_id', $id)->firstOrFail();
-			$msf = Plans::where('id',$request['plan_id'])->value('msf');
-
-			// Place to $data variable
-			$data['customer_name'] = $request->post('customer_name');
-			$data['contact'] = $request->post('contact');
-			$data['address'] = $request->post('address');
-			$data['plan_id'] = (int) $request->post('plan_id');
-			$data['sim'] = $request->post('sim');
-			$data['device_id'] = empty($request->post('device_id')) ? '-' : $request->post('device_id');
-			$data['agent_id'] = (int) $request->post('agent_id');
-			$data['msf'] = (float) $msf;
-			$data['sr_no'] = $request->post('sr_no');
-			$data['so_no'] = $request->post('so_no');
-			$data['status'] = $request->post('status');
-			$data['encoder_id'] = Auth::user()->id;
-			$data['encoded_at'] = now();
-			$data['updated_at'] = now();
-
-			if ($application->update($data)) {
-
-					ApplicationStatus::where('id', $id)->update(['active' => 0]);
-
-					ApplicationStatus::insert([
-						'application_id' => (string) $id,
-						'status_id' => $data['status'], // change this to status
-						'added_by' => Auth::user()->id,
-						'active' => 1,
-						'team_id' => (int) $request->post('team_id'),
-						'created_at' => now(),
-					]);
-
-					return back()->with([
-						'notif.style' => 'success',
-						'notif.icon' => 'plus-circle',
-						'notif.message' => 'Update successful!',
-					]);
-				}
-				else {
-					return back()->with([
-						'notif.style' => 'danger',
-						'notif.icon' => 'times-circle',
-						'notif.message' => 'Failed to update',
-					]);
-				}
-			}
-
-			/**
-			* Remove the specified resource from storage.
-			*
-			* @param  \App\Application  $application
-			* @return \Illuminate\Http\Response
-			*/
-			public function destroy(Application $application)
-			{
-				//
-			}
-
-			public function replaceDashIfNull($arr)
-			{
-				return !empty($arr) ? $arr : "-";
-			}
+		else {
+			return back()->with([
+				'notif.style' => 'danger',
+				'notif.icon' => 'times-circle',
+				'notif.message' => 'Failed to update',
+			]);
 		}
+	}
+
+	/**
+	* Remove the specified resource from storage.
+	*
+	* @param  \App\Application  $application
+	* @return \Illuminate\Http\Response
+	*/
+	public function destroy(Application $application)
+	{
+		//
+	}
+
+	public function replaceDashIfNull($arr)
+	{
+		return !empty($arr) ? $arr : "-";
+	}
+}

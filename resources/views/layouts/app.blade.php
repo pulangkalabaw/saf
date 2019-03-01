@@ -45,7 +45,7 @@
 				<div class="header-navbar-mobile__menu">
 					<button class="btn" type="button"><i class="fa fa-bars"></i></button>
 				</div>
-				<div class="header-navbar-mobile__title"><span>Blank</span></div>
+				<div class="header-navbar-mobile__title"><span>{{ env('APP_NAME') }}</span></div>
 				<div class="header-navbar-mobile__settings dropdown"><a class="btn dropdown-toggle" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-power-off"></i></a>
 					<ul class="dropdown-menu dropdown-menu-right">
 						<li><a href="{{ route('logout') }}">Log Out</a></li>
@@ -54,11 +54,19 @@
 			</div>
 			<div class="navbar-header"><a class="navbar-brand" href="">
 				<div class="logo text-nowrap">
-					<div class="logo__img"><i class="fa fa-chevron-right"></i></div><span class="logo__text">Right</span>
+					<div class="logo__img"><i class="fa fa-chevron-right"></i></div><span class="logo__text">{{ env('APP_NAME') }}</span>
 				</div></a>
 			</div>
 			<div class="topnavbar">
 				<ul class="userbar nav navbar-nav">
+					<li class="dropdown">
+						<a href="#">
+							{{ auth()->user()->fname }}
+							{{ auth()->user()->lname }}
+
+							({{ ucfirst(base64_decode(auth()->user()->role)) }})
+						</a>
+					</li>
 					<li class="dropdown"><a class="userbar__settings dropdown-toggle" href="" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-power-off"></i></a>
 						<ul class="dropdown-menu dropdown-menu-right">
 							<li><a href="{{ route('logout') }}">Log Out</a></li>
@@ -67,6 +75,7 @@
 				</ul>
 			</div>
 		</nav>
+
 		<div class="dashboard">
 			<div class="sidebar">
 				<div class="quickmenu">
@@ -83,6 +92,7 @@
 									<div class="fa fa-fw fa-cog"></div>
 								</div>
 							@endif
+
 							@if(accesesControl(['administrator', 'user']))
 								@if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl")
 									<div class="quickmenu__item {{ str_contains(url()->current(), ['attendance']) ? 'active' : '' }}">
@@ -108,25 +118,26 @@
 										<div class="nav-menu__text"><span>Dashboard</span></div>
 									</a>
 								</li>
+							</ul>
+
+							<div class="sidebar__title">Applications</div>
+							<ul class="nav nav-menu">
 								<li>
 									<a href="{{ route('app.applications.index') }}">
 										<div class="nav-menu__ico"><i class="fa fa-fw fa-folder-o"></i></div>
-										<div class="nav-menu__text"><span>Applications</span></div>
+										<div class="nav-menu__text"><span>List applications</span></div>
 									</a>
 								</li>
-
-
-								{{-- YOUR NON ADMIN --}}
-								@if (session()->get('_c'))
-									<!-- <li>
-										<a href="{{ route('app.your.clusters') }}">
-											<div class="nav-menu__ico"><i class="fa fa-fw fa-building"></i></div>
-											<div class="nav-menu__text"><span>Your Clusters</span></div>
+								@if (count(checkPosition(auth()->user(), ['tl', 'cl'], true)) != 0)
+									<li>
+										<a href="{{ route('app.applications.create') }}">
+											<div class="nav-menu__ico"><i class="fa fa-fw fa-plus-circle"></i></div>
+											<div class="nav-menu__text"><span>Add applications</span></div>
 										</a>
-									</li> -->
+									</li>
 								@endif
-								{{--  --}}
 							</ul>
+
 						</div>
 
 						@if (Auth::user()->role == base64_encode("administrator"))
@@ -136,9 +147,19 @@
 									<li>
 										<a href="{{ route('app.users.index') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-user"></i></div>
-											<div class="nav-menu__text"><span>User Accounts</span></div>
+											<div class="nav-menu__text"><span>User accounts</span></div>
 										</a>
 									</li>
+									<li>
+										<a href="{{ route('app.users.create') }}">
+											<div class="nav-menu__ico"><i class="fa fa-fw fa-plus-circle"></i></div>
+											<div class="nav-menu__text"><span>Add user</span></div>
+										</a>
+									</li>
+								</ul>
+
+								<div class="sidebar__title">Teams</div>
+								<ul class="nav nav-menu">
 									<li>
 										<a href="{{ route('app.teams.index') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-users"></i></div>
@@ -146,58 +167,62 @@
 										</a>
 									</li>
 									<li>
+										<a href="{{ route('app.teams.create') }}">
+											<div class="nav-menu__ico"><i class="fa fa-fw fa-plus-circle"></i></div>
+											<div class="nav-menu__text"><span>Add team</span></div>
+										</a>
+									</li>
+								</ul>
+
+								<div class="sidebar__title">Clusters</div>
+								<ul class="nav nav-menu">
+									<li>
 										<a href="{{ route('app.clusters.index') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-building"></i></div>
 											<div class="nav-menu__text"><span>Clusters</span></div>
 										</a>
 									</li>
+									<li>
+										<a href="{{ route('app.clusters.create') }}">
+											<div class="nav-menu__ico"><i class="fa fa-fw fa-plus-circle"></i></div>
+											<div class="nav-menu__text"><span>Add cluster</span></div>
+										</a>
+									</li>
 								</ul>
 							</div>
 							<div class="sidebar__menu">
-								<div class="sidebar__title">Settings</div>
+								<div class="sidebar__title">Plans Management</div>
 								<ul class="nav nav-menu">
-									{{-- <li>
-										<a href="{{ route('app.statuses.index') }}">
-											<div class="nav-menu__ico"><i class="fa fa-fw fa-quote-right"></i></div>
-											<div class="nav-menu__text"><span>Status Management</span></div>
-										</a>
-									</li>
-									<li>
-										<a href="{{ route('app.product.index') }}">
-											<div class="nav-menu__ico"><i class="fa fa-fw fa-bullseye"></i></div>
-											<div class="nav-menu__text"><span>Product Management</span></div>
-										</a>
-									</li> --}}
-									<li>
-										<a href="{{ route('app.devices.index') }}">
-											<div class="nav-menu__ico"><i class="fa fa-fw fa-mobile"></i></div>
-											<div class="nav-menu__text"><span>Devices Management</span></div>
-										</a>
-									</li>
 									<li>
 										<a href="{{ route('app.plans.index') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-newspaper-o"></i></div>
-											<div class="nav-menu__text"><span>Plans Management</span></div>
+											<div class="nav-menu__text"><span>Plans</span></div>
+										</a>
+									</li>
+									<li>
+										<a href="{{ route('app.plans.create') }}">
+											<div class="nav-menu__ico"><i class="fa fa-fw fa-plus-circle"></i></div>
+											<div class="nav-menu__text"><span>Add plan</span></div>
 										</a>
 									</li>
 								</ul>
 							</div>
 						@endif
-                        {{-- USER ATTENDANCE --}}
+						{{-- USER ATTENDANCE --}}
 						@if(accesesControl(['administrator', 'user']) )
-                        <div class="sidebar__menu">
-                            <div class="sidebar__title">Attendance</div>
-                            <ul class="nav nav-menu">
-                                <li>
-                                    <a href="{{ route('attendance.index') }}">
-                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
-                                        <div class="nav-menu__text"><span>Users Attendance</span></div>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+							<div class="sidebar__menu">
+								<div class="sidebar__title">Attendance</div>
+								<ul class="nav nav-menu">
+									<li>
+										<a href="{{ route('attendance.index') }}">
+											<div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
+											<div class="nav-menu__text"><span>Users Attendance</span></div>
+										</a>
+									</li>
+								</ul>
+							</div>
 						@endif
-                        {{-- Message Board --}}
+						{{-- Message Board --}}
 						<div class="sidebar__menu">
 							<div class="sidebar__title">Message Board</div>
 							<ul class="nav nav-menu">

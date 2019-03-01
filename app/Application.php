@@ -70,8 +70,12 @@ class Application extends Model
         // return $application_status->getStatus($application->status_id)->status;
     }
 
-    public function getEncoder () {
-        return $this->hasOne('App\User', 'id', 'user_id');
+	public function getInsertBy () {
+		return $this->hasOne('App\User', 'id', 'insert_by');
+	}
+
+    public function getEncoder ($id) {
+        return \App\User::where('id', $id)->first();
     }
 
     public function getClusterName () {
