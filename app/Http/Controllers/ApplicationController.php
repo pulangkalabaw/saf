@@ -78,15 +78,39 @@ class ApplicationController extends Controller
 	*/
 	public function create()
 	{
-		$users = User::get();
-		$teams = Teams::get();
+		$teams_model = new Teams();
+		$user_model = new User();
+
+		// Get teams if not admin
+		if (base64_decode(Auth::user()->role) == 'user') {
+
+			// Teams
+			$chpos = checkPosition(Auth::user());
+
+			// FOR NOW THIS MODULE IS ONLY FOR TL AND ADMIN
+			// Issue: when adding or creating new application
+			// if CL, need to have atleast a dropdown for their Clusters
+			// and teams
+			if (count(checkPosition(Auth::user(), ['tl'], true)) == 0) return 'This module is currently for admin and team leader only! Cluster leaders can access this module in the futher updates. Thank your - AppDev';
+
+			$teams = Session::get('_t');
+			$agent_ids = collect($teams)->pluck('agent_ids');
+
+			// Agents
+			$agents = $teams_model->getTeamsAgents($agent_ids);
+		}
+		else {
+			$teams = $teams_model->get();
+			$agents = $user_model->get();
+		}
+
 		$statuses = Statuses::get();
 		$plans = Plans::get();
 		$devices = Devices::get();
 		$products = Product::get();
 
 		return view('app.applications.create', [
-			'users' => $users,
+			'agents' => $agents,
 			'plans' => $plans,
 			'devices' => $devices,
 			'products' => $products,
@@ -141,7 +165,13 @@ class ApplicationController extends Controller
 		// Get cluster
 		$team_model = new Teams();
 		$team_model = $team_model->getCluster($request['team_id']);
-
+		if (empty($team_model[0])) {
+			return back()->with([
+				'notif.style' => 'danger',
+				'notif.icon' => 'times-circle',
+				'notif.message' => 'This team has no cluster!',
+			]);
+		}
 		// Data to be inserted to Application table
 		$application_data = [
 			'application_id' => $application_id,
@@ -229,24 +259,20 @@ class ApplicationController extends Controller
 	{
 		//
 		$users = new User();
-		$teams = Teams::whereIn('team_id', Session::get('_t'))->get();
+
 		$application_model = new Application();
 		$application_status = new ApplicationStatus();
 		$plans = Plans::get();
 		$devices = Devices::get();
 		$products = Product::get();
-
 		$application = $application_model->where('application_id', $id)->firstOrFail();
 
 		return view('app.applications.edit', [
 			'application' => $application,
 			'application_model' => $application_model,
 			'application_status' => $application_status,
-			'agents' => $users->get(),
-			'teams' => $teams,
+			'users' => $users->get(), // !!! FIX THIS: this code will show all users, but we need is the users or agents that is in this team. !!!
 			'plans' => $plans,
-			'devices' => $devices,
-			'products' => $products,
 		]);
 
 	}

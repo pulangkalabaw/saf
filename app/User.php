@@ -51,6 +51,9 @@ class User extends Authenticatable
 	*
 	*/
 	public function getAvailableClusterLeader() {
+		return $this->get();
+
+		//
 		$tl = Clusters::get()->pluck('cl_ids');
 		$cl_decoded = json_decode($tl);
 		if (empty($cl_decoded[0]))  return $this->get();
@@ -63,6 +66,9 @@ class User extends Authenticatable
 	*
 	*/
 	public function getAvailableTeamLeader() {
+		return $this->get();
+		//
+		
 		// Get all tl created
 		$tl = Teams::get()->pluck('tl_ids');
 
@@ -80,7 +86,10 @@ class User extends Authenticatable
 	*
 	*/
 	public function getAvailableAgent() {
-		$agent = Teams::get()->pluck('agent_ids');
+		return $this->get();
+
+		//
+		$agent = Teams::get()->pluck('agent_ids'); // not really a agent code, it is a user.id
 		$agent_decoded = json_decode($agent);
 		if (empty($agent_decoded[0]))  return $this->get();
 		return $this->whereNotIn('id', $agent_decoded)->get();

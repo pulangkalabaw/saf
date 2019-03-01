@@ -247,7 +247,7 @@ function comma_separated_to_array($string, $separator = ',')
 }
 
 // Access Control: were you can give an array of roles that can access
-function accesesControlMiddleware (...$can_access) {
+function accessControlMiddleware (...$can_access) {
 
 	// $can_access is a array of roles
 	if (!in_array(base64_decode(Auth::user()->role), $can_access)) {
@@ -256,7 +256,7 @@ function accesesControlMiddleware (...$can_access) {
 }
 
 // Access Control: were you can give an array of roles that can access specific div
-function accesesControl ($can_access) {
+function accessControl ($can_access) {
 
 	// $can_access is a array of roles
 	return in_array(base64_decode(Auth::user()->role), $can_access);
@@ -706,8 +706,8 @@ function getHeirarchy2(){
 		else if( !empty((Session::get('_t'))) ){
 			// dd(collect(Session::get('_t'))->pluck('id'));
 			$clusters = $clusters_model->get()->map(function($res) use ($teams_model,$user_model,$attendance_model){
-				// dd($res['team_ids']);
-				if( array_intersect(collect(Session::get('_t'))->pluck('id')->toArray(),$res['team_ids']) ){
+
+				if( array_intersect(collect(Session::get('_t'))->pluck('id')->toArray(), collect($res['team_ids'])->toArray()) ){
 					// dd(Session::get('_t'));
 					$team_ids = $res['team_ids'];
 					$res['teams'] = $teams_model->whereIn('id', $res['team_ids'])->get()->map(function($res) use ($teams_model,$user_model,$attendance_model,$team_ids){

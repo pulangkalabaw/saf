@@ -76,17 +76,6 @@
 											<div class="col-md-3">Team Leader</div>
 											<div class="col-md-7">
 												<select name="tl_ids[]" id="" class="form-control selectpicker" multiple>
-													{{-- Current --}}
-													@if (!empty($team->tl_ids))
-														@foreach ($team->getTeamLeader($team->tl_ids) as $key => $tl)
-															<option selected value="{{ (int) $tl->id }}">
-																{{ $tl->fname }}
-																{{ $tl->lname }}
-															</option>
-														@endforeach
-													@else
-														-
-													@endif
 													{{-- Available --}}
 													@foreach ($team_leaders as $tl)
 														@if (!empty($team->agent_ids))
@@ -109,17 +98,7 @@
 										<div>
 											<div class="col-md-3">Agent</div>
 											<div class="col-md-7">
-
 												<select name="agent_ids[]" id="" class="form-control selectpicker" multiple>
-													{{-- Current --}}
-													<!-- @if(!empty($team->agent_ids))
-														@foreach ($team->getAgents($team->agent_ids) as $key => $agent)
-															<option selected value="{{ (int) $agent->id }}">
-																{{ $agent->fname . ' ' . $agent->lname }}
-															</option>
-														@endforeach
-													@endif -->
-
 
 													{{-- Available --}}
 													@foreach ($agents as $agent)

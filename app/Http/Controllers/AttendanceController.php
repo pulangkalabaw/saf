@@ -39,9 +39,21 @@ class AttendanceController extends Controller
 		$get_session;
         // return count(session()->get('_t'));
         if(count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0){
-        // return count(session()->get('_t'));
     		return view('app.attendance.index');
         }
+		// dd()
+		$date_original = $request->date == null ? Carbon::parse(date('Y-m-d')) : Carbon::parse($request->date);
+		$date_select = $date_original;
+		// return $date_select->subDays(1);
+		$date['selected'] = $date_select->toDateString();
+		$date['previous'] = $request->date == null ? Carbon::parse(date('Y-m-d'))->subDays(1)->toDateString() : Carbon::parse($request->date)->subDays(1)->toDateString();
+		if($date_select != Carbon::parse(date('Y-m-d'))){
+			$date['next'] = $request->date == null ? Carbon::parse(date('Y-m-d'))->addDays(1)->toDateString() : Carbon::parse($request->date)->addDays(1)->toDateString();
+		} else {
+			$date['next'] = null;
+		}
+
+		$date_select = $request->date != null ? $request->date : date('Y-m-d H:i:s');
 		$get_user_attendance = [];
 		if(count(session()->get('_c')) >= 1){
 			$get_session = session()->get('_c');
@@ -81,7 +93,7 @@ class AttendanceController extends Controller
 				foreach($user_ids['team_ids'] as $agent){
 					foreach(Teams::where('id', $agent)->pluck('agent_ids') as $agents){
 						foreach($agents as $agnt){
-							$check_agent = Attendance::where('user_id', $agnt)->whereDate('created_at', Carbon::today())->first();
+							$check_agent = Attendance::where('user_id', $agnt)->whereDate('created_at', $date_original)->first();
 							if(!empty($check_agent) || $check_agent != null){
 								$get_user_attendance[] = $check_agent;
 							}
@@ -90,7 +102,7 @@ class AttendanceController extends Controller
 					}
 					foreach(Teams::where('id', $agent)->pluck('tl_ids') as $tl_ids){
 						foreach($tl_ids as $tl){
-							$check_tl = Attendance::where('user_id', $tl)->whereDate('created_at', Carbon::today())->first();
+							$check_tl = Attendance::where('user_id', $tl)->whereDate('created_at', $date_original)->first();
 							if(!empty($check_tl) || $check_tl != null){
 								$get_user_attendance[] = $check_tl;
 							}
@@ -148,7 +160,7 @@ class AttendanceController extends Controller
                             // return $agents;
     						foreach($agents as $agnt){
                                 // return $agnt;
-    							$check_agent = Attendance::where('user_id', $agnt)->whereDate('created_at', Carbon::today())->first();
+    							$check_agent = Attendance::where('user_id', $agnt)->whereDate('created_at', $date_original)->first();
     							// if(empty($check_agent) || $check_agent == null){
 
 								if(!empty($check_agent) || $check_agent != null){
@@ -162,7 +174,7 @@ class AttendanceController extends Controller
     					foreach(Teams::where('id', $agent)->pluck('tl_ids') as $tl_ids){
                             // return $tl_ids;
     						foreach($tl_ids as $tl){
-								$check_tl = Attendance::where('user_id', $tl)->whereDate('created_at', Carbon::today())->first();
+								$check_tl = Attendance::where('user_id', $tl)->whereDate('created_at', $date_original)->first();
 								if(!empty($check_tl) || $check_tl != null){
 									$get_user_attendance[] = $check_tl;
 								}
@@ -181,7 +193,7 @@ class AttendanceController extends Controller
 						// return $agent;
     					foreach(Teams::where('id', $agent)->pluck('agent_ids') as $agents){
     						foreach($agents as $agnt){
-								$check_tl = Attendance::where('user_id', $agnt)->whereDate('created_at', Carbon::today())->first();
+								$check_tl = Attendance::where('user_id', $agnt)->whereDate('created_at', $date_original)->first();
 								if(!empty($check_tl) || $check_tl != null){
 									$get_user_attendance[] = $check_tl;
 								}
@@ -192,7 +204,7 @@ class AttendanceController extends Controller
 						// return $get_user_attendance;
     					foreach(Teams::where('id', $agent)->pluck('tl_ids') as $tl_ids){
     						foreach($tl_ids as $tl){
-								$check_tl = Attendance::where('user_id', $tl)->whereDate('created_at', Carbon::today())->first();
+								$check_tl = Attendance::where('user_id', $tl)->whereDate('created_at', $date_original)->first();
 								if(!empty($check_tl) || $check_tl != null){
 									$get_user_attendance[] = $check_tl;
 								}
@@ -243,7 +255,7 @@ class AttendanceController extends Controller
 				}
 				// return $get_user_ids;
 				foreach($user_ids['agent_ids'] as $agent){
-					$check_agent = Attendance::where('user_id', $agent)->whereDate('created_at', Carbon::today())->first();
+					$check_agent = Attendance::where('user_id', $agent)->whereDate('created_at', $date_original)->first();
 					if(empty($check_agent) || $check_agent == null){
 						array_push($selected_unpresent_users, $agent);
 					}
@@ -366,7 +378,7 @@ class AttendanceController extends Controller
 		// GET PRESENT AGENTS
 		// return $get_user_ids;
 		// return $get_user_ids['user_ids'];
-		$attendance['present'] = Attendance::whereIn('user_id', $get_user_ids['user_ids'])->whereDate('created_at', Carbon::today())->where('status', 1)->with(['Users'])->orderBy('id', 'desc')->get();
+		$attendance['present'] = Attendance::whereIn('user_id', $get_user_ids['user_ids'])->whereDate('created_at', $date_original)->where('status', 1)->with(['Users'])->orderBy('id', 'desc')->get();
         collect($attendance['present'])->map(function($r) use ($get_user_ids){
 			foreach($get_user_ids['user_info'] as $user){
 				// return $r['users']->id;
@@ -379,7 +391,7 @@ class AttendanceController extends Controller
         });
 
 		// GET ABSENT AGENTS
-		$attendance['absent'] = Attendance::whereIn('user_id', $get_user_ids['user_ids'])->whereDate('created_at', Carbon::today())->where('status', 0)->with(['Users'])->orderBy('id', 'desc')->get();
+		$attendance['absent'] = Attendance::whereIn('user_id', $get_user_ids['user_ids'])->whereDate('created_at', $date_original)->where('status', 0)->with(['Users'])->orderBy('id', 'desc')->get();
         collect($attendance['absent'])->map(function($r) use ($get_user_ids){
 			// return $get_user_ids;
 			foreach($get_user_ids['user_info'] as $user){
@@ -394,7 +406,7 @@ class AttendanceController extends Controller
 		// return $attendance['unpresent'];
 		// return $attendance['present'];
 		// return $attendance['absent'];
-		return view('app.attendance.index', compact('attendance', 'teams', 'clusters', 'selected_cluster', 'get_user_attendance'));
+		return view('app.attendance.index', compact('attendance', 'teams', 'clusters', 'selected_cluster', 'get_user_attendance', 'date'));
 	}
 
 	/**
@@ -495,7 +507,7 @@ class AttendanceController extends Controller
 				// return $user['activities'];
 				$request->all();
 				$cluster_id = Clusters::where('team_ids', 'like', '%' . $team_id . '%')->value('id');
-				$check_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', Carbon::today())->first();
+				$check_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', Carbon::now())->first();
 				if(empty($check_attendance)){
 					$set_data = [
 						"cluster_id" => $cluster_id,
