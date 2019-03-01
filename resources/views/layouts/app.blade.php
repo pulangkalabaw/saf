@@ -13,6 +13,8 @@
 	<link href="{{ asset('assets/libs/jquery.scrollbar/jquery.scrollbar.css') }}" rel="stylesheet">
 	<link href="{{ asset('assets/libs/ionrangeslider/css/ion.rangeSlider.css') }}" rel="stylesheet">
 	<link href="{{ asset('assets/libs/ionrangeslider/css/ion.rangeSlider.skinFlat.css') }}" rel="stylesheet">
+	<link href="{{ asset('assets/libs/bootstrap-timepicker/css/bootstrap-timepicker.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
 	<link href="{{ asset('assets/libs/summernote/summernote.css') }}" rel="stylesheet">
 	<link href="{{ asset('assets/css/custom.css') }}" rel="stylesheet">
 	<meta content="stuff, to, help, search, engines, not" name="keywords">
@@ -189,7 +191,7 @@
                             <div class="sidebar__title">Attendance</div>
                             <ul class="nav nav-menu">
                                 <li>
-                                    <a href="{{ route('attendance.index') }}">
+                                    <a href="{{ route('app.attendance.index') }}">
                                         <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
                                         <div class="nav-menu__text"><span>Users Attendance</span></div>
                                     </a>
@@ -230,6 +232,13 @@
 	<script src="{{ asset('assets/libs/ionrangeslider/js/ion.rangeSlider.min.js') }}"></script>
 	<script src="{{ asset('assets/libs/inputNumber/js/inputNumber.js') }}"></script>
 	<script src="{{ asset('assets/libs/bootstrap-switch/js/bootstrap-switch.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap-timepicker/js/bootstrap-timepicker.min.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/moment.js') }}"></script> --}}
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
+	<script src="http://cdn.rawgit.com/Eonasdan/bootstrap-datetimepicker/a549aa8780dbda16f6cff545aeabc3d71073911e/src/js/bootstrap-datetimepicker.js"></script>
+	{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min.js"></script> --}}
+    <script src="{{ asset('assets/libs/bootstrap-select/js/bootstrap-select.min.js') }}"></script>
 	<script src="{{ asset('assets/js/main.js') }}"></script>
 	<script src="{{ asset('assets/js/demo.js') }}"></script>
 
@@ -237,6 +246,7 @@
 
 	<script>
 	console.log("APP VERSION {{ env('APP_VERSION') }} | Khurt Russel")
+
 	$("form").on("submit", function(){
 		$("form button").attr("disabled", "disabled")
 	})
