@@ -187,7 +187,7 @@ function checkPosition ($user, $can_access = [], $diff = false) {
 
 	// check first if this $user
 	// is has a role of 'user'
-	if (base64_decode($user->role) != 'user') return 'undefined';
+	if (base64_decode($user->role) == 'encoder') return [];
 
 	// get the cluster and team (if any)
 	$r = getMyClusterAndTeam($user);
@@ -203,11 +203,13 @@ function checkPosition ($user, $can_access = [], $diff = false) {
 
 	if ($diff) {
 
-		// use array diff
+		// will return the array1 that has the array2
+		//
 		$arr_diff = array_intersect($pos, $can_access);
 		return $arr_diff;
 	}
 
+	// will return the reponse
 	else return $pos;
 
 }

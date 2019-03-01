@@ -26,7 +26,7 @@ Route::resource('attendance', 'AttendanceController');
 Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], function () {
 
     // Dashboard
-    Route::get('/dashboard', 'DashboardController@dashboard')->middleware('access_control:administrator,user');
+    Route::get('dashboard', 'DashboardController@dashboard')->name('dashboard')->middleware('access_control:administrator,user,encoder');
 
     // Users
     Route::resource('users', 'UserController')->middleware('access_control:administrator');
@@ -39,9 +39,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
 
     // Applications
     Route::resource('applications', 'ApplicationController')->middleware('access_control:administrator,user,encoder');
-
-    // Devices
-    Route::resource('devices', 'DevicesController')->middleware('access_control:administrator');
 
     // Plan
     Route::resource('plans', 'PlansController')->middleware('access_control:administrator');

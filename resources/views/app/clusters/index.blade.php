@@ -22,7 +22,7 @@
 									</h3>
 								</div>
 								<div class="col-md-4 text-right">
-									<a href="{{ route('app.clusters.create') }}" class="btn btn-xs btn-default">
+									<a href="{{ route('app.clusters.create') }}" class="btn btn-sm btn-primary">
 										<span class='fa fa-plus-circle'></span>
 									</a>
 								</div>
@@ -161,10 +161,10 @@
 											</table>
 											<br>
 											<div class="row">
-												<div class="col-md-10">
+												<div class="col-md-8 col-xs-8">
 													{{ $clusters->appends(request()->input())->links() }}
 												</div>
-												<div class="col-md-2 text-right">
+												<div class="col-md-4 col-xs-4 text-right">
 													Total <b>{{ $clusters_total }}</b> result(s)
 												</div>
 											</div>

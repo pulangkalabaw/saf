@@ -26,10 +26,10 @@
                                 </h3>
                             </div>
                             <div class="col-md-4 text-right">
-                                <a href="{{ route('app.users.show', $user->id) }}" class="btn btn-xs btn-default">
+                                <a href="{{ route('app.users.show', $user->id) }}" class="btn btn-sm btn-warning">
                                     <span class='fa fa-eye'></span>
                                 </a>
-                                <a href="{{ route('app.users.index') }}" class="btn btn-xs btn-default">
+                                <a href="{{ route('app.users.index') }}" class="btn btn-sm btn-default">
                                     <span class='fa fa-th-list'></span>
                                 </a>
                             </div>
