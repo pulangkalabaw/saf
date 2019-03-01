@@ -34,16 +34,27 @@
 						</div>
 						<div class="panel-body">
 							<div class="row">
+
+								@include('includes.filter')
+
 								<div class="col-md-4 col-xs-12">
 									<div class="form-inline">
 										<div class="form-group">
 											<label>Number of rows: </label>
 
 											<select name="" id="" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value)" class="form-control">
-												<option {{ !empty(request()->get('show') && request()->get('show') == 10) ? 'selected' : ''  }} value="{{ route('app.applications.index') }}?show=10">10</option>
-												<option {{ !empty(request()->get('show') && request()->get('show') == 25) ? 'selected' : ''  }} value="{{ route('app.applications.index') }}?show=25">25</option>
-												<option {{ !empty(request()->get('show') && request()->get('show') == 50) ? 'selected' : ''  }} value="{{ route('app.applications.index') }}?show=50">50</option>
-												<option {{ !empty(request()->get('show') && request()->get('show') == 100) ? 'selected' : ''  }} value="{{ route('app.applications.index') }}?show=100">100</option>
+												<option {{ !empty(request()->get('show') && request()->get('show') == 10) ? 'selected' : ''  }} value="{{ request()->fullUrlWithQuery(['show' => '10']) }}">
+													10
+												</option>
+												<option {{ !empty(request()->get('show') && request()->get('show') == 25) ? 'selected' : ''  }} value="{{ request()->fullUrlWithQuery(['show' => '25']) }}">
+													25
+												</option>
+												<option {{ !empty(request()->get('show') && request()->get('show') == 50) ? 'selected' : ''  }} value="{{ request()->fullUrlWithQuery(['show' => '50']) }}">
+													50
+												</option>
+												<option {{ !empty(request()->get('show') && request()->get('show') == 100) ? 'selected' : ''  }} value="{{ request()->fullUrlWithQuery(['show' => '100']) }}">
+													100
+												</option>
 											</select>
 
 										</div>
@@ -72,12 +83,32 @@
 								<table class="table table-hovered table-striped">
 									<thead>
 										<tr>
-											<th>Customer</th>
+											<th>
+												Customer
+												<a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'customer_name', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
+													<span class='fa fa-sort'></span>
+												</a>
+											</th>
 											<th>Team</th>
-											<th>SR</th>
-											<th>SO</th>
+											<th>
+												SR
+												<a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'sr_no', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
+													<span class='fa fa-sort'></span>
+												</a>
+											</th>
+											<th>
+												SO
+												<a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'so_no', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
+													<span class='fa fa-sort'></span>
+												</a>
+											</th>
 											<th>Agent</th>
-											<th>Date</th>
+											<th>
+												Date
+												<a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'created_at', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
+													<span class='fa fa-sort'></span>
+												</a>
+											</th>
 											<th>Status</th>
 										</tr>
 									</thead>
@@ -160,6 +191,6 @@
 			display: block;
 		}
 	}
-	</style>
+</style>
 
 @endsection

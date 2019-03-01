@@ -34,6 +34,8 @@ class ApplicationController extends Controller
 	{
 		$applications = new Application();
 
+		$applications_total = $applications->count();
+
 		// Get the current login users cluster Id
 		if (base64_decode(Auth::user()->role) == 'user'){
 			$applications = $applications->where('insert_by', Auth::user()->id)
@@ -48,6 +50,12 @@ class ApplicationController extends Controller
 			$applications = $applications->where('cluster_id', $cluster_id);
 		}
 
+
+		// Sorting
+        // params: sort_in & sort_by
+        if (!empty($request->get('sort_in') && !empty($request->get('sort_by')))) $applications = $applications->sort($request);
+
+		// Searching
 		if (!empty($request->get('search_string'))) {
 			// With search string parameter
 			$applications = $applications->search($request->get('search_string'));
@@ -60,7 +68,7 @@ class ApplicationController extends Controller
 		->with(['getClusterName', 'getTeam', 'getAgentName'])
 		->paginate((!empty($request->show) ? $request->show : 10));
 
-		return view('app.applications.index', ['applications' => $applications, 'applications_total' => $total]);
+		return view('app.applications.index', ['applications' => $applications, 'applications_total' => $applications_total, 'total' => $total]);
 	}
 
 	/**

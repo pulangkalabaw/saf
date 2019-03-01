@@ -55,8 +55,6 @@ class User extends Authenticatable
 		$cl_decoded = json_decode($tl);
 		if (empty($cl_decoded[0]))  return $this->get();
 		return $this->whereNotIn('id', $cl_decoded)->get();
-
-
 	}
 
 
@@ -82,7 +80,7 @@ class User extends Authenticatable
 	*
 	*/
 	public function getAvailableAgent() {
-		$agent = Teams::get()->pluck('agent_ids'); // not really a agent code, it is a user.id
+		$agent = Teams::get()->pluck('agent_ids');
 		$agent_decoded = json_decode($agent);
 		if (empty($agent_decoded[0]))  return $this->get();
 		return $this->whereNotIn('id', $agent_decoded)->get();

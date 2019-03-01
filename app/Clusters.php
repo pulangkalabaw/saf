@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Schema;
 use Illuminate\Database\Eloquent\Model;
 
 class Clusters extends Model
@@ -53,6 +54,21 @@ class Clusters extends Model
         }
         return $teams;
     }
+
+	/*
+	 * [ Sorting Module ]
+	 * [ search: team_name ]
+	 *
+	 */
+	public function scopeSort ($query, $request) {
+
+		// Check first if sort_in (database column) is exists!
+		if (!Schema::hasColumn('clusters', $request->get('sort_in'))) return $query;
+
+		// If everything is good
+		return $query->orderBy($request->get('sort_in'), $request->get('sort_by'));
+	}
+
 
     /*
      * [ Search Module ]

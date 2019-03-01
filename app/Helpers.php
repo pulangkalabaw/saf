@@ -268,7 +268,13 @@ function filteredBy($request) {
 
 	// Sorting
 	if (!empty($request->get('sort_in')) && !empty($request->get('sort_by'))) {
-		$string = "Sort in: <b>". ucwords(str_replace('-', ' ', $request->get('sort_in')))
+
+		// Special cases
+		$sort_in = ucwords(str_replace('-', ' ', $request->get('sort_in')));
+		$sort_in = ucwords(str_replace('_', ' ', $sort_in));
+		$sort_in = ucwords(str_replace('Id', 'code', $sort_in));
+
+		$string = "Sort in: <b>". $sort_in
 		. "</b>, Sort by: <b>" . ucwords($request->get('sort_by')) . "</b> <br>";
 	}
 
