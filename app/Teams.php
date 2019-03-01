@@ -80,16 +80,28 @@ class Teams extends Model
 	}
 
 	/**
-	 *
-	 * Get available Teams
-	 *
-	 */
+	*
+	* Get available Teams
+	*
+	*/
 	public function getAvailableTeams() {
-	 	// Get all tl created
-	 	$cl = Clusters::get()->pluck('team_ids');
-	 	$cl_decoded = json_decode($cl);
-	 	if (empty($cl_decoded[0]))  return $this->get();
-	 	return $this->whereNotIn('id', $cl_decoded)->get();
+		// Get all tl created
+		$cl = Clusters::get()->pluck('team_ids');
+		$cl_decoded = json_decode($cl);
+		if (empty($cl_decoded[0]))  return $this->get();
+		return $this->whereNotIn('id', $cl_decoded)->get();
+	}
+
+	/**
+	* Get your team's agents
+	*/
+	public function getTeamsAgents ($agent_ids) { // teams.id
+
+		if (!empty($agent_ids[0])) {
+			return User::whereIn('id', $agent_ids[0])->get()->toArray();
+		}
+
+		return [];
 	}
 
 
@@ -114,8 +126,8 @@ class Teams extends Model
 
 
 	/**
-	 * SET AND GET FOR AGENT ID
-	 */
+	* SET AND GET FOR AGENT ID
+	*/
 
 	public function setAgentIdsAttribute($value)
 	{
@@ -129,8 +141,8 @@ class Teams extends Model
 
 
 	/**
-	 * SET AND GET FOR TEAM LEADER
-	 */
+	* SET AND GET FOR TEAM LEADER
+	*/
 
 	public function setTlIdsAttribute($value)
 	{

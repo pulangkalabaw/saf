@@ -93,7 +93,7 @@
 								</div>
 							@endif
 
-							@if(accesesControl(['administrator', 'user']))
+							@if(accessControl(['administrator', 'user']))
 								@if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl")
 									<div class="quickmenu__item {{ str_contains(url()->current(), ['attendance']) ? 'active' : '' }}">
 										<div class="fa fa-clock-o"></div>
@@ -128,7 +128,7 @@
 										<div class="nav-menu__text"><span>List applications</span></div>
 									</a>
 								</li>
-								@if (count(checkPosition(auth()->user(), ['tl', 'cl'], true)) != 0)
+								@if (count(checkPosition(auth()->user(), ['tl', 'cl'], true)) != 0 || accessControl(['administrator']))
 									<li>
 										<a href="{{ route('app.applications.create') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-plus-circle"></i></div>
@@ -209,7 +209,7 @@
 							</div>
 						@endif
 						{{-- USER ATTENDANCE --}}
-						@if(accesesControl(['administrator', 'user']) )
+						@if(accessControl(['administrator', 'user']) )
 							<div class="sidebar__menu">
 								<div class="sidebar__title">Attendance</div>
 								<ul class="nav nav-menu">

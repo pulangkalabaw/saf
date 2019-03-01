@@ -209,8 +209,8 @@
 											<div class="col-md-3 col-xs-3">Agent:</div>
 											<div class="col-md-7 col-xs-7">
 												<select name="agent_id" class="form-control">
-													@foreach ($agents as $agent)
-														<option {{ $application->agent_id == $agent->id ? 'selected' : ''}}  value="{{ $agent->id }}">{{ $agent->fname . ' ' . $agent->lname }}</option>
+													@foreach ($users as $user)
+														<option {{ $application->user_id == $user->id ? 'selected' : ''}}  value="{{ $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
 													@endforeach
 												</select>
 
