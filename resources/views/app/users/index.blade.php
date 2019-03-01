@@ -65,7 +65,8 @@
 							<div class="col-md-5 col-xs-5">
 								<form action="{{ request()->fullUrl() }}" method="GET">
 									<div class="input-group">
-										<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control" placeholder="Search for Name, Email and Role">
+										<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control"
+										placeholder="Search for first name, last name, email and role">
 										<span class="input-group-btn">
 											<button class="btn btn-primary"><span class='fa fa-search'></span> </button>
 										</span>

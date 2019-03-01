@@ -23,25 +23,16 @@ class Application extends Model
         $teams = new Teams();
         $val = trim($value);
 
-        // Search from the user table first
-        // Use this id to search for the cl, tl, encoder, agent_code
-        $return_query = $query->where('application_id', 'LIKE', "%".$val."%")
-        // ->orWhere('plan_applied', 'LIKE', '%'.$val.'%')
-        ->orWhere('sr_no', 'LIKE', '%'.$val.'%')
+        // Search from the application
+        $return_query = $query->where('so_no', 'LIKE', "%".$val."%")
+		->orWhere('sr_no', 'LIKE', '%'.$val.'%')
+		->orWhere('status', 'LIKE', '%'.$val.'%')
         ->orWhere('customer_name', 'LIKE', '%'.$val.'%');
-
-
-        // Search for Encoder
-        $user = $user->search($val)->first();
-        if (!empty($user)) {
-            $return_query = $return_query->orWhere('user_id', $user->id);
-        }
-
 
         // Search for Team
         $team = $teams->where('team_name', 'LIKE', "%".$val."%")->first();
         if (!empty($team)) {
-            $return_query = $return_query->orWhere('team_id', $team->team_id);
+            $return_query = $return_query->orWhere('team_id', $team->id);
         }
 
         // Then try to search to teams

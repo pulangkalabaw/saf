@@ -51,7 +51,8 @@
 												<div class="col-md-5 col-xs-5">
 													<form action="{{ url()->current() }}" method="GET">
 														<div class="input-group">
-															<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control" placeholder="Search for Team name, TL and Agent">
+															<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control"
+															placeholder="Search for team name and team code">
 															<span class="input-group-btn">
 																<button class="btn btn-primary"><span class='fa fa-search'></span> </button>
 															</span>
@@ -67,8 +68,8 @@
 											<table class="table table-hovered table-striped">
 												<thead>
 													<tr>
-														<th>Cluster name</th>
 														<th>Team code</th>
+														<th>Cluster name</th>
 														<th>
 															Team name
 															<a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'team-name', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
