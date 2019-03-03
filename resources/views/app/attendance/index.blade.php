@@ -416,8 +416,6 @@ var timein = 10 + ":" + 30 + ":" + 00;
 // }
 
 
-
-
 // jQuery(function () {
 //     $('.fa-calendar').click(function() {
 //         $("#jump_to_date").focus();

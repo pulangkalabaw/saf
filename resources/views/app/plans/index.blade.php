@@ -92,12 +92,12 @@
                                     <td>{{ $plan->msf }}</td>
                                     <td>
                                         <a data-toggle="tooltip" title="Edit Status" href="{{ route('app.plans.edit', $plan->id) }}" class="btn btn-success btn-xs"><span class='fa fa-edit'></span></a>
-                                        <button data-toggle="tooltip" title="Delete Status" class="btn btn-xs btn-danger" for="submit-form" tabindex="0" form="{{ $plan->id }}myform"><span class='fa fa-trash'></span>
+                                        <!-- <button data-toggle="tooltip" title="Delete Status" class="btn btn-xs btn-danger" for="submit-form" tabindex="0" form="{{ $plan->id }}myform"><span class='fa fa-trash'></span>
                                             <form class="delete" method="POST" action="{{ route('app.plans.destroy', $plan->id) }}" id="{{ $plan->id }}myform">
                                                 {{ method_field('DELETE') }}
                                                 {{ csrf_field() }}
                                             </form>
-                                        </button>
+                                        </button> -->
                                     </td>
                                 </tr>
                                 @endforeach
