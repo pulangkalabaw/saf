@@ -25,7 +25,7 @@
                                 </h3>
                             </div>
                             <div class="col-md-4 text-right">
-                                <a href="{{ route('app.users.index') }}" class="btn btn-xs btn-default">
+                                <a href="{{ route('app.users.index') }}" class="btn btn-sm btn-default">
                                     <span class='fa fa-th-list'></span>
                                 </a>
                             </div>
@@ -117,7 +117,7 @@
                                     <div>
                                         <div class="col-md-3"></div>
                                         <div class="col-md-7 text-right">
-                                            <button class="btn btn-xs btn-primary">Submit <span class='fa fa-plus-circle'></span> </button>
+                                            <button class="btn btn-sm btn-primary">Submit <span class='fa fa-plus-circle'></span> </button>
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>

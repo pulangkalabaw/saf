@@ -12,6 +12,17 @@
     color: #fff !important;
 }
 
+/* CUSTOM BACKGROUNF */
+.bg-red {
+    background: red !important;
+}
+.bg-blue {
+    background: blue !important;
+}
+.bg-yellow {
+    background: yellow !important;
+}
+
 /* CUSTOM MARGIN */
 
 

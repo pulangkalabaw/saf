@@ -34,6 +34,8 @@ class ApplicationController extends Controller
 	{
 		$applications = new Application();
 
+		$applications_total = $applications->count();
+
 		// Get the current login users cluster Id
 		if (base64_decode(Auth::user()->role) == 'user'){
 			$applications = $applications->where('insert_by', Auth::user()->id)
@@ -48,6 +50,12 @@ class ApplicationController extends Controller
 			$applications = $applications->where('cluster_id', $cluster_id);
 		}
 
+
+		// Sorting
+        // params: sort_in & sort_by
+        if (!empty($request->get('sort_in') && !empty($request->get('sort_by')))) $applications = $applications->sort($request);
+
+		// Searching
 		if (!empty($request->get('search_string'))) {
 			// With search string parameter
 			$applications = $applications->search($request->get('search_string'));
@@ -60,7 +68,7 @@ class ApplicationController extends Controller
 		->with(['getClusterName', 'getTeam', 'getAgentName'])
 		->paginate((!empty($request->show) ? $request->show : 10));
 
-		return view('app.applications.index', ['applications' => $applications, 'applications_total' => $total]);
+		return view('app.applications.index', ['applications' => $applications, 'applications_total' => $applications_total, 'total' => $total]);
 	}
 
 	/**
@@ -70,15 +78,39 @@ class ApplicationController extends Controller
 	*/
 	public function create()
 	{
-		$users = User::get();
-		$teams = Teams::get();
+		$teams_model = new Teams();
+		$user_model = new User();
+
+		// Get teams if not admin
+		if (base64_decode(Auth::user()->role) == 'user') {
+
+			// Teams
+			$chpos = checkPosition(Auth::user());
+
+			// FOR NOW THIS MODULE IS ONLY FOR TL AND ADMIN
+			// Issue: when adding or creating new application
+			// if CL, need to have atleast a dropdown for their Clusters
+			// and teams
+			if (count(checkPosition(Auth::user(), ['tl'], true)) == 0) return 'This module is currently for admin and team leader only! Cluster leaders can access this module in the futher updates. Thank your - AppDev';
+
+			$teams = Session::get('_t');
+			$agent_ids = collect($teams)->pluck('agent_ids');
+
+			// Agents
+			$agents = $teams_model->getTeamsAgents($agent_ids);
+		}
+		else {
+			$teams = $teams_model->get();
+			$agents = $user_model->get();
+		}
+
 		$statuses = Statuses::get();
 		$plans = Plans::get();
 		$devices = Devices::get();
 		$products = Product::get();
 
 		return view('app.applications.create', [
-			'users' => $users,
+			'agents' => $agents,
 			'plans' => $plans,
 			'devices' => $devices,
 			'products' => $products,
@@ -96,12 +128,12 @@ class ApplicationController extends Controller
 	public function store(Request $request)
 	{
 		$validate = Validator::make($request->all(),[
-				'customer_name' => 'required',
-				'contact' => 'required',
-				'address' => 'required',
-				'plan_id' => 'required',
-				'user_id' => 'required',
-				'team_id' => 'required'
+			'customer_name' => 'required',
+			'contact' => 'required',
+			'address' => 'required',
+			'plan_id' => 'required',
+			'user_id' => 'required',
+			'team_id' => 'required'
 		],[
 			'plan_id.required' => 'Please select plan',
 			'user_id.required' => 'Please select user',
@@ -133,7 +165,13 @@ class ApplicationController extends Controller
 		// Get cluster
 		$team_model = new Teams();
 		$team_model = $team_model->getCluster($request['team_id']);
-
+		if (empty($team_model[0])) {
+			return back()->with([
+				'notif.style' => 'danger',
+				'notif.icon' => 'times-circle',
+				'notif.message' => 'This team has no cluster!',
+			]);
+		}
 		// Data to be inserted to Application table
 		$application_data = [
 			'application_id' => $application_id,
@@ -200,117 +238,115 @@ class ApplicationController extends Controller
 			'getDevice',
 			'getPlan',
 			'getProduct',
+			'getInsertBy',
 		])
 		->where('application_id', $id)
 		->firstOrFail();
 
 		return view('app.applications.show', [
 			'application' => $application,
-			'application_model' => $application_model, 'application_status' => $application_status]);
-		}
+			'application_model' => $application_model, 'application_status' => $application_status
+		]);
+	}
 
-		/**
-		* Show the form for editing the specified resource.
-		*
-		* @param  \App\Application  $application
-		* @return \Illuminate\Http\Response
-		*/
-		public function edit($id)
-		{
-			//
-			$users = new User();
-			$teams = Teams::whereIn('team_id', Session::get('_t'))->get();
-			$application_model = new Application();
-			$application_status = new ApplicationStatus();
-			$plans = Plans::get();
-			$devices = Devices::get();
-			$products = Product::get();
+	/**
+	* Show the form for editing the specified resource.
+	*
+	* @param  \App\Application  $application
+	* @return \Illuminate\Http\Response
+	*/
+	public function edit($id)
+	{
+		//
+		$users = new User();
 
-			$application = $application_model->where('application_id', $id)->firstOrFail();
+		$application_model = new Application();
+		$application_status = new ApplicationStatus();
+		$plans = Plans::get();
+		$devices = Devices::get();
+		$products = Product::get();
+		$application = $application_model->where('application_id', $id)->firstOrFail();
 
-			return view('app.applications.edit', [
-				'application' => $application,
-				'application_model' => $application_model,
-				'application_status' => $application_status,
-				'agents' => $users->get(),
-				'teams' => $teams,
-				'plans' => $plans,
-				'devices' => $devices,
-				'products' => $products,
+		return view('app.applications.edit', [
+			'application' => $application,
+			'application_model' => $application_model,
+			'application_status' => $application_status,
+			'users' => $users->get(), // !!! FIX THIS: this code will show all users, but we need is the users or agents that is in this team. !!!
+			'plans' => $plans,
+		]);
+
+	}
+
+	/**
+	* Update the specified resource in storage.
+	*
+	* @param  \Illuminate\Http\Request  $request
+	* @param  \App\Application  $application
+	* @return \Illuminate\Http\Response
+	*/
+	public function update(Request $request, $id)
+	{
+		$application_model = new Application();
+		$application = $application_model->where('application_id', $id)->firstOrFail();
+		$msf = Plans::where('id',$request['plan_id'])->value('msf');
+
+		// Place to $data variable
+		$data['customer_name'] = $request->post('customer_name');
+		$data['contact'] = $request->post('contact');
+		$data['address'] = $request->post('address');
+		$data['plan_id'] = (int) $request->post('plan_id');
+		$data['sim'] = $request->post('sim');
+		$data['device_id'] = empty($request->post('device_id')) ? '-' : $request->post('device_id');
+		$data['agent_id'] = (int) $request->post('agent_id');
+		$data['msf'] = (float) $msf;
+		$data['sr_no'] = $request->post('sr_no');
+		$data['so_no'] = $request->post('so_no');
+		$data['status'] = $request->post('status');
+		$data['encoder_id'] = Auth::user()->id;
+		$data['encoded_at'] = now();
+		$data['updated_at'] = now();
+
+		if ($application->update($data)) {
+
+			ApplicationStatus::where('id', $id)->update(['active' => 0]);
+
+			ApplicationStatus::insert([
+				'application_id' => (string) $id,
+				'status_id' => $data['status'], // change this to status
+				'added_by' => Auth::user()->id,
+				'active' => 1,
+				'team_id' => (int) $request->post('team_id'),
+				'created_at' => now(),
 			]);
 
+			return back()->with([
+				'notif.style' => 'success',
+				'notif.icon' => 'plus-circle',
+				'notif.message' => 'Update successful!',
+			]);
 		}
-
-		/**
-		* Update the specified resource in storage.
-		*
-		* @param  \Illuminate\Http\Request  $request
-		* @param  \App\Application  $application
-		* @return \Illuminate\Http\Response
-		*/
-		public function update(Request $request, $id)
-		{
-			$application_model = new Application();
-			$application = $application_model->where('application_id', $id)->firstOrFail();
-			$msf = Plans::where('id',$request['plan_id'])->value('msf');
-
-			// Place to $data variable
-			$data['customer_name'] = $request->post('customer_name');
-			$data['contact'] = $request->post('contact');
-			$data['address'] = $request->post('address');
-			$data['plan_id'] = (int) $request->post('plan_id');
-			$data['sim'] = $request->post('sim');
-			$data['device_id'] = empty($request->post('device_id')) ? '-' : $request->post('device_id');
-			$data['agent_id'] = (int) $request->post('agent_id');
-			$data['msf'] = (float) $msf;
-			$data['sr_no'] = $request->post('sr_no');
-			$data['so_no'] = $request->post('so_no');
-			$data['status'] = $request->post('status');
-			$data['encoder_id'] = Auth::user()->id;
-			$data['encoded_at'] = now();
-			$data['updated_at'] = now();
-
-			if ($application->update($data)) {
-
-					ApplicationStatus::where('id', $id)->update(['active' => 0]);
-
-					ApplicationStatus::insert([
-						'application_id' => (string) $id,
-						'status_id' => $data['status'], // change this to status
-						'added_by' => Auth::user()->id,
-						'active' => 1,
-						'team_id' => (int) $request->post('team_id'),
-						'created_at' => now(),
-					]);
-
-					return back()->with([
-						'notif.style' => 'success',
-						'notif.icon' => 'plus-circle',
-						'notif.message' => 'Update successful!',
-					]);
-				}
-				else {
-					return back()->with([
-						'notif.style' => 'danger',
-						'notif.icon' => 'times-circle',
-						'notif.message' => 'Failed to update',
-					]);
-				}
-			}
-
-			/**
-			* Remove the specified resource from storage.
-			*
-			* @param  \App\Application  $application
-			* @return \Illuminate\Http\Response
-			*/
-			public function destroy(Application $application)
-			{
-				//
-			}
-
-			public function replaceDashIfNull($arr)
-			{
-				return !empty($arr) ? $arr : "-";
-			}
+		else {
+			return back()->with([
+				'notif.style' => 'danger',
+				'notif.icon' => 'times-circle',
+				'notif.message' => 'Failed to update',
+			]);
 		}
+	}
+
+	/**
+	* Remove the specified resource from storage.
+	*
+	* @param  \App\Application  $application
+	* @return \Illuminate\Http\Response
+	*/
+	public function destroy(Application $application)
+	{
+		//
+	}
+
+	public function replaceDashIfNull($arr)
+	{
+		return !empty($arr) ? $arr : "-";
+	}
+}

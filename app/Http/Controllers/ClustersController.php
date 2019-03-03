@@ -18,48 +18,26 @@ class ClustersController extends Controller
     public function index(Request $request)
     {
 
-		$cluters = new Clusters();
+		$clusters = new Clusters();
 
 		// Count all before paginate
-		$total = $cluters->count();
+		$clusters_total = $clusters->count();
 
-		// Pagination
-		$cluters = $cluters->paginate((!empty($request->show) ? $request->show : 10));
+		// Sorting
+		// params: sort_in & sort_by
+		if (!empty($request->get('sort_in') && !empty($request->get('sort_by')))) $clusters = $clusters->sort($request);
 
-		return view('app.clusters.index', ['clusters' => $cluters, 'clusters_total' => $total]);
-
-
-
-         // Model
-        $clusters = new Clusters();
-
-        // Query
-        $clusters = $clusters
-        ->join('users as cl', 'clusters.cl_id', '=', 'cl.id')
-        ->select(
-            'cl.fname as cl_fname', 'cl.lname as cl_lname',
-            'clusters.*'
-        );
-
-        // Sorting
-        if (!empty($request->get('sort_in') && !empty($request->get('sort_by')))) {
-
-            if (!in_array($request->get('sort_in'), ['cluster-name', 'cluster-leader'])) return back();
-            else $request['sort_in'] = $request->get('sort_in') == "cluster-name" ? 'cluster_name' : 'cl_fname';
-
-            $clusters = $clusters->orderBy($request->get('sort_in'), $request->get('sort_by'));
-        }
-
-        // Search
+		// Search
         if (!empty($request->get('search_string'))) $clusters = $clusters->search($request->get('search_string'));
 
         // Count all before paginate
         $total = $clusters->count();
 
-        // Pagination
-        $clusters = $clusters->paginate((!empty($request->show) ? $request->show : 10));
+		// Pagination
+		$clusters = $clusters->paginate((!empty($request->show) ? $request->show : 10));
 
-        return view('app.clusters.index', ['clusters' => $clusters, 'clusters_total' => $total]);
+		return view('app.clusters.index', ['clusters' => $clusters, 'clusters_total' => $clusters_total, 'total' => $total]);
+
     }
 
     /**

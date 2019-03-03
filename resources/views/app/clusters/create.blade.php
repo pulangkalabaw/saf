@@ -34,7 +34,7 @@
                                 </h3>
                             </div>
                             <div class="col-md-4 text-right">
-                                <a href="{{ route('app.clusters.index') }}" class="btn btn-xs btn-default">
+                                <a href="{{ route('app.clusters.index') }}" class="btn btn-sm btn-default">
                                     <span class='fa fa-th-list'></span>
                                 </a>
                             </div>

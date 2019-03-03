@@ -30,6 +30,7 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
+							@include('includes.filter')
                             @include('includes.notif')
 
                             <div class="col-md-4 col-xs-4">

@@ -188,7 +188,8 @@ function checkPosition ($user, $can_access = [], $diff = false) {
 
 	// check first if this $user
 	// is has a role of 'user'
-	if (base64_decode($user->role) != 'user') return [];
+	if (base64_decode($user->role) == 'encoder') return [];
+
 
 	// get the cluster and team (if any)
 	$r = getMyClusterAndTeam($user);
@@ -204,11 +205,13 @@ function checkPosition ($user, $can_access = [], $diff = false) {
 
 	if ($diff) {
 
-		// use array diff
+		// will return the array1 that has the array2
+		//
 		$arr_diff = array_intersect($pos, $can_access);
 		return $arr_diff;
 	}
 
+	// will return the reponse
 	else return $pos;
 
 }
@@ -246,7 +249,7 @@ function comma_separated_to_array($string, $separator = ',')
 }
 
 // Access Control: were you can give an array of roles that can access
-function accesesControlMiddleware (...$can_access) {
+function accessControlMiddleware (...$can_access) {
 
 	// $can_access is a array of roles
 	if (!in_array(base64_decode(Auth::user()->role), $can_access)) {
@@ -255,7 +258,7 @@ function accesesControlMiddleware (...$can_access) {
 }
 
 // Access Control: were you can give an array of roles that can access specific div
-function accesesControl ($can_access) {
+function accessControl ($can_access) {
 
 	// $can_access is a array of roles
 	return in_array(base64_decode(Auth::user()->role), $can_access);
@@ -267,7 +270,13 @@ function filteredBy($request) {
 
 	// Sorting
 	if (!empty($request->get('sort_in')) && !empty($request->get('sort_by'))) {
-		$string = "Sort in: <b>". ucwords(str_replace('-', ' ', $request->get('sort_in')))
+
+		// Special cases
+		$sort_in = ucwords(str_replace('-', ' ', $request->get('sort_in')));
+		$sort_in = ucwords(str_replace('_', ' ', $sort_in));
+		$sort_in = ucwords(str_replace('Id', 'code', $sort_in));
+
+		$string = "Sort in: <b>". $sort_in
 		. "</b>, Sort by: <b>" . ucwords($request->get('sort_by')) . "</b> <br>";
 	}
 
@@ -598,6 +607,7 @@ function getHeirarchy2(){
 					'target' => 0,
 				];
 				if( array_intersect(collect(Session::get('_t'))->pluck('id')->toArray(),collect($res['team_ids'])->toArray()) ){
+
 					// dd(Session::get('_t'));
 					$team_ids = $res['team_ids'];
 					$res['teams'] = $teams_model->whereIn('id', $res['team_ids'])->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,$team_ids,&$count_applications){

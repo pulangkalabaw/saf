@@ -18,7 +18,7 @@
 	<!-- Modal -->
 	@if ($application_model->status != "-")
 		<div class="modal fade" id="get_all_statuses" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-			<div class="modal-dialog" role="document" style="width: 900px; margin: auto">
+			<div class="modal-dialog" role="document" >
 				<div class="modal-content">
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -67,18 +67,18 @@
 					<div class="panel panel-primary">
 						<div class="panel-heading">
 							<div class="row">
-								<div class="col-md-8">
+								<div class="col-md-8 col-xs-8">
 									<h3 class="panel-title">
 										SAF Application
 									</h3>
 								</div>
-								<div class="col-md-4 text-right">
-									@if (accesesControl(['encoder']))
-										<a href="{{ route('app.applications.edit', $application->application_id) }}" class="btn btn-xs btn-default">
+								<div class="col-md-4 col-xs-4 text-right">
+									@if (accessControl(['encoder']))
+										<a href="{{ route('app.applications.edit', $application->application_id) }}" class="btn btn-sm btn-success">
 											<span class='fa fa-edit'></span>
 										</a>
 									@endif
-									<a href="{{ route('app.applications.index') }}" class="btn btn-xs btn-default">
+									<a href="{{ route('app.applications.index') }}" class="btn btn-sm btn-default">
 										<span class='fa fa-th-list'></span>
 									</a>
 								</div>
@@ -88,18 +88,20 @@
 
 							<div class="row">
 								<div class="col-md-6">
+									<h3>Application Form</h3>
+									<br />
 
 									<div>
-										<div class="col-md-3">Application #:</div>
-										<div class="col-md-7">
+										<div class="col-md-3 col-xs-3">Application #:</div>
+										<div class="col-md-7 col-xs-7">
 											{{ $application->application_id }}
 										</div>
 									</div>
 									<div class="clearfix"></div><br>
 
 									<div>
-										<div class="col-md-3">Status:</div>
-										<div class="col-md-7">
+										<div class="col-md-3 col-xs-3">Status:</div>
+										<div class="col-md-7 col-xs-7">
 											{{ ucfirst($application_model->recentStatusShort($application->application_id)) }}
 											@if ($application_model->recentStatusShort($application->application_id) != "-")
 												<button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#get_all_statuses">
@@ -111,44 +113,33 @@
 									<div class="clearfix"></div><br>
 
 									<div>
-										<div class="col-md-3">Team:</div>
-										<div class="col-md-7">
+										<div class="col-md-3 col-xs-3">Team:</div>
+										<div class="col-md-7 col-xs-7">
 											{{ $application->getTeam->team_name }}
 										</div>
 									</div>
 									<div class="clearfix"></div><br>
 
 									<div>
-										<div class="col-md-3">Encoded date:</div>
-										<div class="col-md-7">
+										<div class="col-md-3 col-xs-3">Encoded date:</div>
+										<div class="col-md-7 col-xs-7">
 											{{ $application->created_at }}
 										</div>
 									</div>
 									<div class="clearfix"></div><br>
 
 									<div>
-										<div class="col-md-3">Customer name:</div>
-										<div class="col-md-7">
+										<div class="col-md-3 col-xs-3">Customer name:</div>
+										<div class="col-md-7 col-xs-7">
 											{{ $application->customer_name }}
 										</div>
 									</div>
 									<div class="clearfix"></div><br>
 
-									<div>
-										<div class="col-md-3">Device:</div>
-										<div class="col-md-7">
-											@if (!empty($application->getDevice))
-												{{ $application->getDevice->device_name }}
-											@else
-												-
-											@endif
-										</div>
-									</div>
-									<div class="clearfix"></div><br>
 
 									<div>
-										<div class="col-md-3">Plan applied:</div>
-										<div class="col-md-7">
+										<div class="col-md-3 col-xs-3">Plan applied:</div>
+										<div class="col-md-7 col-xs-7">
 											@if (!empty($application->getPlan))
 												{{ $application->getPlan->plan_name }}
 											@else
@@ -157,34 +148,81 @@
 										</div>
 									</div>
 									<div class="clearfix"></div><br>
-									<div class="clearfix"></div><br>
-								</div>
-
-								<div class="col-md-6">
 
 									<div>
-										<div class="col-md-3">SR #:</div>
-										<div class="col-md-7">
+										<div class="col-md-3 col-xs-3 col-xs-3">Sim/Device:</div>
+										<div class="col-md-7 col-xs-7 col-xs-7">
+											{{ empty($application->sim) ? '-' : $application->sim  }}
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
+
+
+									<div>
+										<div class="col-md-3 col-xs-3">SR #:</div>
+										<div class="col-md-7 col-xs-7">
 											{{ $application->sr_no == '' ? '-' : $application->sr_no }}
 										</div>
 									</div>
 									<div class="clearfix"></div><br>
 
 									<div>
-										<div class="col-md-3">SO #:</div>
-										<div class="col-md-7">
+										<div class="col-md-3 col-xs-3">SO #:</div>
+										<div class="col-md-7 col-xs-7">
 											{{ $application->so_no == '' ? '-' : $application->so_no }}
 										</div>
 									</div>
 									<div class="clearfix"></div><br>
 
+
+
 									<div>
-										<div class="col-md-3">Agent:</div>
-										<div class="col-md-7">
+										<div class="col-md-3 col-xs-3">Agent:</div>
+										<div class="col-md-7 col-xs-7">
 											{{ $application->getAgentName->fname . ' ' . $application->getAgentName->lname }}
 										</div>
 									</div>
 									<div class="clearfix"></div><br>
+
+
+								</div>
+
+								<div class="col-md-6">
+
+									<h3>Modified</h3><br />
+
+
+									<div>
+										<div class="col-md-3 col-xs-3">Added by</div>
+										<div class="col-md-7 col-xs-7">
+											{{ $application->getInsertBy->fname }}
+											{{ $application->getInsertBy->lname }}
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
+
+
+									@if (!empty($application->encoder_id) && !empty($application->encoded_at))
+										<div>
+											<div>
+												<div class="col-md-3 col-xs-3">Encoder</div>
+												<div class="col-md-7 col-xs-7">
+													{{ $application->getEncoder($application->encoder_id)->fname }}
+													{{ $application->getEncoder($application->encoder_id)->lname }}
+												</div>
+											</div>
+											<div class="clearfix"></div><br>
+
+											<div>
+												<div class="col-md-3 col-xs-3">Encoded at</div>
+												<div class="col-md-7 col-xs-7">
+													{{ $application->encoded_at }}
+												</div>
+											</div>
+											<div class="clearfix"></div><br>
+										</div>
+
+									@endif
 
 								</div>
 							</div>

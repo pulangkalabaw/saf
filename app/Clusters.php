@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Schema;
 use Illuminate\Database\Eloquent\Model;
 
 class Clusters extends Model
@@ -54,6 +55,21 @@ class Clusters extends Model
         return $teams;
     }
 
+	/*
+	 * [ Sorting Module ]
+	 * [ search: team_name ]
+	 *
+	 */
+	public function scopeSort ($query, $request) {
+
+		// Check first if sort_in (database column) is exists!
+		if (!Schema::hasColumn('clusters', $request->get('sort_in'))) return $query;
+
+		// If everything is good
+		return $query->orderBy($request->get('sort_in'), $request->get('sort_by'));
+	}
+
+
     /*
      * [ Search Module ]
      * [ search: cluster_name ]
@@ -66,14 +82,8 @@ class Clusters extends Model
 
         // Search from the user table first
         // Use this id to search for the cl, tl, encoder, agent_code
-        $return_query = $query->where('cluster_name', 'LIKE', "%".$val."%");
-
-        if (!empty($user->search($val)->first())) {
-            $user_id = $user->search($val)->first()->id;
-            $agent_code = $user->search($val)->first()->agent_code;
-            $return_query = $return_query
-            ->orWhere('cl_id', $user_id);
-        }
+        $return_query = $query->where('cluster_id', 'LIKE', "%".$val."%")
+		->orWhere('cluster_name', 'LIKE', "%".$val."%");
 
         // Then try to search to teams
         return $return_query;

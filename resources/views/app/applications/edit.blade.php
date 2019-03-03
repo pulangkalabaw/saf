@@ -73,10 +73,10 @@
 									</h3>
 								</div>
 								<div class="col-md-4 text-right">
-									<a href="{{ route('app.applications.show', $application->application_id) }}" class="btn btn-xs btn-default">
+									<a href="{{ route('app.applications.show', $application->application_id) }}" class="btn btn-sm btn-warning">
 										<span class='fa fa-eye'></span>
 									</a>
-									<a href="{{ route('app.applications.index') }}" class="btn btn-xs btn-default">
+									<a href="{{ route('app.applications.index') }}" class="btn btn-sm btn-default">
 										<span class='fa fa-th-list'></span>
 									</a>
 								</div>
@@ -155,28 +155,13 @@
 										<div class="clearfix"></div><br>
 
 										<div>
-											<div class="col-md-3 col-xs-3">Device:</div>
+											<div class="col-md-3 col-xs-3">Sim/Device:</div>
 											<div class="col-md-7 col-xs-7">
-
-												@if (!empty($application->getDevice))
-													<select name="device_id" class="form-control">
-														<option value="" selected></option>
-														@foreach ($devices as $device)
-															<option {{ $application->device_id == $device->device_id ? 'selected' : ''}} value="{{ $device->device_id }}">{{ $device->device_name }}</option>
-														@endforeach
-													</select>
-
-												@else
-													<select name="device_id" class="form-control">
-														<option value="" selected></option>
-														@foreach ($devices as $device)
-															<option value="{{ $device->device_id }}">{{ $device->device_name }}</option>
-														@endforeach
-													</select>
-												@endif
+												<input type="text" name="sim" class="form-control" value="{{ $application->sim }}">
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
+
 									</div>
 
 
@@ -207,7 +192,7 @@
 										<div>
 											<div class="col-md-3 col-xs-3">SR #:</div>
 											<div class="col-md-7 col-xs-7">
-												<input type="text" name="sr_no" required class="form-control" value="{{ $application->sr_no }}">
+												<input type="text" name="sr_no" class="form-control" value="{{ $application->sr_no }}">
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
@@ -215,7 +200,7 @@
 										<div>
 											<div class="col-md-3 col-xs-3">SO #:</div>
 											<div class="col-md-7 col-xs-7">
-												<input type="text" name="so_no" required class="form-control" value="{{ $application->so_no }}">
+												<input type="text" name="so_no" class="form-control" value="{{ $application->so_no }}">
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
@@ -224,8 +209,8 @@
 											<div class="col-md-3 col-xs-3">Agent:</div>
 											<div class="col-md-7 col-xs-7">
 												<select name="agent_id" class="form-control">
-													@foreach ($agents as $agent)
-														<option {{ $application->agent_id == $agent->id ? 'selected' : ''}}  value="{{ $agent->id }}">{{ $agent->fname . ' ' . $agent->lname }}</option>
+													@foreach ($users as $user)
+														<option {{ $application->user_id == $user->id ? 'selected' : ''}}  value="{{ $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
 													@endforeach
 												</select>
 

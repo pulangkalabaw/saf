@@ -18,8 +18,6 @@ Route::get('/login', 'LoginController@login')->name('login');
 Route::post('/login', 'LoginController@postLogin')->name('login');
 Route::get('/logout', 'LoginController@logout')->name('logout');
 
-Route::get('attendance/sample', 'AttendanceController@sample');
-Route::resource('attendance', 'AttendanceController');
 
 
 // App Routes
@@ -30,6 +28,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
 
     // Dashboard of Attendance
     Route::get('attendancedashboard', 'DashboardController@attendanceDashboard')->name('attendanceDashboard')->middleware('access_control:administrator,user');
+
 
     // Users
     Route::resource('users', 'UserController')->middleware('access_control:administrator');
@@ -43,9 +42,6 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     // Applications
     Route::resource('applications', 'ApplicationController')->middleware('access_control:administrator,user,encoder');
 
-    // Devices
-    Route::resource('devices', 'DevicesController')->middleware('access_control:administrator');
-
     // Plan
     Route::resource('plans', 'PlansController')->middleware('access_control:administrator');
 
@@ -55,6 +51,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     // delete specific post
     Route::post('delete-post', 'MessageBoardController@delete')->name('delete-post');
 
+    // Attendance
+    Route::get('attendance/sample', 'AttendanceController@sample');
+    Route::resource('attendance', 'AttendanceController');
 
     // For non-admin
     Route::get('your-clusters', 'NonAdminController@yourClusters')->name('your.clusters');

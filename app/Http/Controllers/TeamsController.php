@@ -20,12 +20,24 @@ class TeamsController extends Controller
 		$teams = new Teams();
 
 		// Count all before paginate
-		$total = $teams->count();
+		$teams_total = $teams->count();
+
+		// Sorting
+        // params: sort_in & sort_by
+        if (!empty($request->get('sort_in') && !empty($request->get('sort_by')))) {
+			$teams = $teams->sort($request);
+		}
+
+		// Search
+        if (!empty($request->get('search_string'))) $teams = $teams->search($request->get('search_string'));
+
+        // Count all before paginate
+        $total = $teams->count();
 
 		// Pagination
 		$teams = $teams->paginate((!empty($request->show) ? $request->show : 10));
 
-		return view('app.teams.index', ['teams' => $teams, 'teams_total' => $total]);
+		return view('app.teams.index', ['teams' => $teams, 'teams_total' => $teams_total, 'total' => $total]);
 
 	}
 	/**

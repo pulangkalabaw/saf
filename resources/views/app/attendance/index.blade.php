@@ -39,6 +39,28 @@
                         @else
                         <div class="panel-body">
                             <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-1">
+                                        <a href="{{ url('app/attendance') . '?date=' . $date['previous'] }}" class="btn btn-md btn-default">Previous</a>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="date" class="form-control" value="{{ $date['selected'] }}" onchange="window.location = '{{ url('app/attendance') . '?date=' }}' + this.value ;">
+                                        {{-- <div class="input-group date">
+                                            <input class="form-control" name="jump_to_date" type="text" id="jump_to_date" value="{{ $date['selected'] }}" onchange="window.location = '{{ url('app/attendance') . '?date=' }}' + this.value ;">
+                                            <div class="input-group-addon" title="Jump to certain date" id="icon-container">
+                                                <div class="fa fa-calendar" title="Jump to certain date"></div>
+                                            </div>
+                                        </div> --}}
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button onclick="window.location  = '{{ url('app/attendance') . '?date=' . $date['next'] }}'" {{ $date['next'] == null ? 'disabled' : '' }} class="btn btn-md btn-default">Next</button>
+                                    </div>
+                                    <div class="col md-7">
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 @if(!empty($clusters))
                                     @foreach(array_reverse($clusters) as $cluster)
                                         {{-- {{ dd(url('attendance') . '?team_id=' . $cluster['id']) }} --}}
@@ -62,6 +84,26 @@
                                 <li role="presentation"><a href="#absent" aria-controls="absent" role="tab" data-toggle="tab">Absents <span class="label">{{ count($attendance['absent']) }}</span></a></li>
                             </ul>
                             <div class="tab-content" >
+                                {{-- {{ dd(Carbon\Carbon::parse(request()->date)->format('F d, Y')) }} --}}
+                                @if(!empty(request()->date))
+                                    <div class="panel-body">
+                                        <div class="form-group text-center">
+                                            @php
+                                            $fucking_date = Carbon\Carbon::parse(request()->date)->diffInDays(Carbon\Carbon::parse(date('Y-m-d')), false);
+                                            $fucking_message = '';
+                                            if($fucking_date == 1){
+                                                $fucking_message = ' (Yesterday)';
+                                            } else if($fucking_date == 0) {
+                                                $fucking_message = ' (Now)';
+                                            }
+                                            @endphp
+                                            <label><h2><i class="fa fa-calendar text-success"></i> {{ Carbon\Carbon::parse(request()->date)->format('F d, Y')  . $fucking_message}}</h2></label>
+                                        </div>
+                                        <div class="form-group text-center">
+                                            {{-- <label>Please make sure that you are a team leader or a cluster</label> --}}
+                                        </div>
+                                    </div>
+                                @endif
                                 <div class="tab-pane active" id="unpresent" role="tabpanel">
                                     {{-- {{ count($attendance['unpresent']) }} --}}
                                     <div id="desktop-view">
@@ -74,7 +116,7 @@
                                         </div>
                                         @else
         								@include('includes.notif')
-                                        <form enctype="multipart/form-data" action="{{route('attendance.store')}}" method="POST">
+                                        <form enctype="multipart/form-data" action="{{route('app.attendance.store')}}" method="POST">
                                             {{ csrf_field() }}
                                             {{-- <input type="hidden" name="cl_id" value="{{  }}"> --}}
                                             <div class="panel-body">
@@ -187,7 +229,7 @@
                                         @endif
                                     </div>
                                     <div id="mobile-view">
-                                        <form enctype="multipart/form-data" action="{{ route('attendance.store') }}" method="POST">
+                                        <form enctype="multipart/form-data" action="{{ route('app.attendance.store') }}" method="POST">
                                             {{ csrf_field() }}
                                             <div class="form-group">
                                                 <button type="submit" class="btn btn-success">Submit</button>
@@ -359,6 +401,9 @@ function agentAttendance(){
 }
 var today = new Date();
 var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+var thisMonth = (today.getUTCMonth() + 1) < 10 ? "0" + (today.getUTCMonth() + 1) : today.getUTCMonth()
+var thisDate = today.getUTCDate() < 10 ? "0" + today.getUTCDate() : today.getUTCDate()
+var date = today.getUTCFullYear() + "-" + thisMonth + "-" + thisDate;
 var timein = 10 + ":" + 30 + ":" + 00;
 
 // alert(time + ">=" +  timein + " = " + time >= timein);
@@ -370,7 +415,31 @@ var timein = 10 + ":" + 30 + ":" + 00;
 //     $('#mutliplebtn').attr('disabled', true);
 // }
 
+
+// jQuery(function () {
+//     $('.fa-calendar').click(function() {
+//         $("#jump_to_date").focus();
+//     });
+//     $('#icon-container').click(function() {
+//         $("#jump_to_date").focus();
+//     });
+//     jQuery('#jump_to_date').datepicker ({
+//         format: 'yyyy-mm-dd',
+//         // autoclose: true,
+//         todayBtn: true,
+//         todayHighlight: true
+//     });
+//
+// });
+var selected_date = "{{ request()->date }}";
 if(time <= timein){
+    $('#buttonButtom').attr('disabled', true);
+    $('#buttonTop').attr('disabled', true);
+    $('.atendance').attr('disabled', true);
+    $('#browseImg').attr('disabled', true);
+
+}
+if(selected_date < date){
     $('#buttonButtom').attr('disabled', true);
     $('#buttonTop').attr('disabled', true);
     $('.atendance').attr('disabled', true);
