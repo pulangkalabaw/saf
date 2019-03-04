@@ -26,8 +26,14 @@
                         <h3 class="panel-title">Applications</h3>
                     </div>
                     <div class="panel-body">
-                        <h5>As of {{ now()->format('M d y g:i a') }} - {{ now()->format('M d y g:i a') }}</h5>
-
+                        @if(!isset($heirarchy['clusters'][0]['cluster_name']))
+                            @if(checkPosition(auth()->user(), ['a']))
+                                <h5 class="text-center text-info"><i class="fa fa-info-circle"></i> *Agents dashboard coming soon*</h5>
+                            @else
+                                <h5 class="text-center text-warning"><i class="fa fa-warning"></i> You have no clusters or team</h5>
+                            @endif
+                        @endif
+                        <!-- <h5>As of {{ now()->format('M d y g:i a') }} - {{ now()->format('M d y g:i a') }}</h5> -->
                         <!-- PUT FOREACH TEAM  -->
                         @foreach($heirarchy['clusters'] as $clus)
                             @if($clus) <!-- FOR CATCHING NULL ERRORS -->
