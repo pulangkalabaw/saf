@@ -465,7 +465,7 @@ function getHeirarchy2(){
 			$res['teams'] = $teams_model->whereIn('id', $res['team_ids'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,$application_model,&$count_applications){
 
 				// calcualting applications and saf
-				// dd( Carbon::parse('first day of February 2019')." ".Carbon::parse('last day of February 2019')->endOfMonth() );				
+				// dd( Carbon::parse('first day of February 2019')." ".Carbon::parse('last day of February 2019')->endOfMonth() );
 				$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications){
 					if($res['status'] == 'new'){
 						(float)$count_applications['new'] += (float)$res['msf'];
@@ -516,7 +516,7 @@ function getHeirarchy2(){
 				// end of calculate present, absent, unkown
 
 				// for percentage of this cutoff
-				$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/$res['attendance']['totaltarget']) * 100); // ADD THIS
+				$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
 				return $res;
 			});
 			return $res;
@@ -536,7 +536,7 @@ function getHeirarchy2(){
 					'target' => 0,
 				];
 				$res['teams'] = $teams_model->whereIn('id',Session::get('_c')[0]['team_ids'])->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,&$count_applications){
-					
+
 					// calcualting applications and saf
 					// dd( Carbon::parse('first day of February 2019')." ".Carbon::parse('last day of February 2019')->endOfMonth() );
 					$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications){
@@ -589,7 +589,7 @@ function getHeirarchy2(){
 					// end of calculate present, absent, unkown
 
 					// for percentage of this cutoff
-					$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/$res['attendance']['totaltarget']) * 100); // ADD THIS
+					$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
 					return $res;
 				});
 				return $res;
@@ -665,7 +665,7 @@ function getHeirarchy2(){
 							// end of calculate present, absent, unkown
 
 							// for percentage of this cutoff
-							$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/$res['attendance']['totaltarget']) * 100); // ADD THIS
+							$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
 							return $res;
 						}
 					});
