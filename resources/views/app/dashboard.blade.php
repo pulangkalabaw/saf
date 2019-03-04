@@ -23,7 +23,7 @@
             <div class="col-md-12">
                 <div class="panel panel-info">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Applications</h3>
+                        <h3 class="panel-title">Dashboard Applications</h3>
                     </div>
                     <div class="panel-body">
                         @if(!isset($heirarchy['clusters'][0]['cluster_name']))
