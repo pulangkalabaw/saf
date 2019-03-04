@@ -19,4 +19,11 @@ class ApplicationStatus extends Model
         $application_status = $this->where('application_id', $application_id)->firstOrFail();
         return User::where('id', $application_status->added_by)->firstOrFail();
     }
+    // Shows all the edited application status
+    public function editedStatuses ($application_id) {
+        return ApplicationStatus::where('application_id',$application_id)->get()->map(function ($response){
+			$response['added_by'] = User::where('id',$response['added_by'])->first(['fname','lname']);
+			return $response;
+		});
+    }
 }

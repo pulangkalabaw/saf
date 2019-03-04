@@ -121,6 +121,13 @@
 										<div class="nav-menu__text"><span>Dashboard</span></div>
 									</a>
 								</li>
+
+								<li>
+									<a href="{{ route('app.oic.index') }}">
+										<div class="nav-menu__ico"><i class="fa fa-fw fa-users"></i></div>
+										<div class="nav-menu__text"><span>OIC</span></div>
+									</a>
+								</li>
 							</ul>
 
 							<div class="sidebar__title">Applications</div>

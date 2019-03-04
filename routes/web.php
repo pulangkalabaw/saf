@@ -55,6 +55,9 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     Route::get('attendance/sample', 'AttendanceController@sample');
     Route::resource('attendance', 'AttendanceController');
 
+    // OIC
+    Route::resource('oic','OicController')->middleware('access_control:administrator,user,encoder');
+
     // For non-admin
     Route::get('your-clusters', 'NonAdminController@yourClusters')->name('your.clusters');
     Route::get('your-cluster/{id}', 'NonAdminController@clusterShow')->name('your.clusters.show');
