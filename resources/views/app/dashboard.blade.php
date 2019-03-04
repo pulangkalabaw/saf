@@ -61,7 +61,8 @@
         @endif
         <!-- PAT WIDGET -->
 
-        <div class="row">
+        <!-- START OF GRAPHS  -->
+        <!-- <div class="row">
             <div class="col-md-6">
                 <div class="panel panel-danger">
                     <div class="panel-heading">
@@ -95,7 +96,8 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
+        <!-- END OF GRAPHS  -->
     </div>
 </div>
 

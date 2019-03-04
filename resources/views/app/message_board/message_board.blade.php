@@ -8,6 +8,7 @@
         <li class="active">Message Board</li>
     </ol>
 </div>
+@if(0) <!-- FOR MAINTENANCE  -->
 <div class="container-fluid half-padding">
     <div class="template template__blank">
         <div class="row" style="padding: 15px;">
@@ -309,6 +310,24 @@
 
 
 </div>
+@else <!-- FOR MAINTENANCE -->
+    <div class="container-fluid half-padding">
+        <div class="template template__blank">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-warning">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Maintenance</h3>
+                        </div>
+                        <div class="panel-body text-center">
+                            <p>This page is currently under maintenance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endif <!-- END FOR MAINTENANCE  -->
 </div>
 
 @endsection
