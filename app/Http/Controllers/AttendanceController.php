@@ -36,6 +36,7 @@ class AttendanceController extends Controller
 	}
 	public function index(Request $request)
 	{
+		// return count(checkPosition(Auth::user(), ['cl', 'tl'], true));
 		$get_session;
         // return count(session()->get('_t'));
         if(count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0){
@@ -52,7 +53,7 @@ class AttendanceController extends Controller
 		} else {
 			$date['next'] = null;
 		}
-
+		// return $date;
 		$date_select = $request->date != null ? $request->date : date('Y-m-d H:i:s');
 		$get_user_attendance = [];
 		if(count(session()->get('_c')) >= 1){
@@ -307,14 +308,6 @@ class AttendanceController extends Controller
 							$r['value_btn'] = ['class' => 'btn-danger', 'label' => 'Absent'];
 						}
 					}
-					// else {
-					// 	$r['value_activity'] = null;
-					// 	$r['value_location'] = null;
-					// 	$r['value_remarks'] = null;
-					// 	$r['value_status'] = null;
-					// 	$r['value_btn'] = null;
-					// }
-					// return $get_attendance;
 				}
 			}
 			foreach($teams as $team){
@@ -406,6 +399,7 @@ class AttendanceController extends Controller
 		// return $attendance['unpresent'];
 		// return $attendance['present'];
 		// return $attendance['absent'];
+		// return $get_user_attendance;
 		return view('app.attendance.index', compact('attendance', 'teams', 'clusters', 'selected_cluster', 'get_user_attendance', 'date'));
 	}
 
@@ -462,7 +456,7 @@ class AttendanceController extends Controller
 		$data = [];
 		foreach($get_user as $user){
 			// return $request->all();
-			if($user['status'] != null){
+			if(empty($user['modified_status']) && $user['status'] != null){
 				$team_id;
 				if(count(Session::get('_c')) != 0){
 					if(count(Session::get('_c')) == 1){
@@ -524,20 +518,25 @@ class AttendanceController extends Controller
 					array_push($data, $set_data);
 				}
 			}
-			$check_the_fucking_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', Carbon::today())->first();
-			if(!empty($check_the_fucking_attendance)){
-				if($user['status'] == null){
-					Attendance::where('user_id', $user['user_id'])->delete();
-				}
-				else {
-					$set_data = [
-						"activities" => $user['activities'],
-						"location" => $user['location'],
-						"remarks" => $user['remarks'],
-						"status" => $user['status'],
-						'modified_by' => Auth::user()->id,
-					];
-					Attendance::where('user_id', $user['user_id'])->update($set_data);
+			if(!empty($user['modified_status'])){
+				$check_the_fucking_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', Carbon::today())->first();
+				if(!empty($check_the_fucking_attendance)){
+					if($user['status'] == null){
+						Attendance::where('user_id', $user['user_id'])->delete();
+					}
+					else {
+						if(!empty($user['modified_remarks'])){
+							$set_data = [
+								"activities" => $user['activities'],
+								"location" => $user['location'],
+								"remarks" => $user['remarks'],
+								"status" => $user['status'],
+								'modified_by' => Auth::user()->id,
+								'modified_remarks' => $user['modified_remarks'],
+							];
+							Attendance::where('user_id', $user['user_id'])->update($set_data);
+						}
+					}
 				}
 			}
 		}

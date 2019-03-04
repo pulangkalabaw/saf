@@ -41,22 +41,27 @@
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-md-1">
-                                        <a href="{{ url('app/attendance') . '?date=' . $date['previous'] }}" class="btn btn-md btn-default">Previous</a>
+                                        <div class="form-group">
+                                            <button onclick="window.location  = '{{ url('app/attendance') . '?date=' . $date['previous'] }}'" class="btn btn-md btn-default">Previous</button>
+                                        </div>
                                     </div>
                                     <div class="col-md-3">
-                                        <input type="date" class="form-control" value="{{ $date['selected'] }}" onchange="window.location = '{{ url('app/attendance') . '?date=' }}' + this.value ;">
-                                        {{-- <div class="input-group date">
-                                            <input class="form-control" name="jump_to_date" type="text" id="jump_to_date" value="{{ $date['selected'] }}" onchange="window.location = '{{ url('app/attendance') . '?date=' }}' + this.value ;">
-                                            <div class="input-group-addon" title="Jump to certain date" id="icon-container">
-                                                <div class="fa fa-calendar" title="Jump to certain date"></div>
+                                        <div class="form-group">
+                                            {{-- <input type="date" class="form-control" value="{{ $date['selected'] }}" onselect="window.location = '{{ url('app/attendance') . '?date=' }}' + this.value ;" max="2019-03-04"> --}}
+                                            <div class="input-group date">
+                                                <input class="form-control" name="jump_to_date" type="text" id="jump_to_date" value="{{ $date['selected'] }}" max="2019-03-04">
+                                                <div class="input-group-addon" title="Jump to certain date" id="icon-container">
+                                                    <div class="fa fa-calendar" title="Jump to certain date"></div>
+                                                </div>
                                             </div>
-                                        </div> --}}
+                                        </div>
                                     </div>
                                     <div class="col-md-1">
-                                        <button onclick="window.location  = '{{ url('app/attendance') . '?date=' . $date['next'] }}'" {{ $date['next'] == null ? 'disabled' : '' }} class="btn btn-md btn-default">Next</button>
+                                        <div class="form-group">
+                                            <button onclick="window.location  = '{{ url('app/attendance') . '?date=' . $date['next'] }}'" {{ $date['next'] == null ? 'disabled' : '' }} class="btn btn-md btn-default">Next</button>
+                                        </div>
                                     </div>
                                     <div class="col md-7">
-
                                     </div>
                                 </div>
                             </div>
@@ -121,6 +126,7 @@
                                             {{-- <input type="hidden" name="cl_id" value="{{  }}"> --}}
                                             <div class="panel-body">
                                                 <button class="btn btn-primary pull-right" id="buttonTop">Submit</button>
+                                                {{-- <button type="button" class="btn btn-danger pull-right" id="buttonTop">toggle</button> --}}
                                             </div>
                                             <div class="panel-body">
                                                 <div class="table-responsive">
@@ -137,7 +143,7 @@
                                                         </thead>
                                                         <tbody>
                                                             @foreach($attendance['unpresent'] as $index => $value)
-                                                                <tr>
+                                                                <tr id="tr-container-{{ $index }}" class="">
                                                                     <td class="text-center">
                                                                         <input type="hidden" hidden name="user[{{ $index }}][status]" class="setStatus" id="status_{{ $index }}"
                                                                         @if(!empty($value['value_btn']))
@@ -148,14 +154,19 @@
                                                                             @endif
                                                                         @endif
                                                                         >
-                                                                        <button type="button" name="changeStatus" id="changeStatus_{{ $index }}" onclick="changeButtonStatus('desktop', 'changeStatus_{{ $index }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]')"
+                                                                        <button type="button" name="changeStatus" id="changeStatus_{{ $value['id'] }}" onclick="changeButtonStatus('desktop', 'changeStatus_{{ $value['id'] }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]');
+                                                                        @if(!empty($value['value_btn']))
+                                                                            showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')
+                                                                        @endif
+                                                                        "
                                                                         class="btn
                                                                         @if(!empty($value['value_btn']))
                                                                             {{ $value['value_btn']['class'] }}
                                                                         @else
                                                                             btn-default
-                                                                        @endif atendance
-                                                                        ">@php
+                                                                        @endif attendance
+                                                                        "
+                                                                        >@php
                                                                         if(!empty($value['value_btn'])){
                                                                             echo $value['value_btn']['label'];
                                                                         }else{
@@ -167,9 +178,11 @@
                                                                     {{-- <td>{{  }}</td> --}}
                                                                     <td>
                                                                         <input name="user[{{ $index }}][user_id]" class="form-control" type="hidden" value={{ $value['id'] }}>
-                                                                        <select class="form-control input-gray" name="user[{{ $index }}][activities]"
+                                                                        <select class="form-control input-gray" name="user[{{ $index }}][activities]" id="user_activity_{{ $value['id'] }}"
                                                                             @if(empty($value['value_activity']))
                                                                                 disabled
+                                                                            @else
+                                                                                onchange="showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
                                                                             @endif
                                                                         >
                                                                             <option
@@ -190,9 +203,10 @@
                                                                     </td>
                                                                     <td>
                                                                         <div class="form-group">
-                                                                            <input name="user[{{ $index }}][location]" id="user[{{ $index }}][location]" class="form-control input-gray" required type="text"
+                                                                            <input name="user[{{ $index }}][location]" id="user_location_{{ $value['id'] }}" class="form-control input-gray" required type="text"
                                                                             @if(!empty($value['value_location']))
                                                                                 value="{{ $value['value_location'] }}"
+                                                                                oninput="showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
                                                                             @else
                                                                                 disabled
                                                                             @endif
@@ -200,9 +214,10 @@
                                                                         </div>
                                                                     </td>
                                                                     <td>
-                                                                        <input name="user[{{ $index }}][remarks]" id="user[{{ $index }}][remarks]" class="form-control input-gray" required type="text"
+                                                                        <input name="user[{{ $index }}][remarks]" id="user_remarks_{{ $value['id'] }}" class="form-control input-gray"  required type="text"
                                                                         @if(!empty($value['value_remarks']))
                                                                             value="{{ $value['value_remarks'] }}"
+                                                                            oninput="showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
                                                                         @else
                                                                             disabled
                                                                         @endif
@@ -210,6 +225,24 @@
                                                                     </td>
 
                                                                     <td class="text-light text-center">{{ $value['team_name'] }}</td>
+                                                                </tr>
+                                                                <tr class="bg-gray tr-accordion" id="tr-accordion-{{ $value['id'] }}">
+                                                                    <td></td>
+                                                                    <td colspan="5">
+                                                                        <div class="collapse" id="accordion-container-{{ $value['id'] }}">
+                                                                            <div class="row vertical-align">
+                                                                                <div class="col-md-2">
+                                                                                    <label class="pull-right">Remarks:</label>
+                                                                                </div>
+                                                                                <div class="col-md-10">
+                                                                                    @if(!empty($value['value_location']))
+                                                                                        <input type="hidden" name="user[{{ $index }}][modified_status]" value="1">
+                                                                                    @endif
+                                                                                    <input name="user[{{ $index }}][modified_remarks]" id="user_modified_remarks_{{ $value['id'] }}" class="form-control text-light" required disabled type="text">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
                                                                 </tr>
                                                             @endforeach
                                                         </tbody>
@@ -232,7 +265,7 @@
                                         <form enctype="multipart/form-data" action="{{ route('app.attendance.store') }}" method="POST">
                                             {{ csrf_field() }}
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-success">Submit</button>
+                                                <button type="submit" class="btn btn-success btn-mobile-submit">Submit</button>
                                             </div>
                                             <div class="form-group">
                                                 @include('app.attendance.mobile-view')
@@ -242,7 +275,7 @@
                                                 <input type="file" name="empImg" id="browseImg">
                                             </div>
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn-success">Submit</button>
+                                                <button type="submit" class="btn btn-success btn-mobile-submit">Submit</button>
                                             </div>
                                         </form>
                                     </div>
@@ -416,35 +449,63 @@ var timein = 10 + ":" + 30 + ":" + 00;
 // }
 
 
-// jQuery(function () {
-//     $('.fa-calendar').click(function() {
-//         $("#jump_to_date").focus();
-//     });
-//     $('#icon-container').click(function() {
-//         $("#jump_to_date").focus();
-//     });
-//     jQuery('#jump_to_date').datepicker ({
-//         format: 'yyyy-mm-dd',
-//         // autoclose: true,
-//         todayBtn: true,
-//         todayHighlight: true
-//     });
-//
-// });
-var selected_date = "{{ request()->date }}";
+jQuery(document).ready(function () {
+    $('.fa-calendar').click(function() {
+        $("#jump_to_date").focus();
+    });
+    $('#icon-container').click(function() {
+        $("#jump_to_date").focus();
+    });
+
+    jQuery('#jump_to_date').datepicker ({
+        format: 'yyyy-mm-dd',
+        todayHighlight: true,
+        endDate: '+0d',
+    }).on('changeDate', function(){
+        window.location = '{{ url('app/attendance') . '?date=' }}' + this.value;
+    });
+});
 if(time <= timein){
     $('#buttonButtom').attr('disabled', true);
     $('#buttonTop').attr('disabled', true);
-    $('.atendance').attr('disabled', true);
+    $('.attendance').attr('disabled', true);
     $('#browseImg').attr('disabled', true);
-
 }
+
+var selected_date = "{{ request()->date != null ? request()->date : Carbon\Carbon::now() }}";
 if(selected_date < date){
     $('#buttonButtom').attr('disabled', true);
     $('#buttonTop').attr('disabled', true);
-    $('.atendance').attr('disabled', true);
+    $('.attendance').attr('disabled', true);
     $('#browseImg').attr('disabled', true);
+    $('.btn-mobile-submit').attr('disabled', true);
+    $('.btn-mobile-status').attr('disabled', true);
+}
 
+function showClRemark(index, location, remarks, activity, buttonLabel){
+    original_location = location;
+    original_remarks = remarks;
+    original_activity = activity;
+    original_button = buttonLabel;
+
+    if($('#changeStatus_' + index).text() == 'Undecided'){
+        $('#accordion-container-' + index).collapse('hide');
+        $('#user_modified_remarks_' + index).attr('disabled', true);
+        $('#tr-accordion-' + index).hide();
+    }
+    else {
+        if((original_remarks != $('#user_remarks_' + index).val()) || (original_location != $('#user_location_' + index).val()) || (original_activity != $('#user_activity_' + index).val()) || ($('#changeStatus_' + index).text() != original_button)){
+            $('#tr-accordion-' + index).show();
+            $('#user_modified_remarks_' + index).attr('disabled', false);
+            $('#accordion-container-' + index).collapse('show');
+        } else {
+            $('#accordion-container-' + index).collapse('hide');
+            $('#user_modified_remarks_' + index).attr('disabled', true);
+            // $('#tr-accordion-' + index).attr('hidden', true);
+            $('#tr-accordion-' + index).hide();
+        }
+    }
+    // $('#accordion-container-' + index).collapse("show");
 }
 
 </script>

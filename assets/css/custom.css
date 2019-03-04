@@ -22,6 +22,10 @@
 .bg-yellow {
     background: yellow !important;
 }
+.bg-gray {
+    background: #30363C !important;
+    color: white !important;
+}
 
 /* CUSTOM MARGIN */
 
@@ -35,4 +39,19 @@
 @media screen and (max-width: 768px) {
 	#desktop-view { display: none; }
 	#mobile-view { display: block; }
+}
+
+/* ACCORDION ON TABLE */
+.collapse-row.collapsed + tr {
+  display: none;
+}
+
+.tr-accordion{
+    display: none;
+}
+
+
+.vertical-align {
+    display: flex;
+    align-items: center;
 }
