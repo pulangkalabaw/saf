@@ -1,4 +1,3 @@
-
 <div class="panel-body">
     {{-- {{ dd(count($attendance['unpresent'])) }} --}}
     @foreach($attendance['unpresent'] as $index => $value)
@@ -23,12 +22,29 @@
                                 @endif
                             @endif
                             >
-                            <button type="button" name="changeStatus" id="changeStatus_mobile_{{ $index }}" onclick="changeButtonStatus('mobile', 'changeStatus_mobile_{{ $index }}', 'status_mobile_{{ $index }}' , 'user_mobile_[{{ $index }}][activities]', 'user_mobile_[{{ $index }}][location]', 'user_mobile_[{{ $index }}][remarks]', '{{ $index }}')" class="btn btn-default pull-right">Undecided</button>
+                            <button type="button" name="changeStatus" id="changeStatus_{{ $index }}" onclick="changeButtonStatus('desktop', 'changeStatus_{{ $index }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]')"
+                            class="btn pull-right
+                            @if(!empty($value['value_btn']))
+                                {{ $value['value_btn']['class'] }}
+                            @else
+                                btn-default
+                            @endif attendance
+                            ">@php
+                            if(!empty($value['value_btn'])){
+                                echo $value['value_btn']['label'];
+                            }else{
+                                echo 'Undecided';
+                            }
+                            @endphp</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="panel-footer" id="panel-footer-{{ $index }}" hidden>
+            <div class="panel-footer" id="panel-footer-{{ $index }}"
+                @if(empty($value['value_btn']))
+                    hidden
+                @endif
+            >
                 <div class="form-group form-horizontal">
                     <div class="row">
                         <div class="col-4">
@@ -57,24 +73,23 @@
                         </div>
                         <div class="col-4">
                             <label class="text-light">Location</label>
-                            <input name="users[{{ $index }}][location]" id="user_mobile_location_{{ $index }}" class="form-control" type="text" required disabled
+                            <input name="user[{{ $index }}][location]" id="user[{{ $index }}][location]" class="form-control text-light" required type="text"
                                 @if(!empty($value['value_location']))
                                     value="{{ $value['value_location'] }}"
                                 @else
-                                    {{-- disabled --}}
+                                    disabled
                                 @endif
-                            >
+                                >
                         </div>
                         <div class="col-4">
                             <label class="text-light">Remarks</label>
-                            <input name="users[{{ $index }}][remarks]" id="user_mobile_remarks_{{ $index }}" class="form-control" type="text" required disabled>
-                            {{-- <input name="users[{{ $index }}][remarks]" id="user_mobile_remarks_{{ $index }}" class="form-control" required type="text" --}}
+                            <input name="user[{{ $index }}][remarks]" id="user[{{ $index }}][remarks]" class="form-control text-light" required type="text"
                                 @if(!empty($value['value_remarks']))
                                     value="{{ $value['value_remarks'] }}"
                                 @else
-                                    {{-- disabled --}}
+                                    disabled
                                 @endif
-                            {{-- > --}}
+                            >
                         </div>
                     </div>
                 </div>

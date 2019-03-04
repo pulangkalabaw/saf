@@ -96,7 +96,8 @@
 							@endif
 
 							@if(accessControl(['administrator', 'user']))
-								@if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl")
+								@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
+								{{-- @if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl") --}}
 									<div class="quickmenu__item {{ str_contains(url()->current(), ['attendance','attendancedashboard']) ? 'active' : '' }}">
 										<div class="fa fa-clock-o"></div>
 									</div>
@@ -212,6 +213,7 @@
 						@endif
 						{{-- USER ATTENDANCE --}}
 						@if(accessControl(['administrator', 'user']) )
+							@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
 							<div class="sidebar__menu">
 								<div class="sidebar__title">Attendance</div>
 								<ul class="nav nav-menu">
@@ -221,31 +223,18 @@
 											<div class="nav-menu__text"><span>Users Attendance</span></div>
 										</a>
 									</li>
+									<li>
+										<a href="{{ route('app.attendance.index') }}">
+											<div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
+											<div class="nav-menu__text"><span>List of Attendance</span></div>
+										</a>
+									</li>
 								</ul>
 							</div>
+							@endif
 						@endif
-                        {{-- USER ATTENDANCE --}}
-						@if(accessControl(['administrator', 'user']) )
-                        <div class="sidebar__menu">
-                            <div class="sidebar__title">Attendance</div>
-                            <ul class="nav nav-menu">
-								<li>
-                                    <a href="{{ route('app.attendanceDashboard') }}">
-                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-dashboard"></i></div>
-                                        <div class="nav-menu__text"><span>Dashboard</span></div>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="{{ route('app.attendance.index') }}">
-                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
-                                        <div class="nav-menu__text"><span>Users Attendance</span></div>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-						@endif
-                        {{-- Message Board --}}
 
+                        {{-- Message Board --}}
 						<div class="sidebar__menu">
 							<div class="sidebar__title">Message Board</div>
 							<ul class="nav nav-menu">
