@@ -93,6 +93,7 @@ class OicController extends Controller
     public function store(Request $request)
     {
         //Get the value of cluster id within the team
+        // return $request->all();
         $teams = new Teams();
         $teams = $teams->clusters($request->team_id);
         $cluster_id = $teams[0]['cluster_id'];
