@@ -211,27 +211,29 @@
 								</ul>
 							</div>
 						@endif
-						{{-- USER ATTENDANCE --}}
+
+                        {{-- USER ATTENDANCE --}}
 						@if(accessControl(['administrator', 'user']) )
-							@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
-							<div class="sidebar__menu">
-								<div class="sidebar__title">Attendance</div>
-								<ul class="nav nav-menu">
+	                        <div class="sidebar__menu">
+	                            <div class="sidebar__title">Attendance</div>
+	                            <ul class="nav nav-menu">
 									<li>
-										<a href="{{ route('app.attendance.index') }}">
-											<div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
-											<div class="nav-menu__text"><span>Users Attendance</span></div>
-										</a>
-									</li>
-									<li>
-										<a href="{{ route('app.attendance.index') }}">
-											<div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
-											<div class="nav-menu__text"><span>List of Attendance</span></div>
-										</a>
-									</li>
-								</ul>
-							</div>
-							@endif
+	                                    <a href="{{ route('app.attendanceDashboard') }}">
+	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-dashboard"></i></div>
+	                                        <div class="nav-menu__text"><span>Dashboard</span></div>
+	                                    </a>
+	                                </li>
+									@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
+	                                <li>
+	                                    <a href="{{ route('app.attendance.index') }}">
+	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
+	                                        <div class="nav-menu__text"><span>Users Attendance</span></div>
+	                                    </a>
+	                                </li>
+									@endif
+	                            </ul>
+	                        </div>
+
 						@endif
 
                         {{-- Message Board --}}

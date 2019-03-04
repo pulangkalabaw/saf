@@ -440,6 +440,8 @@ function searchTeamAndCluster ($auth) {
 // Function for getting dashbaord reports
 function getHeirarchy2(){
 
+	// $date = Carbon::now()->today();
+
 	$teams_model = new Teams();
 	$clusters_model = new Clusters();
 	$user_model = new User();
@@ -705,6 +707,11 @@ function getHeirarchy2(){
 	return [
 		'clusters' => (!empty($clusters)) ? $clusters : [],
 		// 'teams' => (!empty($teams)) ? $teams : [],
+		// 'dates' => [
+		// 	'prev' => $date->subMonths(1),
+		// 	'curr' => $date,
+		// 	'next' => $date->addMonths(1),
+		// ],
 		'myattendance' => (!empty($myattendance)) ? $myattendance : [],
 	];
 
