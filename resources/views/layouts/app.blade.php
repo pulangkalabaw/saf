@@ -216,7 +216,7 @@
 								<div class="sidebar__title">Attendance</div>
 								<ul class="nav nav-menu">
 									<li>
-										<a href="{{ route('attendance.index') }}">
+										<a href="{{ route('app.attendance.index') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
 											<div class="nav-menu__text"><span>Users Attendance</span></div>
 										</a>
@@ -225,7 +225,7 @@
 							</div>
 						@endif
                         {{-- USER ATTENDANCE --}}
-						@if(accesesControl(['administrator', 'user']) )
+						@if(accessControl(['administrator', 'user']) )
                         <div class="sidebar__menu">
                             <div class="sidebar__title">Attendance</div>
                             <ul class="nav nav-menu">

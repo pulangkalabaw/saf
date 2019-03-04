@@ -18,7 +18,7 @@
     <div class="template template__blank">
 
         <!-- PAT WIDGET  -->
-        @if( (!empty(checkPosition(auth()->user(), ['tl','cl'])) || accesesControl(['administrator','user'])) && isset($heirarchy) )
+        @if( (!empty(checkPosition(auth()->user(), ['tl','cl'])) || accessControl(['administrator','user'])) && isset($heirarchy) )
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-info">
