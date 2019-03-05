@@ -96,7 +96,7 @@
 							@endif
 
 							@if(accessControl(['administrator', 'user']))
-								@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
+								@if(count(checkPosition(auth()->user(), ['cl', 'tl', 'agent'], true)) != 0)
 								{{-- @if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl") --}}
 									<div class="quickmenu__item {{ str_contains(url()->current(), ['attendance','attendancedashboard']) ? 'active' : '' }}">
 										<div class="fa fa-clock-o"></div>
@@ -104,9 +104,13 @@
 								@endif
 							@endif
 
-							<div class="quickmenu__item {{ str_contains(url()->current(), ['messages']) ? 'active' : '' }}">
-								<div class="fa fa-fw fa-bullhorn"></div>
-							</div>
+							@if(accessControl(['administrator', 'user']))
+								@if(count(checkPosition(auth()->user(), ['cl', 'tl', 'agent'], true)) != 0)
+									<div class="quickmenu__item {{ str_contains(url()->current(), ['messages']) ? 'active' : '' }}">
+										<div class="fa fa-fw fa-bullhorn"></div>
+									</div>
+								@endif
+							@endif
 						</div>
 					</div>
 				</div>

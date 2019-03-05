@@ -68,10 +68,12 @@ class DashboardController extends Controller
 
     // Method for attendance Dashboard
     public function attendanceDashboard(){
-        // dd(Carbon::now()->today()->subMonths(1));
-        // dd(Carbon::now()->today()->addMonths(1));
+        $attendance_model = new Attendance();
+        // dd(Carbon::now()->daysInMonth);
+        $myattendance = $attendance_model->where('user_id', auth()->user()->id)->whereMonth('created_at', '=', Carbon::now()->month)->get();
         return view('app.attendance.dashboard', [
             'heirarchy' => getHeirarchy2(),
+            'myattendance' => $myattendance,
         ]);
     }
 }

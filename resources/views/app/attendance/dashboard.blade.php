@@ -20,10 +20,38 @@
       <!-- ATTENDANCE WIDGET  -->
       @if(!empty($heirarchy))
       <div class="row">
-        <div class="{{ !empty(Session::get('_a') || !empty(Session::get('_t'))) ? 'col-md-12' : 'col-md-12'  }}">
+
+        <!-- FOR AGENT ONLY LIST OF ATTENDANCE PER MONTH/CUTOFF  -->
+        @if( in_array('agent',checkPosition(auth()->user(), ['agent'], true)) && (count(checkPosition(auth()->user(), ['agent'], true)) == 1) )
+        <div class="col-md-8">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">List of My Attendance</h3>
+                </div>
+                <div class="panel-body">
+                    @if(isset($myattendance))
+                        <h5><b>For this month of {{ now()->format('F') }}</b></h5>
+                        @foreach($myattendance as $myatt)
+                            <div class="col-md-3">
+                                <div class="breadcrumb">
+                                    <p><strong>{{ Carbon\Carbon::parse($myatt->created_at)->format('M d Y') }}</strong></p>
+                                    <p class="{{ ($myatt->status == 1) ? 'text-success' : ( ($myatt->status == 0) ? 'text-danger' : 'text-warning' ) }}"><b>{{ ($myatt->status == 1) ? 'Present' : ( ($myatt->status == 0) ? 'Absent' : 'Unkown' ) }}</b></p>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
+        <!-- END FOR AGENT ONLY LIST OF ATTENDANCE PER MONTH/CUTOFF  -->
+
+
+        <!-- ATTENDANCE PART  -->
+        <div class="{{ (  in_array('agent',checkPosition(auth()->user(), ['agent'], true)) && (count(checkPosition(auth()->user(), ['agent'], true)) == 1)  ) ? 'col-md-4' : 'col-md-12'  }}">
           <div class="panel panel-info">
               <div class="panel-heading">
-                  <h3 class="panel-title">Attendance</h3>
+                  <h3 class="panel-title">Today's Attendance</h3>
               </div>
               <div class="panel-body">
                 <!-- CLUSTER -->
@@ -63,12 +91,9 @@
                     <div class="col-md-12">
                         <br>
                         @foreach($heirarchy['myattendance'] as $team)
-                        <div class="col-md-4 mt-4 mb-4">
+                        <div class="col-md-12 mt-4 mb-4">
                           <div class="breadcrumb">
                             <h5>{{ $team->team_name }}</h5>
-                            <!-- <p>Present: <b class="text-success">30</b></p> -->
-                            <!-- <p>Absent: <b class="text-danger">2</b></p> -->
-                            <!-- <p>Unkown: <b class="text-warning">1</b></p> -->
                             <p>Your attendance is <span class="{{ ($team->attendance == 'Present') ? 'text-success' : (($team->attendance == 'Absent') ? 'text-danger' : 'text-warning') }}">{{ $team->attendance }}</span> today.</p>
                           </div>
                         </div>
@@ -83,6 +108,8 @@
           </div>
 
         </div>
+        <!-- END OF ATTENDANCE PART  -->
+
         @if( (empty(Session::get('_t')) && empty(Session::get('_a'))) || !empty(Session::get('_c')) )
         <div class="col-md-3">
           <!-- OVERVIEW -->
