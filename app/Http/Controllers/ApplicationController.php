@@ -37,19 +37,20 @@ class ApplicationController extends Controller
 		$applications_total = $applications->count();
 
 		// Get the current login users cluster Id
+
 		if (base64_decode(Auth::user()->role) == 'user'){
 			$applications = $applications->where('insert_by', Auth::user()->id)
 			->orWhere('agent_id', Auth::user()->id);
-		}
 
-		// Check if the login user is a cluster leader
-		// Outputs the application data of all the teams under the cluster
-		$cluster_data = getMyClusterAndTeam(Auth::user());
-		if(!empty($cluster_data['_c'][0])){
-			$cluster_id = $cluster_data['_c'][0]['cluster_id'];
-			$applications = $applications->where('cluster_id', $cluster_id);
+			// Check if the login user is a cluster leader
+			// Outputs the application data of all the teams under the cluster
+			$cluster_data = getMyClusterAndTeam(Auth::user());
+			if(!empty($cluster_data['_c'][0])){
+				$appli = new Application();
+				$cluster_id = $cluster_data['_c'][0]['cluster_id'];
+				$applications = $appli->where('cluster_id', $cluster_id);
+			}
 		}
-
 
 		// Sorting
         // params: sort_in & sort_by

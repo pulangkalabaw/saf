@@ -52,10 +52,11 @@
                                     <div>
                                         <div class="col-md-3">With Sim</div>
                                         <div class="col-md-7">
-                                            <select class="form-control" name="with_sim" required>
+                                            <input type="checkbox" name="with_sim" value="1">
+                                            {{-- <select class="form-control" name="with_sim" required>
                                                 <option {{ old('with_sim') == '1' ? 'selected': '' }} value="1">YES</option>
                                                 <option {{ old('with_sim') == '0' ? 'selected': '' }} value="0">NO</option>
-                                            </select>
+                                            </select> --}}
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -63,10 +64,11 @@
                                     <div>
                                         <div class="col-md-3">With Device</div>
                                         <div class="col-md-7">
-                                            <select class="form-control" name="with_device" required>
+                                            <input type="checkbox" name="with_device" value="1">
+                                            {{-- <select class="form-control" name="with_device" required>
                                                 <option {{ old('with_device') == '1' ? 'selected': '' }} value="1">YES</option>
                                                 <option {{ old('with_device') == '0' ? 'selected': '' }} value="0">NO</option>
-                                            </select>
+                                            </select> --}}
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>

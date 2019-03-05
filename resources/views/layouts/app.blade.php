@@ -103,7 +103,7 @@
 									</div>
 								@endif
 							@endif
-
+							{{-- dissable for presentation --}}
 							<div class="quickmenu__item {{ str_contains(url()->current(), ['messages']) ? 'active' : '' }}">
 								<div class="fa fa-fw fa-bullhorn"></div>
 							</div>
@@ -121,7 +121,7 @@
 										<div class="nav-menu__text"><span>Dashboard</span></div>
 									</a>
 								</li>
-
+								{{-- remove this comment after the presentation --}}
 								<li>
 									<a href="{{ route('app.oic.index') }}">
 										<div class="nav-menu__ico"><i class="fa fa-fw fa-users"></i></div>
@@ -255,6 +255,7 @@
 								</li>
 							</ul>
 						</div>
+
 					</div>
 				</div>
 			</div>

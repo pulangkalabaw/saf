@@ -40,8 +40,7 @@
 
 							<div class="row">
 								<div class="col-md-7">
-
-									<div>
+									{{-- <div>
 										<div class="col-md-3">Cluster name</div>
 										<div class="col-md-7">
 											@if (count($team->getCluster($team->team_id)) != 0)
@@ -51,9 +50,9 @@
 											@endif
 										</div>
 									</div>
-									<div class="clearfix"></div><br>
+									<div class="clearfix"></div><br> --}}
 
-									<div>
+									{{-- <div>
 										<div class="col-md-3">Cluster Leader</div>
 										<div class="col-md-7">
 											@if (count($team->getCluster($team->team_id)) != 0)
@@ -65,7 +64,7 @@
 										</div>
 									</div>
 									<div class="clearfix"></div>
-									<hr>
+									<hr> --}}
 
 
 									<div>

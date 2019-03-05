@@ -444,19 +444,14 @@ class AttendanceController extends Controller
 		if(count(Session::get('_c')) == 0){
 			$get_team = Session::get('_t')[0];
 			$get_cluster = Clusters::get();
-						// return Auth::user()->id;
 			foreach($get_cluster as $cluster){
 				$cluster['team_ids'];
 				foreach($cluster['team_ids'] as $tl){
-					// return $tl;
 					if($get_team['id'] == $tl){
 						$user_cluster_id = $cluster['id'];
-						// break;
 					}
 				}
 			}
-			// return $user_cluster_id;
-			// return ;
 			$check_user_attendance = Attendance::where('user_id', Auth::user()->id)->whereDate('created_at', Carbon::now()->toDateString())->first();
 			if(empty($check_user_attendance)){
 				Attendance::create([
