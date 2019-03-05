@@ -273,15 +273,25 @@ class AttendanceController extends Controller
 				}
 				foreach($user_ids as $user_id){
 					foreach($user_id['agent_ids'] as $user){
-						if(!in_array($user, $get_user_ids['user_ids'])){
+						if(!empty($get_user_ids)){
+							if(!in_array($user, $get_user_ids['user_ids'])){
+								$get_user_ids['user_ids'][] = $user;
+								$get_user_ids['user_info'][] = ['user_id' => $user, 'team_name' => $user_id['team_name']];
+							}
+						} else {
 							$get_user_ids['user_ids'][] = $user;
 							$get_user_ids['user_info'][] = ['user_id' => $user, 'team_name' => $user_id['team_name']];
 						}
 					}
 					foreach($user_id['tl_ids'] as $tl_id){
-						if(!in_array($tl_id, $get_user_ids['user_ids'])){
-							$get_user_ids['user_ids'][] = $tl_id;
-							$get_user_ids['user_info'][] = ['user_id' => $tl_id, 'team_name' => $user_id['team_name']];
+						if(!empty($get_user_ids)){
+							if(!in_array($tl_id, $get_user_ids['user_ids'])){
+								$get_user_ids['user_ids'][] = $tl_id;
+								$get_user_ids['user_info'][] = ['user_id' => $tl_id, 'team_name' => $user_id['team_name']];
+							}
+						} else {
+							$get_user_ids['user_ids'][] = $user;
+							$get_user_ids['user_info'][] = ['user_id' => $user, 'team_name' => $user_id['team_name']];
 						}
 					}
 				}
