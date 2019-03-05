@@ -355,6 +355,7 @@ function changeButtonStatus(view = "desktop",buttonName = "", status, activities
     // how to count elements with same class in jquery
     $('.buttonStatus')
     $buttonText = $('#' + buttonName).text();
+    // alert(footer);
     if(view == "desktop"){
         if($buttonText == 'Undecided'){
             $('#' + buttonName).removeClass('btn-default').addClass('btn-info');
@@ -423,7 +424,7 @@ function toggle(source) {
 }
 
 function agentAttendance(){
-    console.log($('#chb1').val() == "" && $('#ch6').val() == "");
+    // console.log($('#chb1').val() == "" && $('#ch6').val() == "");
     if($('#chb1').val() != "" && $('#ch6').val() != ""){
         $('#present').removeAttr('disabled');
         $('#absent').removeAttr('disabled');

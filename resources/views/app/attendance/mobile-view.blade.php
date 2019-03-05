@@ -8,12 +8,12 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-sm-10">
-                            <h5 class="text-light">{{ $value['fname'] . ' ' . $value['lname'] }}</h5>
+                            <h5 class="text-light"><span class="margin-vertical {{ !empty($value['tl']) ? 'text-info' : '' }}">{{ $value['fname'] . ' ' . $value['lname']}}</span></h5>
                             <label class="text-light">Team: {{ $value['team_name']}}</label>
                         </div>
                         <div class="col-sm-2">
                             <input type="hidden" name="mobile_version" value="1">
-                            <input type="hidden" name="users[{{ $index }}][status]" class="setStatus" id="user_mobile_status_{{ $index }}"
+                            <input type="hidden" name="users[{{ $index }}][status]" class="setStatus" id="user_mobile_status_{{ $value['id'] }}"
                             @if(!empty($value['value_btn']))
                                 @if($value['value_btn']['class'] == 'btn-info')
                                     value="1"
@@ -22,7 +22,7 @@
                                 @endif
                             @endif
                             >
-                            <button type="button" name="changeStatus" id="changeStatus_{{ $index }}" onclick="changeButtonStatus('desktop', 'changeStatus_{{ $index }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]')"
+                            <button type="button" name="changeStatus" id="changeStatus_{{ $index }}" onclick="changeButtonStatus('mobile', 'changeStatus_{{ $index }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]', '{{ $value['id'] }}')"
                             class="btn pull-right
                             @if(!empty($value['value_btn']))
                                 {{ $value['value_btn']['class'] }}
@@ -40,7 +40,7 @@
                     </div>
                 </div>
             </div>
-            <div class="panel-footer" id="panel-footer-{{ $index }}"
+            <div class="panel-footer" id="panel-footer-{{ $value['id'] }}"
                 @if(empty($value['value_btn']))
                     hidden
                 @endif
@@ -73,7 +73,7 @@
                         </div>
                         <div class="col-4">
                             <label class="text-light">Location</label>
-                            <input name="user[{{ $index }}][location]" id="user[{{ $index }}][location]" class="form-control text-light" required type="text"
+                            <input name="users[{{ $index }}][location]" id="user_mobile_location_{{ $value['id'] }}" class="form-control text-light" required type="text"
                                 @if(!empty($value['value_location']))
                                     value="{{ $value['value_location'] }}"
                                 @else
@@ -83,7 +83,7 @@
                         </div>
                         <div class="col-4">
                             <label class="text-light">Remarks</label>
-                            <input name="user[{{ $index }}][remarks]" id="user[{{ $index }}][remarks]" class="form-control text-light" required type="text"
+                            <input name="users[{{ $index }}][remarks]" id="user_mobile_remarks_{{ $value['id'] }}" class="form-control text-light" required type="text"
                                 @if(!empty($value['value_remarks']))
                                     value="{{ $value['value_remarks'] }}"
                                 @else

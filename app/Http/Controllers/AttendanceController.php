@@ -440,6 +440,37 @@ class AttendanceController extends Controller
 		// return $request->all();
 		// return $team_id = Teams::where('tl_id', Auth::user()->id)->get(['team_id']);
 		// return Clusters::where('team_ids', 'like', '%' . $team_id . '%')->get(['cluster_id']);
+		// return checkPosition(Auth::user(), ['tl'], true);
+		if(count(Session::get('_c')) == 0){
+			$get_team = Session::get('_t')[0];
+			$get_cluster = Clusters::get();
+						// return Auth::user()->id;
+			foreach($get_cluster as $cluster){
+				$cluster['team_ids'];
+				foreach($cluster['team_ids'] as $tl){
+					// return $tl;
+					if($get_team['id'] == $tl){
+						$user_cluster_id = $cluster['id'];
+						// break;
+					}
+				}
+			}
+			// return $user_cluster_id;
+			// return ;
+			$check_user_attendance = Attendance::where('user_id', Auth::user()->id)->whereDate('created_at', Carbon::now()->toDateString())->first();
+			if(empty($check_user_attendance)){
+				Attendance::create([
+					"cluster_id" => $user_cluster_id,
+					"team_id" => $get_team['id'],
+					"user_id" => Auth::user()->id,
+					"activities" => 'Team Leader',
+					"location" => 'Team Leader',
+					"remarks" => 'Team Leader',
+					"status" => 1,
+					'created_by' => Auth::user()->id,
+				]);
+			}
+		}
 
 
 		$this->validate($request, [
@@ -509,9 +540,17 @@ class AttendanceController extends Controller
 					}
 				}
 				// return $user['activities'];
-				$request->all();
-				$cluster_id = Clusters::where('team_ids', 'like', '%' . $team_id . '%')->value('id');
-				$check_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', Carbon::now())->first();
+				// $request->all();
+				// return $team_id;
+				$clusters = Clusters::get();
+				foreach($clusters as $cluster){
+					foreach($cluster['team_ids'] as $tl){
+						if($team_id == $tl){
+							$cluster_id = $cluster['id'];
+						}
+					}
+				}
+				$check_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', Carbon::now()->toDateString())->first();
 				if(empty($check_attendance)){
 					$set_data = [
 						"cluster_id" => $cluster_id,
@@ -559,6 +598,8 @@ class AttendanceController extends Controller
 		// 	'created_at' => date('Y-m-d H:i:s'),
 		// 	'updated_at' => date('Y-m-d H:i:s'),
 		// ]);
+		// if(){}
+		// return $data;
 		Attendance::insert($data);
 		if(!empty($data_image)){
 			Attendance_image::create($data_image);
