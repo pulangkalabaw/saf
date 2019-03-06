@@ -20,17 +20,108 @@
       <!-- ATTENDANCE WIDGET  -->
       @if(!empty($heirarchy))
       <div class="row">
-        <div class="{{ !empty(Session::get('_a') || !empty(Session::get('_t'))) ? 'col-md-12' : 'col-md-12'  }}">
+
+        <!-- FOR AGENT ONLY LIST OF ATTENDANCE PER MONTH/CUTOFF  -->
+        @if( count(checkPosition(auth()->user(), ['tl','agent'], true)) )
+        <div class="col-md-8">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">List of My Attendance</h3>
+                </div>
+                <div class="panel-body">
+                    @if(isset($myattendance))
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6 col-xs-6">
+                                <!-- <div class="col-md-4 col-xs-3"> -->
+                                    <a href="{{ route('app.attendanceDashboard', ['date' => $myattendance['prev']]) }}" class="btn btn-default btn-sm"><i class="fa fa-arrow-left"></i> {{ Carbon\Carbon::parse($myattendance['prev'])->format('M Y') }}</a>
+                                </div>
+                                <!-- <div class="col-md-4 col-xs-6 text-center">
+
+                                    <form action="{{ route('app.attendanceDashboard') }}" method="get">
+                                        <div class="input-group">
+                                            <input type="date" class="form-control input-sm" name="exactdate" placeholder="Date">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-info btn-sm" type="submit">
+                                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </form>
+
+                                </div> -->
+                                <!-- <div class="col-md-4 col-xs-3 text-right"> -->
+                                <div class="col-md-6 col-xs-6 text-right">
+                                    @if( today() >= Carbon\Carbon::parse($myattendance['next']) )
+                                    <a href="{{ route('app.attendanceDashboard', ['date' => $myattendance['next']]) }}" class="btn btn-default btn-sm">{{ Carbon\Carbon::parse($myattendance['next'])->format('M Y') }} <i class="fa fa-arrow-right"></i></a>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="row text-center">
+                                <div class="col-md-4 col-xs-1"></div>
+                                <div class="col-md-4 col-xs-10 text-center">
+<br>
+                                    <form action="{{ route('app.attendanceDashboard') }}" method="get">
+                                        <div class="input-group">
+                                            <input type="date" class="form-control input-sm" name="exactdate" placeholder="Date">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-info btn-sm" type="submit">
+                                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </form>
+
+                                </div>
+                                <div class="col-md-4 col-xs-1"></div>
+
+                            </div>
+
+
+                            <h5 class="text-center"><b>{{ $myattendance['currmsg'] }}</b></h5>
+                            <br>
+                        </div>
+                        @if(!$myattendance['attendance']->isEmpty())
+                            @foreach($myattendance['attendance'] as $myatt)
+                                <div class="col-md-3">
+                                    <div class="breadcrumb">
+                                        <p><strong>{{ Carbon\Carbon::parse($myatt->created_at)->format('M d Y') }}</strong></p>
+                                        <p class="{{ ($myatt->status == 1) ? 'text-success' : ( ($myatt->status == 0) ? 'text-danger' : 'text-warning' ) }}"><b>{{ ($myatt->status == 1) ? 'Present' : ( ($myatt->status == 0) ? 'Absent' : 'Unkown' ) }}</b></p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="col-md-12">
+                                <div class="text-center">No data found</div>
+                            </div>
+                        @endif
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
+        <!-- END FOR AGENT ONLY LIST OF ATTENDANCE PER MONTH/CUTOFF  -->
+
+
+        <!-- ATTENDANCE PART  -->
+        <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-4' : 'col-md-12'  }}">
           <div class="panel panel-info">
               <div class="panel-heading">
-                  <h3 class="panel-title">Attendance</h3>
+                  <!-- if the logged in user is an agent only  -->
+                  @if( count(checkPosition(auth()->user(), ['agent'], true)) )
+                      <h3 class="panel-title">My Today's Attendance</h3>
+                  @else
+                  <!-- if the logged in user is cl, admin, encoder -->
+                      <h3 class="panel-title">Today's Team Attendance</h3>
+                  @endif
               </div>
               <div class="panel-body">
                 <!-- CLUSTER -->
                 <div class="row">
                   @if(!empty($heirarchy) && $heirarchy['clusters'])
-                  <div class="col-md-3">
-                    <h5>As of <small>{{  now()->format('M d y g:i a') }}</small></h5>
+                  <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-12' : 'col-md-3'  }}">
+                    <h5>As of {{  now()->format('F d Y') }}</h5>
                     <!-- <input type="date" class="form-control"> -->
                   </div>
                   @endif
@@ -44,9 +135,15 @@
                             @if(!empty($clus->teams))
                               @foreach($clus->teams as $team)
                                   @if(!empty($team))
-                                      <div class="col-md-4">
+                                      <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-12' : 'col-md-4'  }}">
                                         <div class="breadcrumb">
                                           <h5>{{ $team->team_name }} <small>Total Agents: {{ $team->total_agents }}</small></h5>
+                                          @if(isset($team->totaltl))
+                                                  <p>
+                                                      TL Attendance: <b class="{{ ($team->totaltl == $team->tlattendance) ? 'text-success' : 'text-danger' }}">{{ $team->tlattendance }}</b>
+                                                      <small class="text-muted">(Total TL: {{ $team->totaltl }})</small>
+                                                  </p>
+                                          @endif
                                           <p>Present: <b class="text-success">{{ $team->attendance['present'] }}</b></p>
                                           <p>Absent: <b class="text-danger">{{ $team->attendance['absent'] }}</b></p>
                                           <p>Unkown: <b class="text-warning">{{ $team->attendance['unkown'] }}</b></p>
@@ -63,12 +160,9 @@
                     <div class="col-md-12">
                         <br>
                         @foreach($heirarchy['myattendance'] as $team)
-                        <div class="col-md-4 mt-4 mb-4">
+                        <div class="col-md-12 mt-4 mb-4">
                           <div class="breadcrumb">
                             <h5>{{ $team->team_name }}</h5>
-                            <!-- <p>Present: <b class="text-success">30</b></p> -->
-                            <!-- <p>Absent: <b class="text-danger">2</b></p> -->
-                            <!-- <p>Unkown: <b class="text-warning">1</b></p> -->
                             <p>Your attendance is <span class="{{ ($team->attendance == 'Present') ? 'text-success' : (($team->attendance == 'Absent') ? 'text-danger' : 'text-warning') }}">{{ $team->attendance }}</span> today.</p>
                           </div>
                         </div>
@@ -83,6 +177,8 @@
           </div>
 
         </div>
+        <!-- END OF ATTENDANCE PART  -->
+
         @if( (empty(Session::get('_t')) && empty(Session::get('_a'))) || !empty(Session::get('_c')) )
         <div class="col-md-3">
           <!-- OVERVIEW -->
