@@ -524,7 +524,9 @@ function getHeirarchy2(){
 				// end of calculate/get attendance of tl on this day
 
 				// for percentage of this cutoff
-				$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
+				// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
+				$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/(($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0)) * 100); // ADD THIS
+				
 				return $res;
 			});
 			return $res;
@@ -603,7 +605,9 @@ function getHeirarchy2(){
 					// end of calculate/get attendance of tl on this day
 
 					// for percentage of this cutoff
-					$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
+					// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
+					$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/(($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0)) * 100); // ADD THIS
+
 					return $res;
 				});
 				return $res;
@@ -679,7 +683,8 @@ function getHeirarchy2(){
 							// end of calculate present, absent, unkown
 
 							// for percentage of this cutoff
-							$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
+							$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/(($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0)) * 100); // ADD THIS
+
 							return $res;
 						}
 					});
@@ -728,6 +733,61 @@ function getHeirarchy2(){
 		'myattendance' => (!empty($myattendance)) ? $myattendance : [],
 	];
 
+
+}
+
+ function computation($agent_ids,$date){
+
+	// get start and end of the month
+	$start = new Carbon($date->startOfMonth());
+	$end = $date->endOfMonth();
+
+	// get all data from saf_application table
+	$results = Application::whereIn('agent_id',$agent_ids)->whereBetween('created_at', array($start->startOfMonth(), $end->endOfMonth()))->get(['status','agent_id','msf'])->map(function($res){
+		// get msf of activated application
+		if($res['status'] == 'activated'){
+
+			$res['activated'] = $res['msf'];
+
+		}elseif($res['status'] == 'new'){
+			// get msf of new new application
+			$res['new'] = $res['msf'];
+
+		}
+
+		return $res;
+	});
+
+	$data = [];
+	foreach($agent_ids as $id){
+		// get user acount info, fname,laname,target
+		$user_data = User::where('id',$id)->first();
+
+		foreach($results as $result){
+			if($result['agent_id'] == $id){
+				// collect activated and new application
+				$activated[$id]['activated'][] = $result['activated'];
+				$activated[$id]['new'][] = $result['new'];
+				// name of the agent
+				$data[$id]['fname'] = $user_data['fname'];
+				$data[$id]['lname'] = $user_data['lname'];
+				// Sum of activated and and new application
+				$data[$id]['activated'] = array_sum($activated[$id]['activated']);
+				$data[$id]['new'] =array_sum($activated[$id]['new']);
+				// user target
+				$data[$id]['target'] =$user_data['target'];
+				// compute target percentage
+				$data[$id]['percentage'] = (int)round((array_sum($activated[$id]['activated']) + array_sum($activated[$id]['new']) / $user_data['target'] * 100));
+			}
+		}
+	}
+	// get next and previous date
+ 	$previous = new Carbon($date->subMonths(1));
+	$next = $date->addMonth(1);
+
+	$datas =['previous' => $previous,'next' => $next,'data' => $data];
+
+	return $datas;
 
 }
 
