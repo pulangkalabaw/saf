@@ -67,13 +67,43 @@ class DashboardController extends Controller
     }
 
     // Method for attendance Dashboard
-    public function attendanceDashboard(){
+    public function attendanceDashboard(Request $request){
+        // date format should be year-month-day e.g. 2019-03-01
+        try{
+
+            $datenow = ($request->date !== null) ? Carbon::parse($request->date) : ((!empty($request->exactdate)) ? Carbon::parse($request->exactdate) : now());
+            $tempdate = [
+                'prev' => ($request->date !== null) ? Carbon::parse($request->date) : ((!empty($request->exactdate)) ? Carbon::parse($request->exactdate) : now()),
+                'next' => ($request->date !== null) ? Carbon::parse($request->date) : ((!empty($request->exactdate)) ? Carbon::parse($request->exactdate) : now()),
+            ];
+
+        }catch (\Exception $e){
+            $datenow = now();
+            $tempdate = [
+                'prev' =>  now(),
+                'next' =>  now(),
+            ];
+        }
+
         $attendance_model = new Attendance();
-        // dd(Carbon::now()->daysInMonth);
-        $myattendance = $attendance_model->where('user_id', auth()->user()->id)->whereMonth('created_at', '=', Carbon::now()->month)->get();
+        if(!empty($request->exactdate)){
+            $myattendance['attendance'] = $attendance_model->where('user_id', auth()->user()->id)->whereDate('created_at', '=', $datenow->format('Y-m-d'))->get();
+            $myattendance['currmsg'] =  'Data On '.$datenow->format("F d Y");
+
+        }else{
+            $myattendance['attendance'] = $attendance_model->where('user_id', auth()->user()->id)->whereMonth('created_at', '=', $datenow->month)->get();
+            $myattendance['currmsg'] =  'For this month of '.$datenow->format("F");
+
+        }
+        $myattendance['prev'] =  $tempdate['prev']->subMonths(1)->format('Y-m-d');
+        $myattendance['curr'] =  $datenow->format('Y-m-d');
+        $myattendance['next'] =  $tempdate['next']->addMonths(1)->format('Y-m-d');
+
+
+        // RETURN VIEW
         return view('app.attendance.dashboard', [
             'heirarchy' => getHeirarchy2(),
-            'myattendance' => $myattendance,
+            'myattendance' => (!empty($myattendance)) ? $myattendance : null,
         ]);
     }
 }

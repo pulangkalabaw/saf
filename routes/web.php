@@ -27,7 +27,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     Route::get('homedashboard', 'DashboardController@dashboard')->name('dashboard')->middleware('access_control:administrator,user,encoder');
 
     // Dashboard of Attendance
-    Route::get('attendancedashboard', 'DashboardController@attendanceDashboard')->name('attendanceDashboard')->middleware('access_control:administrator,user');
+    Route::get('attendancedashboard/{date?}', 'DashboardController@attendanceDashboard')->name('attendanceDashboard')->middleware('access_control:administrator,user');
 
 
     // Users

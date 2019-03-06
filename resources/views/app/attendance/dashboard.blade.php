@@ -30,15 +30,71 @@
                 </div>
                 <div class="panel-body">
                     @if(isset($myattendance))
-                        <h5><b>For this month of {{ now()->format('F') }}</b></h5>
-                        @foreach($myattendance as $myatt)
-                            <div class="col-md-3">
-                                <div class="breadcrumb">
-                                    <p><strong>{{ Carbon\Carbon::parse($myatt->created_at)->format('M d Y') }}</strong></p>
-                                    <p class="{{ ($myatt->status == 1) ? 'text-success' : ( ($myatt->status == 0) ? 'text-danger' : 'text-warning' ) }}"><b>{{ ($myatt->status == 1) ? 'Present' : ( ($myatt->status == 0) ? 'Absent' : 'Unkown' ) }}</b></p>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6 col-xs-6">
+                                <!-- <div class="col-md-4 col-xs-3"> -->
+                                    <a href="{{ route('app.attendanceDashboard', ['date' => $myattendance['prev']]) }}" class="btn btn-default btn-sm"><i class="fa fa-arrow-left"></i> {{ Carbon\Carbon::parse($myattendance['prev'])->format('M Y') }}</a>
+                                </div>
+                                <!-- <div class="col-md-4 col-xs-6 text-center">
+
+                                    <form action="{{ route('app.attendanceDashboard') }}" method="get">
+                                        <div class="input-group">
+                                            <input type="date" class="form-control input-sm" name="exactdate" placeholder="Date">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-info btn-sm" type="submit">
+                                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </form>
+
+                                </div> -->
+                                <!-- <div class="col-md-4 col-xs-3 text-right"> -->
+                                <div class="col-md-6 col-xs-6 text-right">
+                                    @if( today() >= Carbon\Carbon::parse($myattendance['next']) )
+                                    <a href="{{ route('app.attendanceDashboard', ['date' => $myattendance['next']]) }}" class="btn btn-default btn-sm">{{ Carbon\Carbon::parse($myattendance['next'])->format('M Y') }} <i class="fa fa-arrow-right"></i></a>
+                                    @endif
                                 </div>
                             </div>
-                        @endforeach
+
+                            <div class="row text-center">
+                                <div class="col-md-4 col-xs-1"></div>
+                                <div class="col-md-4 col-xs-10 text-center">
+<br>
+                                    <form action="{{ route('app.attendanceDashboard') }}" method="get">
+                                        <div class="input-group">
+                                            <input type="date" class="form-control input-sm" name="exactdate" placeholder="Date">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-info btn-sm" type="submit">
+                                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </form>
+
+                                </div>
+                                <div class="col-md-4 col-xs-1"></div>
+
+                            </div>
+
+
+                            <h5 class="text-center"><b>{{ $myattendance['currmsg'] }}</b></h5>
+                        </div>
+                        @if(!$myattendance['attendance']->isEmpty())
+                            @foreach($myattendance['attendance'] as $myatt)
+                                <div class="col-md-3">
+                                    <div class="breadcrumb">
+                                        <p><strong>{{ Carbon\Carbon::parse($myatt->created_at)->format('M d Y') }}</strong></p>
+                                        <p class="{{ ($myatt->status == 1) ? 'text-success' : ( ($myatt->status == 0) ? 'text-danger' : 'text-warning' ) }}"><b>{{ ($myatt->status == 1) ? 'Present' : ( ($myatt->status == 0) ? 'Absent' : 'Unkown' ) }}</b></p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="col-md-12">
+                                <div class="text-center">No data found</div>
+                            </div>
+                        @endif
                     @endif
                 </div>
             </div>
