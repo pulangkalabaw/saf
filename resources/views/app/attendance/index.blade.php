@@ -150,9 +150,9 @@
                                                                         >
                                                                         <button type="button" name="changeStatus" id="changeStatus_{{ $value['id'] }}" onclick="changeButtonStatus('desktop', 'changeStatus_{{ $value['id'] }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]');
                                                                         @if(!empty($value['value_btn']))
-                                                                            showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')
+                                                                            showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}');
                                                                         @endif
-                                                                        @if(request()->date != Carbon\Carbon::now()))
+                                                                        @if(request()->date != Carbon\Carbon::now()->toDateString())
                                                                             showRemark('{{ $value['id'] }}');
                                                                         @endif
                                                                         "
@@ -232,9 +232,12 @@
                                                                                     <label class="pull-right">Remarks:</label>
                                                                                 </div>
                                                                                 <div class="col-md-10">
-                                                                                    @if(!empty($value['value_location']))
+                                                                                    @if(!empty($value['value_location']) || request()->date != Carbon\Carbon::now()->toDateString())
                                                                                         <input type="hidden" name="user[{{ $index }}][modified_status]" value="1">
                                                                                     @endif
+                                                                                    {{-- @if(request()->date != Carbon\Carbon::now()->toDateString())
+                                                                                        <input type="text" name="user[{{ $index }}][modified_status]" value="1">
+                                                                                    @endif --}}
                                                                                     <input name="user[{{ $index }}][modified_remarks]" id="user_modified_remarks_{{ $value['id'] }}" class="form-control text-light" required disabled type="text">
                                                                                 </div>
                                                                             </div>
@@ -536,15 +539,16 @@ function showMobileClRemark(index, location, remarks, activity, buttonLabel){
 }
 
 function showRemark(index){
-
-    if($('#changeMobileStatus_' + index).text() == 'Undecided'){
-        $('#accordion-mobile-container-' + index).collapse('hide');
-        $('#user_mobile_modified_remarks_' + index).attr('disabled', true);
-        // $('#tr-accordion-' + index).hide();
+    // alert(index);
+    if($('#changeStatus_' + index).text() == 'Undecided'){
+        $('#accordion-container-' + index).collapse('hide');
+        $('#user_modified_remarks_' + index).attr('disabled', true);
+        $('#tr-accordion-' + index).hide();
     }
     else {
-        $('#user_mobile_modified_remarks_' + index).attr('disabled', false);
-        $('#accordion-mobile-container-' + index).collapse('show');
+        $('#tr-accordion-' + index).show();
+        $('#user_modified_remarks_' + index).attr('disabled', false);
+        $('#accordion-container-' + index).collapse('show');
     }
 }
 

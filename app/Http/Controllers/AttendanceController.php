@@ -493,11 +493,23 @@ class AttendanceController extends Controller
 		$data = [];
 		foreach($get_user as $user){
 			// return $request->all();
-			if(empty($user['modified_status']) && $user['status'] != null){
-				$team_id;
-				if(count(Session::get('_c')) != 0){
-					if(count(Session::get('_c')) == 1){
-						$_c = Session::get('_c')[0];
+			$team_id;
+			if(count(Session::get('_c')) != 0){
+				if(count(Session::get('_c')) == 1){
+					$_c = Session::get('_c')[0];
+					$cluster_id = $_c['id'];
+					foreach($_c['team_ids'] as $teams){
+						$get_team = Teams::where('id', $teams)->first();
+						if(in_array($user['user_id'], $get_team['agent_ids'])){
+								$team_id = $get_team['id'];
+						}
+						if(in_array($user['user_id'], $get_team['tl_ids'])){
+								$team_id = $get_team['id'];
+						}
+					}
+				}
+				else if(count(Session::get('_c')) > 1){
+					foreach(Session::get('_c') as $_c){
 						$cluster_id = $_c['id'];
 						foreach($_c['team_ids'] as $teams){
 							$get_team = Teams::where('id', $teams)->first();
@@ -509,43 +521,32 @@ class AttendanceController extends Controller
 							}
 						}
 					}
-					else if(count(Session::get('_c')) > 1){
-						foreach(Session::get('_c') as $_c){
-							$cluster_id = $_c['id'];
-							foreach($_c['team_ids'] as $teams){
-								$get_team = Teams::where('id', $teams)->first();
-								if(in_array($user['user_id'], $get_team['agent_ids'])){
-										$team_id = $get_team['id'];
-								}
-								if(in_array($user['user_id'], $get_team['tl_ids'])){
-										$team_id = $get_team['id'];
-								}
-							}
-						}
+				}
+			}
+			else if(count(Session::get('_t')) != 0){
+				foreach(session()->get('_t') as $teams){
+					// return $teams;
+					if(in_array($user['user_id'], $teams['agent_ids'])){
+						$team_id = $teams['id'];
+					}
+					if(in_array($user['user_id'], $teams['tl_ids'])){
+						$team_id = $teams['id'];
 					}
 				}
-				else if(count(Session::get('_t')) != 0){
-					foreach(session()->get('_t') as $teams){
-						// return $teams;
-						if(in_array($user['user_id'], $teams['agent_ids'])){
-							$team_id = $teams['id'];
-						}
-						if(in_array($user['user_id'], $teams['tl_ids'])){
-							$team_id = $teams['id'];
-						}
+			}
+			$clusters = Clusters::get();
+			foreach($clusters as $cluster){
+				foreach($cluster['team_ids'] as $tl){
+					if($team_id == $tl){
+						$cluster_id = $cluster['id'];
 					}
 				}
+			}
+			// return $request->all();
+			if(empty($user['modified_status']) && $user['status'] != null){
 				// return $user['activities'];
 				// $request->all();
 				// return $team_id;
-				$clusters = Clusters::get();
-				foreach($clusters as $cluster){
-					foreach($cluster['team_ids'] as $tl){
-						if($team_id == $tl){
-							$cluster_id = $cluster['id'];
-						}
-					}
-				}
 				$check_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', $selected_date)->first();
 				if(empty($check_attendance)){
 					$set_data = [
@@ -582,6 +583,40 @@ class AttendanceController extends Controller
 							];
 							Attendance::where('user_id', $user['user_id'])->update($set_data);
 						}
+					}
+				} else {
+					if($user['status'] != null){
+						// return $team_id;
+						// return $cluster_id;
+						// return $user['user_id'];
+						// return [
+						// 	"cluster_id" => $cluster_id,
+						// 	"team_id" => $team_id,
+						// 	"user_id" => $user['user_id'],
+						// 	"activities" => $user['activities'],
+						// 	"location" => $user['location'],
+						// 	"remarks" => $user['remarks'],
+						// 	"status" => $user['status'],
+						// 	'created_by' => Auth::user()->id,
+						// 	'modified_by' => Auth::user()->id,
+						// 	'modified_remarks' => $user['modified_remarks'],
+						// 	'created_at' => $selected_date,
+						// 	'updated_at' => date('Y-m-d H:i:s'),
+						// ];
+						Attendance::insert([
+							"cluster_id" => $cluster_id,
+							"team_id" => $team_id,
+							"user_id" => $user['user_id'],
+							"activities" => $user['activities'],
+							"location" => $user['location'],
+							"remarks" => $user['remarks'],
+							"status" => $user['status'],
+							'created_by' => Auth::user()->id,
+							'modified_by' => Auth::user()->id,
+							'modified_remarks' => $user['modified_remarks'],
+							'created_at' => $selected_date,
+							'updated_at' => date('Y-m-d H:i:s'),
+						]);
 					}
 				}
 			}
