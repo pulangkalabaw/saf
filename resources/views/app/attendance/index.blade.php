@@ -19,11 +19,6 @@
                                         User Attendance
                                     </h3>
                                 </div>
-                                <div class="col-md-4 text-right">
-                                    <a href="" class="btn btn-xs btn-default">
-                                        <span class='fa fa-plus-circle'></span>
-                                    </a>
-                                </div>
                             </div>
                         </div>
                         {{-- {{dd(empty($attendance['unpresent']))}} --}}
@@ -47,7 +42,6 @@
                                     </div>
                                     <div class="col-md-3">
                                         <div class="form-group">
-                                            {{-- <input type="date" class="form-control" value="{{ $date['selected'] }}" onselect="window.location = '{{ url('app/attendance') . '?date=' }}' + this.value ;" max="2019-03-04"> --}}
                                             <div class="input-group date">
                                                 <input class="form-control" name="jump_to_date" type="text" id="jump_to_date" value="{{ $date['selected'] }}" max="2019-03-04">
                                                 <div class="input-group-addon" title="Jump to certain date" id="icon-container">
@@ -68,8 +62,7 @@
                             <div class="form-group">
                                 @if(!empty($clusters))
                                     @foreach(array_reverse($clusters) as $cluster)
-                                        {{-- {{ dd(url('attendance') . '?team_id=' . $cluster['id']) }} --}}
-                                            <button type="button" onclick="window.location='{{ url('attendance') . '?cl_id=' . $cluster['id'] }}'" class="btn btn-primary" id="mutliplebtn" {{ $selected_cluster == $cluster['id'] ? 'disabled' : '' }}>{{ $cluster['name'] }}</button>
+                                        <button type="button" onclick="window.location='{{ url('attendance') . '?cl_id=' . $cluster['id'] }}'" class="btn btn-primary" id="mutliplebtn" {{ $selected_cluster == $cluster['id'] ? 'disabled' : '' }}>{{ $cluster['name'] }}</button>
                                     @endforeach
                                 @endif
                             </div>
@@ -125,6 +118,7 @@
                                             {{ csrf_field() }}
                                             {{-- <input type="hidden" name="cl_id" value="{{  }}"> --}}
                                             <div class="panel-body">
+                                                <input name="selected_date" type="hidden" value="{{ $date['selected'] }}">
                                                 <button class="btn btn-primary pull-right" id="buttonTop">Submit</button>
                                                 {{-- <button type="button" class="btn btn-danger pull-right" id="buttonTop">toggle</button> --}}
                                             </div>
@@ -157,6 +151,9 @@
                                                                         <button type="button" name="changeStatus" id="changeStatus_{{ $value['id'] }}" onclick="changeButtonStatus('desktop', 'changeStatus_{{ $value['id'] }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]');
                                                                         @if(!empty($value['value_btn']))
                                                                             showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')
+                                                                        @endif
+                                                                        @if(request()->date != Carbon\Carbon::now()))
+                                                                            showRemark('{{ $value['id'] }}');
                                                                         @endif
                                                                         "
                                                                         class="btn
@@ -474,6 +471,8 @@ if(time <= timein){
 }
 
 var selected_date = "{{ request()->date != null ? request()->date : Carbon\Carbon::now() }}";
+
+@if(count(session()->get('_c')) == 0)
 if(selected_date < date){
     $('#buttonButtom').attr('disabled', true);
     $('#buttonTop').attr('disabled', true);
@@ -482,6 +481,7 @@ if(selected_date < date){
     $('.btn-mobile-submit').attr('disabled', true);
     $('.btn-mobile-status').attr('disabled', true);
 }
+@endif
 
 function showClRemark(index, location, remarks, activity, buttonLabel){
     original_location = location;
@@ -533,6 +533,19 @@ function showMobileClRemark(index, location, remarks, activity, buttonLabel){
         }
     }
     // $('#accordion-container-' + index).collapse("show");
+}
+
+function showRemark(index){
+
+    if($('#changeMobileStatus_' + index).text() == 'Undecided'){
+        $('#accordion-mobile-container-' + index).collapse('hide');
+        $('#user_mobile_modified_remarks_' + index).attr('disabled', true);
+        // $('#tr-accordion-' + index).hide();
+    }
+    else {
+        $('#user_mobile_modified_remarks_' + index).attr('disabled', false);
+        $('#accordion-mobile-container-' + index).collapse('show');
+    }
 }
 
 </script>

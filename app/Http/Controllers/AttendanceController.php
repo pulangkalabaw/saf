@@ -441,6 +441,7 @@ class AttendanceController extends Controller
 		// return $team_id = Teams::where('tl_id', Auth::user()->id)->get(['team_id']);
 		// return Clusters::where('team_ids', 'like', '%' . $team_id . '%')->get(['cluster_id']);
 		// return checkPosition(Auth::user(), ['tl'], true);
+		$selected_date = !empty($request->selected_date) ? $request->selected_date : Carbon::now()->toDateString();
 		if(count(Session::get('_c')) == 0){
 			$get_team = Session::get('_t')[0];
 			$get_cluster = Clusters::get();
@@ -452,7 +453,7 @@ class AttendanceController extends Controller
 					}
 				}
 			}
-			$check_user_attendance = Attendance::where('user_id', Auth::user()->id)->whereDate('created_at', Carbon::now()->toDateString())->first();
+			$check_user_attendance = Attendance::where('user_id', Auth::user()->id)->whereDate('created_at', $selected_date)->first();
 			if(empty($check_user_attendance)){
 				Attendance::create([
 					"cluster_id" => $user_cluster_id,
@@ -545,7 +546,7 @@ class AttendanceController extends Controller
 						}
 					}
 				}
-				$check_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', Carbon::now()->toDateString())->first();
+				$check_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', $selected_date)->first();
 				if(empty($check_attendance)){
 					$set_data = [
 						"cluster_id" => $cluster_id,
@@ -556,14 +557,15 @@ class AttendanceController extends Controller
 						"remarks" => $user['remarks'],
 						"status" => $user['status'],
 						'created_by' => Auth::user()->id,
-						'created_at' => date('Y-m-d H:i:s'),
+						'created_at' => $selected_date,
 						'updated_at' => date('Y-m-d H:i:s'),
 					];
 					array_push($data, $set_data);
 				}
 			}
 			if(!empty($user['modified_status'])){
-				$check_the_fucking_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', Carbon::today())->first();
+				// return $selected_date;
+				$check_the_fucking_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', $selected_date)->first();
 				if(!empty($check_the_fucking_attendance)){
 					if($user['status'] == null){
 						Attendance::where('user_id', $user['user_id'])->delete();
