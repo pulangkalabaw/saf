@@ -99,9 +99,9 @@
 												{{ $team->team_id }}
 											</td>
 											<td>
-												@if (count($team->getCluster($team->team_id)) != 0)
-													<a href="{{ route('app.clusters.show', $team->getCluster($team->team_id)[0]['id']) }}">
-														{{  $team->getCluster($team->team_id)[0]['cluster_name'] }}
+												@if (count($team->getCluster($team->id)) != 0)
+													<a href="{{ route('app.clusters.show', $team->getCluster($team->id)[0]['id']) }}">
+														{{  $team->getCluster($team->id)[0]['cluster_name'] }}
 													</a>
 												@else
 													No cluster
