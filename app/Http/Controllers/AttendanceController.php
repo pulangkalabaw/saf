@@ -273,15 +273,25 @@ class AttendanceController extends Controller
 				}
 				foreach($user_ids as $user_id){
 					foreach($user_id['agent_ids'] as $user){
-						if(!in_array($user, $get_user_ids['user_ids'])){
+						if(!empty($get_user_ids)){
+							if(!in_array($user, $get_user_ids['user_ids'])){
+								$get_user_ids['user_ids'][] = $user;
+								$get_user_ids['user_info'][] = ['user_id' => $user, 'team_name' => $user_id['team_name']];
+							}
+						} else {
 							$get_user_ids['user_ids'][] = $user;
 							$get_user_ids['user_info'][] = ['user_id' => $user, 'team_name' => $user_id['team_name']];
 						}
 					}
 					foreach($user_id['tl_ids'] as $tl_id){
-						if(!in_array($tl_id, $get_user_ids['user_ids'])){
-							$get_user_ids['user_ids'][] = $tl_id;
-							$get_user_ids['user_info'][] = ['user_id' => $tl_id, 'team_name' => $user_id['team_name']];
+						if(!empty($get_user_ids)){
+							if(!in_array($tl_id, $get_user_ids['user_ids'])){
+								$get_user_ids['user_ids'][] = $tl_id;
+								$get_user_ids['user_info'][] = ['user_id' => $tl_id, 'team_name' => $user_id['team_name']];
+							}
+						} else {
+							$get_user_ids['user_ids'][] = $user;
+							$get_user_ids['user_info'][] = ['user_id' => $user, 'team_name' => $user_id['team_name']];
 						}
 					}
 				}
@@ -430,6 +440,33 @@ class AttendanceController extends Controller
 		// return $request->all();
 		// return $team_id = Teams::where('tl_id', Auth::user()->id)->get(['team_id']);
 		// return Clusters::where('team_ids', 'like', '%' . $team_id . '%')->get(['cluster_id']);
+		// return checkPosition(Auth::user(), ['tl'], true);
+		$selected_date = !empty($request->selected_date) ? $request->selected_date : Carbon::now()->toDateString();
+		if(count(Session::get('_c')) == 0){
+			$get_team = Session::get('_t')[0];
+			$get_cluster = Clusters::get();
+			foreach($get_cluster as $cluster){
+				$cluster['team_ids'];
+				foreach($cluster['team_ids'] as $tl){
+					if($get_team['id'] == $tl){
+						$user_cluster_id = $cluster['id'];
+					}
+				}
+			}
+			$check_user_attendance = Attendance::where('user_id', Auth::user()->id)->whereDate('created_at', $selected_date)->first();
+			if(empty($check_user_attendance)){
+				Attendance::create([
+					"cluster_id" => $user_cluster_id,
+					"team_id" => $get_team['id'],
+					"user_id" => Auth::user()->id,
+					"activities" => 'Team Leader',
+					"location" => 'Team Leader',
+					"remarks" => 'Team Leader',
+					"status" => 1,
+					'created_by' => Auth::user()->id,
+				]);
+			}
+		}
 
 
 		$this->validate($request, [
@@ -456,11 +493,23 @@ class AttendanceController extends Controller
 		$data = [];
 		foreach($get_user as $user){
 			// return $request->all();
-			if(empty($user['modified_status']) && $user['status'] != null){
-				$team_id;
-				if(count(Session::get('_c')) != 0){
-					if(count(Session::get('_c')) == 1){
-						$_c = Session::get('_c')[0];
+			$team_id;
+			if(count(Session::get('_c')) != 0){
+				if(count(Session::get('_c')) == 1){
+					$_c = Session::get('_c')[0];
+					$cluster_id = $_c['id'];
+					foreach($_c['team_ids'] as $teams){
+						$get_team = Teams::where('id', $teams)->first();
+						if(in_array($user['user_id'], $get_team['agent_ids'])){
+								$team_id = $get_team['id'];
+						}
+						if(in_array($user['user_id'], $get_team['tl_ids'])){
+								$team_id = $get_team['id'];
+						}
+					}
+				}
+				else if(count(Session::get('_c')) > 1){
+					foreach(Session::get('_c') as $_c){
 						$cluster_id = $_c['id'];
 						foreach($_c['team_ids'] as $teams){
 							$get_team = Teams::where('id', $teams)->first();
@@ -472,36 +521,33 @@ class AttendanceController extends Controller
 							}
 						}
 					}
-					else if(count(Session::get('_c')) > 1){
-						foreach(Session::get('_c') as $_c){
-							$cluster_id = $_c['id'];
-							foreach($_c['team_ids'] as $teams){
-								$get_team = Teams::where('id', $teams)->first();
-								if(in_array($user['user_id'], $get_team['agent_ids'])){
-										$team_id = $get_team['id'];
-								}
-								if(in_array($user['user_id'], $get_team['tl_ids'])){
-										$team_id = $get_team['id'];
-								}
-							}
-						}
+				}
+			}
+			else if(count(Session::get('_t')) != 0){
+				foreach(session()->get('_t') as $teams){
+					// return $teams;
+					if(in_array($user['user_id'], $teams['agent_ids'])){
+						$team_id = $teams['id'];
+					}
+					if(in_array($user['user_id'], $teams['tl_ids'])){
+						$team_id = $teams['id'];
 					}
 				}
-				else if(count(Session::get('_t')) != 0){
-					foreach(session()->get('_t') as $teams){
-						// return $teams;
-						if(in_array($user['user_id'], $teams['agent_ids'])){
-							$team_id = $teams['id'];
-						}
-						if(in_array($user['user_id'], $teams['tl_ids'])){
-							$team_id = $teams['id'];
-						}
+			}
+			$clusters = Clusters::get();
+			foreach($clusters as $cluster){
+				foreach($cluster['team_ids'] as $tl){
+					if($team_id == $tl){
+						$cluster_id = $cluster['id'];
 					}
 				}
+			}
+			// return $request->all();
+			if(empty($user['modified_status']) && $user['status'] != null){
 				// return $user['activities'];
-				$request->all();
-				$cluster_id = Clusters::where('team_ids', 'like', '%' . $team_id . '%')->value('id');
-				$check_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', Carbon::now())->first();
+				// $request->all();
+				// return $team_id;
+				$check_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', $selected_date)->first();
 				if(empty($check_attendance)){
 					$set_data = [
 						"cluster_id" => $cluster_id,
@@ -512,14 +558,15 @@ class AttendanceController extends Controller
 						"remarks" => $user['remarks'],
 						"status" => $user['status'],
 						'created_by' => Auth::user()->id,
-						'created_at' => date('Y-m-d H:i:s'),
+						'created_at' => $selected_date,
 						'updated_at' => date('Y-m-d H:i:s'),
 					];
 					array_push($data, $set_data);
 				}
 			}
 			if(!empty($user['modified_status'])){
-				$check_the_fucking_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', Carbon::today())->first();
+				// return $selected_date;
+				$check_the_fucking_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', $selected_date)->first();
 				if(!empty($check_the_fucking_attendance)){
 					if($user['status'] == null){
 						Attendance::where('user_id', $user['user_id'])->delete();
@@ -537,6 +584,40 @@ class AttendanceController extends Controller
 							Attendance::where('user_id', $user['user_id'])->update($set_data);
 						}
 					}
+				} else {
+					if($user['status'] != null){
+						// return $team_id;
+						// return $cluster_id;
+						// return $user['user_id'];
+						// return [
+						// 	"cluster_id" => $cluster_id,
+						// 	"team_id" => $team_id,
+						// 	"user_id" => $user['user_id'],
+						// 	"activities" => $user['activities'],
+						// 	"location" => $user['location'],
+						// 	"remarks" => $user['remarks'],
+						// 	"status" => $user['status'],
+						// 	'created_by' => Auth::user()->id,
+						// 	'modified_by' => Auth::user()->id,
+						// 	'modified_remarks' => $user['modified_remarks'],
+						// 	'created_at' => $selected_date,
+						// 	'updated_at' => date('Y-m-d H:i:s'),
+						// ];
+						Attendance::insert([
+							"cluster_id" => $cluster_id,
+							"team_id" => $team_id,
+							"user_id" => $user['user_id'],
+							"activities" => $user['activities'],
+							"location" => $user['location'],
+							"remarks" => $user['remarks'],
+							"status" => $user['status'],
+							'created_by' => Auth::user()->id,
+							'modified_by' => Auth::user()->id,
+							'modified_remarks' => $user['modified_remarks'],
+							'created_at' => $selected_date,
+							'updated_at' => date('Y-m-d H:i:s'),
+						]);
+					}
 				}
 			}
 		}
@@ -549,6 +630,8 @@ class AttendanceController extends Controller
 		// 	'created_at' => date('Y-m-d H:i:s'),
 		// 	'updated_at' => date('Y-m-d H:i:s'),
 		// ]);
+		// if(){}
+		// return $data;
 		Attendance::insert($data);
 		if(!empty($data_image)){
 			Attendance_image::create($data_image);

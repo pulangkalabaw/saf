@@ -17,7 +17,6 @@ class Teams extends Model
 		// init
 		$cluster_ids = [];
 		$cluster_model = new Clusters();
-
 		// select team_ids and cluster_id
 		$clusters = $cluster_model->get(['team_ids', 'id'])->toArray();
 

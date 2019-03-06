@@ -51,12 +51,11 @@
 													@if (empty(old('team_id')))
 														<option value="" selected>Select Team (required)</option>
 													@endif
-													@foreach ($teams as $team)
-														<option {{ old('team_id') == $team['id'] ? 'selected' : ''}} value="{{ $team['id'] }}">
-															{{ $team['team_name'] }}
-														</option>
+													@foreach($teams as $team)
+														<option {{ old('team_id') == $team['id'] ? 'selected' : '' }} value="{{ $team['id'] }}">{{ $team['team_name'] }}</option>
 													@endforeach
 												</select>
+
 	                                        </div>
 	                                    </div>
 	                                    <div class="clearfix"></div><br>
@@ -131,7 +130,7 @@
 														<option value="" selected>Select agent (required)</option>
 													@endif
 													@foreach ($agents as $agent)
-														<option {{ old('id') == $agent['id'] ? 'selected' : ''}}  value="{{ $agent['id'] }}">{{ $agent['fname'] . ' ' . $agent['lname'] }}</option>
+														<option {{ old('id') == $agent['id'] ? 'selected' : '' }} value="{{ $agent['id'] }}">{{ $agent['fname'] }} {{ $agent['lname'] }}</option>
 													@endforeach
 												</select>
 	                                        </div>

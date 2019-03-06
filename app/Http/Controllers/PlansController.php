@@ -52,11 +52,12 @@ class PlansController extends Controller
      */
     public function store(Request $request)
     {
+        if(empty($request->with_sim) || $request->with_sim == 0){
+            $request->with_sim = 0;
+        }
         // Validate inputs
         $validate = Validator::make($request->all(), [
-            'plan_name' => 'required|string|max:255',
-            'with_sim' => 'required',
-            'with_device' => 'required',
+            'plan_name' => 'required|string|max:255'
         ]);
 
         if($validate->fails()) return back()->withErrors($validate->errors())->withInput();

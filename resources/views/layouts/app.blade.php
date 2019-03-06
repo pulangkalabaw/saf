@@ -109,6 +109,7 @@
 									</div>
 								@endif
 							@endif
+
 						</div>
 					</div>
 				</div>
@@ -123,7 +124,7 @@
 										<div class="nav-menu__text"><span>Dashboard</span></div>
 									</a>
 								</li>
-
+								{{-- remove this comment after the presentation --}}
 								<li>
 									<a href="{{ route('app.oic.index') }}">
 										<div class="nav-menu__ico"><i class="fa fa-fw fa-users"></i></div>
@@ -232,14 +233,14 @@
 	                                        <div class="nav-menu__text"><span>Dashboard</span></div>
 	                                    </a>
 	                                </li>
-									@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
+									{{-- @if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0) --}}
 	                                <li>
 	                                    <a href="{{ route('app.attendance.index') }}">
 	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
 	                                        <div class="nav-menu__text"><span>Users Attendance</span></div>
 	                                    </a>
 	                                </li>
-									@endif
+									{{-- @endif --}}
 	                            </ul>
 	                        </div>
 
@@ -257,6 +258,7 @@
 								</li>
 							</ul>
 						</div>
+
 					</div>
 				</div>
 			</div>

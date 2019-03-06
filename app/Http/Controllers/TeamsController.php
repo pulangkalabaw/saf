@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Validator;
 use App\Teams;
+use App\Clusters;
 use Illuminate\Http\Request;
 
 class TeamsController extends Controller
@@ -16,7 +17,7 @@ class TeamsController extends Controller
 	*/
 	public function index(Request $request)
 	{
-
+		$cluster_model = new Clusters();
 		$teams = new Teams();
 
 		// Count all before paginate
@@ -37,7 +38,7 @@ class TeamsController extends Controller
 		// Pagination
 		$teams = $teams->paginate((!empty($request->show) ? $request->show : 10));
 
-		return view('app.teams.index', ['teams' => $teams, 'teams_total' => $teams_total, 'total' => $total]);
+		return view('app.teams.index', ['teams' => $teams, 'teams_total' => $teams_total, 'total' => $total, 'cluster_model' => $cluster_model]);
 
 	}
 	/**
@@ -95,10 +96,10 @@ class TeamsController extends Controller
 	*/
 	public function show($id)
 	{
-		//
+		$cluster_model = new Clusters();
 		$teams = Teams::where('id', $id)->firstOrFail();
 
-		return view('app.teams.show', ['team' => $teams]);
+		return view('app.teams.show', ['team' => $teams, 'cluster_model' => $cluster_model]);
 	}
 
 	/**
