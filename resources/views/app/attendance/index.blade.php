@@ -24,6 +24,16 @@
                             </div>
                             {{-- {{dd(empty($attendance['unpresent']))}} --}}
                             {{-- {{ dd(count(session()->get('_t'))) }} --}}
+                            @if(count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0)
+                                <div class="panel-body">
+                                    <div class="form-group text-center">
+                                        <label><h2><i class="fa fa-close text-danger"></i> Sorry you are not permitted to access this!</h2></label>
+                                    </div>
+                                    <div class="form-group text-center">
+                                        <label>Please make sure that you are a Team leader or Cluster leader or Officer in charge</label>
+                                    </div>
+                                </div>
+                            @else
                             <div class="panel-body">
                                 <div class="form-group">
                                     <div class="row">
@@ -46,16 +56,6 @@
                                     </div>
                                 </div>
                             </div>
-                            @if(count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0)
-                                <div class="panel-body">
-                                    <div class="form-group text-center">
-                                        <label><h2><i class="fa fa-close text-danger"></i> Sorry you are not permitted to access this!</h2></label>
-                                    </div>
-                                    <div class="form-group text-center">
-                                        <label>Please make sure that you are a Team leader or Cluster leader or Officer in charge</label>
-                                    </div>
-                                </div>
-                            @else
                             <div class="panel-body" style="display:none;" id="showpanel">
                                 <div class="form-group text-center">
                                     <label><h2><i class="fa fa-close text-danger"></i> Sorry you cannot access user attendance</h2></label>
