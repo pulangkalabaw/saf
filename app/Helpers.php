@@ -6,6 +6,74 @@ use App\Attendance;
 use App\Application;
 use Carbon\Carbon;
 
+/*
+*
+*
+*
+* Get all the available teams and agents of the login in user
+*
+*
+*/
+function getUserDetailClusterAndTeam($auth) {
+
+	if(in_array('cl', checkPosition($auth))){
+		$teams = new Teams();
+		$agents = new User();
+
+		$team_ids = [];
+		$agent_ids = [];
+
+		$clusters_model = fetchCluster($auth);
+
+		// get teams inside the cluster
+		foreach($clusters_model as $cluster){
+			if(!array_intersect($team_ids, $cluster['team_ids'])){
+				$team_ids = array_merge($team_ids, $cluster['team_ids']);
+			}
+		}
+
+		$teams = $teams->whereIn('id', $team_ids)->get();
+
+		// get agents inside the team
+		foreach($teams as $team){
+			if(!array_intersect($agent_ids, $team['agent_ids'])){
+				$agent_ids = array_merge($agent_ids, $team['agent_ids']);
+			}
+		}
+
+		$agents = $agents->whereIn('id', $agent_ids)->get();
+
+		$r['_c'] = $clusters_model;
+		$r['_t'] = $teams;
+		$r['_a'] = $agents;
+		return $r;
+	}
+
+	// if the login user is tl get all the available agents under that tl
+	if(in_array('tl', checkPosition($auth))){
+		$agents = new User();
+
+		$agent_ids = [];
+		$cluster_ids = [];
+
+		$teams = fetchTeams($auth);
+
+		// get agents inside the team
+		foreach($teams as $team){
+			if(!array_intersect($agent_ids, $team['agent_ids'])){
+				$agent_ids = array_merge($agent_ids, $team['agent_ids']);
+			}
+		}
+
+		$agents = $agents->whereIn('id', $agent_ids)->get();
+
+		$r['_c'] = null;
+		$r['_t'] = $teams;
+		$r['_a'] = $agents;
+		return $r;
+	}
+}
+
 /**
 * Update Sessions
 *

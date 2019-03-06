@@ -10,6 +10,7 @@ use App\Plans;
 use App\Teams;
 use App\Product;
 use App\Devices;
+use App\Clusters;
 use App\Statuses;
 use App\Application;
 use App\ApplicationStatus;
@@ -39,17 +40,8 @@ class ApplicationController extends Controller
 		// Get the current login users cluster Id
 
 		if (base64_decode(Auth::user()->role) == 'user'){
-			$applications = $applications->where('insert_by', Auth::user()->id)
-			->orWhere('agent_id', Auth::user()->id);
-
-			// Check if the login user is a cluster leader
-			// Outputs the application data of all the teams under the cluster
-			$cluster_data = getMyClusterAndTeam(Auth::user());
-			if(!empty($cluster_data['_c'][0])){
-				$appli = new Application();
-				$cluster_id = $cluster_data['_c'][0]['cluster_id'];
-				$applications = $appli->where('cluster_id', $cluster_id);
-			}
+			$applications = $applications->whereIn('team_id', Session::get('_t'))
+			->orWhereIn('cluster_id', Session::get('_c'));
 		}
 
 		// Sorting
@@ -79,44 +71,23 @@ class ApplicationController extends Controller
 	*/
 	public function create()
 	{
-		$teams_model = new Teams();
-		$user_model = new User();
-
-		// Get teams if not admin
-		if (base64_decode(Auth::user()->role) == 'user') {
-
-			// Teams
-			$chpos = checkPosition(Auth::user());
-
-			// FOR NOW THIS MODULE IS ONLY FOR TL AND ADMIN
-			// Issue: when adding or creating new application
-			// if CL, need to have atleast a dropdown for their Clusters
-			// and teams
-			if (count(checkPosition(Auth::user(), ['tl'], true)) == 0) return 'This module is currently for admin and team leader only! Cluster leaders can access this module in the futher updates. Thank your - AppDev';
-
-			$teams = Session::get('_t');
-			$agent_ids = collect($teams)->pluck('agent_ids');
-
-			// Agents
-			$agents = $teams_model->getTeamsAgents($agent_ids);
-		}
-		else {
-			$teams = $teams_model->get();
-			$agents = $user_model->get();
-		}
-
-		$statuses = Statuses::get();
+		$data = getUserDetailClusterAndTeam(Auth::user());
 		$plans = Plans::get();
-		$devices = Devices::get();
-		$products = Product::get();
+		$clusters = Clusters::get();
+		$teams = Teams::get();
+		$agents = User::get();
+
+		if(base64_decode(Auth::user()->role) != 'administrator'){
+			$clusters = $data['_c'];
+			$teams = $data['_t'];
+			$agents = $data['_a'];
+		}
 
 		return view('app.applications.create', [
-			'agents' => $agents,
 			'plans' => $plans,
-			'devices' => $devices,
-			'products' => $products,
-			'statuses' => $statuses,
+			'clusters' => $clusters,
 			'teams' => $teams,
+			'agents' => $agents,
 		]);
 	}
 
