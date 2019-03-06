@@ -1,9 +1,9 @@
-<div class="panel-body">
+<div class="panel-body padding-left-0 padding-right-0">
     {{-- {{ dd(count($attendance['unpresent'])) }} --}}
     @foreach($attendance['unpresent'] as $index => $value)
         {{-- {{ dd($value) }} --}}
     <div class="form-group">
-        <div class="panel">
+        <div class="panel bg-default">
             <div class="panel-body">
                 <div class="form-group">
                     <div class="row">
@@ -44,17 +44,17 @@
                     </div>
                 </div>
             </div>
-            <div class="panel-footer" id="panel-footer-{{ $value['id'] }}"
+            <div class="panel-footer bg-default" id="panel-footer-{{ $value['id'] }}"
                 @if(empty($value['value_btn']))
                     hidden
                 @endif
             >
                 <div class="form-group form-horizontal">
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-4 margin-bottom-20">
                             <label class="text-light">Activity</label>
                             <input name="users[{{ $index }}][user_id]" id="user_mobile_userid_{{ $index }}" class="form-control" type="hidden" value={{ $value['id'] }}>
-                            <select class="form-control text-light" name="users[{{ $index }}][activities]" id="user_mobile_activity_{{ $value['id'] }}"
+                            <select class="form-control text-light input-gray" name="users[{{ $index }}][activities]" id="user_mobile_activity_{{ $value['id'] }}"
                                 @if(empty($value['value_activity']))
                                     disabled
                                 @else
@@ -77,9 +77,9 @@
                                 >Saturation</option>
                             </select>
                         </div>
-                        <div class="col-4">
+                        <div class="col-4 margin-bottom-20">
                             <label class="text-light">Location</label>
-                            <input name="users[{{ $index }}][location]" id="user_mobile_location_{{ $value['id'] }}" class="form-control text-light" required type="text"
+                            <input name="users[{{ $index }}][location]" id="user_mobile_location_{{ $value['id'] }}" class="form-control text-light input-gray" required type="text"
                                 @if(!empty($value['value_location']))
                                     value="{{ $value['value_location'] }}"
                                     oninput="showMobileClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
@@ -88,9 +88,9 @@
                                 @endif
                                 >
                         </div>
-                        <div class="col-4">
+                        <div class="col-4 margin-bottom-20">
                             <label class="text-light">Remarks</label>
-                            <input name="users[{{ $index }}][remarks]" id="user_mobile_remarks_{{ $value['id'] }}" class="form-control text-light" required type="text"
+                            <input name="users[{{ $index }}][remarks]" id="user_mobile_remarks_{{ $value['id'] }}" class="form-control text-light input-gray" required type="text"
                                 @if(!empty($value['value_remarks']))
                                     value="{{ $value['value_remarks'] }}"
                                     oninput="showMobileClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
@@ -108,7 +108,7 @@
                                 @if(!empty($value['value_location']))
                                     <input type="hidden" name="users[{{ $index }}][modified_status]" value="1">
                                 @endif
-                                <input name="users[{{ $index }}][modified_remarks]" id="user_mobile_modified_remarks_{{ $value['id'] }}" class="form-control text-light" required disabled type="text"
+                                <input name="users[{{ $index }}][modified_remarks]" id="user_mobile_modified_remarks_{{ $value['id'] }}" class="form-control text-light input-gray" required disabled type="text"
                                 >
                             </div>
                         </div>
