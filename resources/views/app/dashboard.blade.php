@@ -26,11 +26,24 @@
                         <h3 class="panel-title">Dashboard Applications</h3>
                     </div>
                     <div class="panel-body">
-                        @if(!isset($heirarchy['clusters'][0]['cluster_name']))
-                            @if(checkPosition(auth()->user(), ['a']))
+                        @if(!isset($heirarchy['clusters']))
+                            @if( count(checkPosition(auth()->user(), ['agent'], true)) > 0 )
                                 <h5 class="text-center text-info"><i class="fa fa-info-circle"></i> *Agents dashboard coming soon*</h5>
                             @else
-                                <h5 class="text-center text-warning"><i class="fa fa-warning"></i> You have no clusters or team</h5>
+                                <!-- <h5 class="text-center text-warning"><i class="fa fa-warning"></i> You have no clusters or team</h5> -->
+                            @endif
+                        @else
+                            @if( in_array('agent',checkPosition(auth()->user(), ['agent'], true)) && (count(checkPosition(auth()->user(), ['agent'], true)) == 1) )
+                                <h5 class="text-center text-info"><i class="fa fa-info-circle"></i>You are an agent</h5>
+                            @elseif( count(checkPosition(auth()->user(), ['cl','tl'])) > 0 )
+                                <!-- <h5 class="text-center text-warning"><i class="fa fa-warning"></i> TL CL ENCODER ADMIN</h5> -->
+                            @else
+                                @if( base64_decode(auth()->user()->role) == 'administrator' )
+                                    <h5 class="text-center text-info"><i class="fa fa-info-circle"></i> Admin privilege</h5>
+                                @else
+                                    <h5 class="text-center text-warning"><i class="fa fa-warning"></i> You have no cluster or teams</h5>
+                                @endif
+
                             @endif
                         @endif
                         <!-- <h5>As of {{ now()->format('M d y g:i a') }} - {{ now()->format('M d y g:i a') }}</h5> -->

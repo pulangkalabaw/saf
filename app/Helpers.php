@@ -495,6 +495,7 @@ function getHeirarchy2(){
 					'present' => 0,
 					'absent' => 0,
 					'unkown' => 0,
+					'tl' => 0,  // FOR TL
 					'totaltarget' => 0, // ADD THIS
 				];
 				$agents = $user_model->whereIn('id',collect($res['agent_ids'])->toArray())->get();
@@ -516,6 +517,11 @@ function getHeirarchy2(){
 				});
 				$res['attendance'] = $res['attendance']->values()->last();
 				// end of calculate present, absent, unkown
+
+				// calculate/get attendance of tl on this day
+				$res['tlattendance'] = count($attendance_model->whereIn('user_id',collect($res['tl_ids'])->toArray())->where('created_at', '>=', Carbon::today())->get());
+				$res['totaltl'] = count(collect($res['tl_ids'])->toArray());
+				// end of calculate/get attendance of tl on this day
 
 				// for percentage of this cutoff
 				$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
@@ -568,6 +574,7 @@ function getHeirarchy2(){
 						'present' => 0,
 						'absent' => 0,
 						'unkown' => 0,
+						'tl' => 0,  // FOR TL
 						'totaltarget' => 0, // ADD THIS
 					];
 					$agents = $user_model->whereIn('id',collect($res['agent_ids'])->toArray())->get();
@@ -589,6 +596,11 @@ function getHeirarchy2(){
 					});
 					$res['attendance'] = $res['attendance']->values()->last();
 					// end of calculate present, absent, unkown
+
+					// calculate/get attendance of tl on this day
+					$res['tlattendance'] = count($attendance_model->whereIn('user_id',collect($res['tl_ids'])->toArray())->where('created_at', '>=', Carbon::today())->get());
+					$res['totaltl'] = count(collect($res['tl_ids'])->toArray());
+					// end of calculate/get attendance of tl on this day
 
 					// for percentage of this cutoff
 					$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS

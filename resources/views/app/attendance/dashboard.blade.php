@@ -22,7 +22,7 @@
       <div class="row">
 
         <!-- FOR AGENT ONLY LIST OF ATTENDANCE PER MONTH/CUTOFF  -->
-        @if( in_array('agent',checkPosition(auth()->user(), ['agent'], true)) && (count(checkPosition(auth()->user(), ['agent'], true)) == 1) )
+        @if( count(checkPosition(auth()->user(), ['tl','agent'], true)) )
         <div class="col-md-8">
             <div class="panel panel-primary">
                 <div class="panel-heading">
@@ -80,6 +80,7 @@
 
 
                             <h5 class="text-center"><b>{{ $myattendance['currmsg'] }}</b></h5>
+                            <br>
                         </div>
                         @if(!$myattendance['attendance']->isEmpty())
                             @foreach($myattendance['attendance'] as $myatt)
@@ -104,17 +105,23 @@
 
 
         <!-- ATTENDANCE PART  -->
-        <div class="{{ (  in_array('agent',checkPosition(auth()->user(), ['agent'], true)) && (count(checkPosition(auth()->user(), ['agent'], true)) == 1)  ) ? 'col-md-4' : 'col-md-12'  }}">
+        <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-4' : 'col-md-12'  }}">
           <div class="panel panel-info">
               <div class="panel-heading">
-                  <h3 class="panel-title">Today's Attendance</h3>
+                  <!-- if the logged in user is an agent only  -->
+                  @if( count(checkPosition(auth()->user(), ['agent'], true)) )
+                      <h3 class="panel-title">My Today's Attendance</h3>
+                  @else
+                  <!-- if the logged in user is cl, admin, encoder -->
+                      <h3 class="panel-title">Today's Team Attendance</h3>
+                  @endif
               </div>
               <div class="panel-body">
                 <!-- CLUSTER -->
                 <div class="row">
                   @if(!empty($heirarchy) && $heirarchy['clusters'])
-                  <div class="col-md-3">
-                    <h5>As of <small>{{  now()->format('M d y g:i a') }}</small></h5>
+                  <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-12' : 'col-md-3'  }}">
+                    <h5>As of {{  now()->format('F d Y') }}</h5>
                     <!-- <input type="date" class="form-control"> -->
                   </div>
                   @endif
@@ -128,9 +135,15 @@
                             @if(!empty($clus->teams))
                               @foreach($clus->teams as $team)
                                   @if(!empty($team))
-                                      <div class="col-md-4">
+                                      <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-12' : 'col-md-4'  }}">
                                         <div class="breadcrumb">
                                           <h5>{{ $team->team_name }} <small>Total Agents: {{ $team->total_agents }}</small></h5>
+                                          @if(isset($team->totaltl))
+                                                  <p>
+                                                      TL Attendance: <b class="{{ ($team->totaltl == $team->tlattendance) ? 'text-success' : 'text-danger' }}">{{ $team->tlattendance }}</b>
+                                                      <small class="text-muted">(Total TL: {{ $team->totaltl }})</small>
+                                                  </p>
+                                          @endif
                                           <p>Present: <b class="text-success">{{ $team->attendance['present'] }}</b></p>
                                           <p>Absent: <b class="text-danger">{{ $team->attendance['absent'] }}</b></p>
                                           <p>Unkown: <b class="text-warning">{{ $team->attendance['unkown'] }}</b></p>
