@@ -96,12 +96,10 @@
 							@endif
 
 							@if(accessControl(['administrator', 'user']))
-								@if(count(checkPosition(auth()->user(), ['cl', 'tl', 'agent'], true)) != 0)
 								{{-- @if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl") --}}
 									<div class="quickmenu__item {{ str_contains(url()->current(), ['attendance','attendancedashboard']) ? 'active' : '' }}">
 										<div class="fa fa-clock-o"></div>
 									</div>
-								@endif
 							@endif
 
 							@if(accessControl(['administrator', 'user']))
