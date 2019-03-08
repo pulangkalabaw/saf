@@ -21,7 +21,7 @@ $factory->define(App\User::class, function (Faker $faker) {
             'lname' => 'Baril',
             'email' => 'jiromes@gmail.com',
             'password' => bcrypt('sadsad'),
-            'role' => base64_encode('user'),
+            'role' => base64_encode('administrator'),
             'isActive' => 1,
             'remember_token' => str_random(10),
         ]);
@@ -44,7 +44,7 @@ $factory->define(App\User::class, function (Faker $faker) {
     $role = ['user', 'administrator', 'encoder'];
     $role_arr = array_random_assoc($role);
     $role = array_values($role_arr)[0];
-
+    //
     return [
         'fname' => $faker->firstname,
         'lname' => $faker->lastname,

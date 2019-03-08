@@ -34,7 +34,7 @@
                             @endif
                         @else
                             @if( in_array('agent',checkPosition(auth()->user(), ['agent'], true)) && (count(checkPosition(auth()->user(), ['agent'], true)) == 1) )
-                                <h5 class="text-center text-info"><i class="fa fa-info-circle"></i>You are an agent</h5>
+                                {{-- <h5 class="text-center text-info"><i class="fa fa-info-circle"></i>You are an agent</h5> --}}
                             @elseif( count(checkPosition(auth()->user(), ['cl','tl'])) > 0 )
                                 <!-- <h5 class="text-center text-warning"><i class="fa fa-warning"></i> TL CL ENCODER ADMIN</h5> -->
                             @else

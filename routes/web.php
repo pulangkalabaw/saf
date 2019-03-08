@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/', 'DashboardController@home');
+Route::get('/', 'LoginController@login');
 
 // Authentication
 Route::get('/login', 'LoginController@login')->name('login');
