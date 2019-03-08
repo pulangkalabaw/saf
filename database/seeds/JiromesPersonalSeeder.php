@@ -17,11 +17,11 @@ class JiromesPersonalSeeder extends Seeder
         $faker=faker::create();
             // CREATE USER ADMIN
         User::create([
-            'fname' => 'Ender Thompson',
+            'fname' => 'jiromes Angel',
             'lname' => 'Baril',
-            'email' => 'lelouch0278@gmail.com',
+            'email' => 'jiromes@gmail.com',
             'password' => bcrypt('sadsad'),
-            'role' => base64_encode('administrator'),
+            'role' => base64_encode('user'),
             'isActive' => 1,
             'remember_token' => str_random(10),
         ]);
@@ -75,7 +75,7 @@ class JiromesPersonalSeeder extends Seeder
         $user = User::where('role', base64_encode('user'))->take(5)->orderBy('id', 'desc')->pluck('id');
         // TEAM SELECT
         Teams::create([
-            'team_name' => 'Team HaIsZt_b3nteqUa4htRo0',
+            'team_name' => 'Hindi Kame Bobo Team',
             'team_id' => rand(1111, 9999),
             'tl_ids' => [$user_tl],
             'agent_ids' => $user,
@@ -85,7 +85,7 @@ class JiromesPersonalSeeder extends Seeder
         $users_teams = Teams::take(3)->orderBy('id', 'desc')->pluck('id');
         Clusters::create([
             'cluster_id' => rand(1111, 9999),
-            'cluster_name' => 'Team m4pHaG_M4ha4L',
+            'cluster_name' => 'Larry Gadon',
             'cl_ids' => [$user_cl],
             'team_ids' => $users_teams,
         ]);

@@ -30,7 +30,7 @@
                                         <label><h2><i class="fa fa-close text-danger"></i> Sorry you are not permitted to access this!</h2></label>
                                     </div>
                                     <div class="form-group text-center">
-                                        <label>Please make sure that you are a Team leader or Cluster leader or Officer in charge</label>
+                                        <label>Please make sure that have Team/s or Cluster/s</label>
                                     </div>
                                 </div>
                             @else
@@ -314,7 +314,7 @@
                                 <label><h3><i class="fa fa-close text-danger"></i> Sorry you are not permitted to access this!</h3></label>
                             </div>
                             <div class="form-group text-center">
-                                <label>Please make sure that you are a Team leader or Cluster leader or Officer in charge</label>
+                                <label>Please make sure that have Team/s or Cluster/s</label>
                             </div>
                         </div>
                         @else
