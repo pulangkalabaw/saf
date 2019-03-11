@@ -97,7 +97,7 @@ class DashboardController extends Controller
 
         }
         $myattendance['prev'] =  $tempdate['prev']->subMonths(1)->format('Y-m-d');
-        $myattendance['curr'] =  $datenow->format('Y-m-d');
+        $myattendance['curr'] =  $datenow;
         $myattendance['next'] =  $tempdate['next']->addMonths(1)->format('Y-m-d');
 
 
