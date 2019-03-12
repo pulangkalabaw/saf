@@ -4,6 +4,11 @@
 
 @endsection
 
+<styles>
+    <link href="{{ asset('assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/libs/bootstrap-timepicker/css/bootstrap-timepicker.min.css') }}" rel="stylesheet">
+</styles>
+
 @section('content')
 
 <div class="main-heading">
@@ -20,7 +25,99 @@
       <!-- ATTENDANCE WIDGET  -->
       @if(!empty($heirarchy))
       <div class="row">
-        <div class="{{ !empty(Session::get('_a') || !empty(Session::get('_t'))) ? 'col-md-12' : 'col-md-12'  }}">
+
+        <!-- FOR AGENT ONLY LIST OF ATTENDANCE PER MONTH/CUTOFF  -->
+        @if( count(checkPosition(auth()->user(), ['tl','agent'], true)) )
+        <div class="col-md-8">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h3 class="panel-title">List of My Attendance</h3>
+                </div>
+                <div class="panel-body">
+                    @if(isset($myattendance))
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6 col-xs-6">
+                                <!-- <div class="col-md-4 col-xs-3"> -->
+                                    <a href="{{ route('app.attendanceDashboard', ['date' => $myattendance['prev']]) }}" class="btn btn-default btn-sm"><i class="fa fa-arrow-left"></i> {{ Carbon\Carbon::parse($myattendance['prev'])->format('M Y') }}</a>
+                                </div>
+                                <!-- <div class="col-md-4 col-xs-6 text-center">
+
+                                    <form action="{{ route('app.attendanceDashboard') }}" method="get">
+                                        <div class="input-group">
+                                            <input type="date" class="form-control input-sm" name="exactdate" placeholder="Date">
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-info btn-sm" type="submit">
+                                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                                </button>
+                                            </span>
+                                        </div>
+                                    </form>
+
+                                </div> -->
+                                <!-- <div class="col-md-4 col-xs-3 text-right"> -->
+                                <div class="col-md-6 col-xs-6 text-right">
+                                    @if(  today() >= Carbon\Carbon::parse($myattendance['next']) )
+                                    <a href="{{ route('app.attendanceDashboard', ['date' => $myattendance['next']]) }}" class="btn btn-default btn-sm">{{ Carbon\Carbon::parse($myattendance['next'])->format('M Y') }} <i class="fa fa-arrow-right"></i></a>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="row text-center">
+                                <div class="col-md-4 col-xs-1"></div>
+                                <div class="col-md-4 col-xs-10 text-center">
+<br>
+                                    <form action="{{ route('app.attendanceDashboard') }}" method="get">
+                                        <div class="input-group">
+                                            <!-- <input type="date" class="form-control input-sm" name="exactdate" placeholder="Date"> -->
+                                            <!-- <span class="input-group-btn">
+                                                <button class="btn btn-info" type="submit">
+                                                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                                </button>
+                                            </span> -->
+                                            <div class="input-group date">
+                                                <input class="form-control input-sm" type="text" name="exactdate" value="{{ $myattendance['curr']->format('m/d/Y') }}">
+                                                <div class="input-group-addon">
+                                                  <div class="fa fa-calendar"></div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </form>
+
+                                </div>
+                                <div class="col-md-4 col-xs-1"></div>
+
+                            </div>
+
+
+                            <h5 class="text-center"><b>{{ $myattendance['currmsg'] }}</b></h5>
+                            <br>
+                        </div>
+                        @if(!$myattendance['attendance']->isEmpty())
+                            @foreach($myattendance['attendance'] as $myatt)
+                                <div class="col-md-3">
+                                    <div class="breadcrumb">
+                                        <p><strong>{{ Carbon\Carbon::parse($myatt->created_at)->format('M d Y') }}</strong></p>
+                                        <p class="{{ ($myatt->status == 1) ? 'text-success' : ( ($myatt->status == 0) ? 'text-danger' : 'text-warning' ) }}"><b>{{ ($myatt->status == 1) ? 'Present' : ( ($myatt->status == 0) ? 'Absent' : 'Unkown' ) }}</b></p>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="col-md-12">
+                                <div class="text-center">No data found</div>
+                            </div>
+                        @endif
+                    @endif
+                </div>
+            </div>
+        </div>
+        @endif
+        <!-- END FOR AGENT ONLY LIST OF ATTENDANCE PER MONTH/CUTOFF  -->
+
+
+        <!-- ATTENDANCE PART  -->
+        <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-4' : 'col-md-12'  }}">
           <div class="panel panel-info">
               <div class="panel-heading">
                   <h3 class="panel-title">Attendance</h3>
@@ -147,3 +244,21 @@
 {{-- @include('partials.scripts._datatables') --}}
 
 @endsection
+<script src="{{ asset('assets/libs/jquery/jquery.min.js') }}"></script>
+
+<script src="{{ asset('assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap-timepicker/js/bootstrap-timepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap-tabdrop/bootstrap-tabdrop.min.js') }}"></script>
+<script>
+$(document).ready(function(){
+    $('.date').datepicker({
+        endDate: '+0d',
+    }).on('changeDate', function(){
+        window.location = '{{ url('app/attendancedashboard') . '?exactdate=' }}' + $("input[name='exactdate']").val();
+    });
+	$('.input-daterange').datepicker();
+	$('.datepicker-embed').datepicker();
+	$('.timepicker input').timepicker({showMeridian: false, showSeconds: true});
+});
+
+</script>
