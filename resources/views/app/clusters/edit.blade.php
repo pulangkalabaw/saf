@@ -74,7 +74,8 @@
                                     <div>
                                         <div class="col-md-3">Cluster Leader</div>
                                         <div class="col-md-7">
-											<select name="cl_ids[]" id="" class="form-control selectpicker" multiple>
+											<select name="cl_ids[]" id="" class="form-control" multiple  style="height: 200px;">
+
 												{{-- Available --}}
 												@foreach ($cluster_leaders as $cl)
 													@if (!empty($cluster->cl_ids))
@@ -96,7 +97,7 @@
                                     <div>
                                         <div class="col-md-3">Team(s)</div>
                                         <div class="col-md-7">
-                                            <select name="team_ids[]" id="" class="form-control selectpicker" multiple>
+                                            <select name="team_ids[]" id="" class="form-control" multiple  style="height: 200px;">
 												@foreach ($teams as $team)
 													@if (!empty($cluster->team_ids))
 														<option {{ in_array($team->id, $cluster->team_ids) ? 'selected' : '' }} value="{{ $team->id }}">

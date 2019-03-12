@@ -104,9 +104,10 @@
 								@endif
 							@endif
 							{{-- dissable for presentation --}}
-							<div class="quickmenu__item {{ str_contains(url()->current(), ['messages']) ? 'active' : '' }}">
+							{{-- <div class="quickmenu__item {{ str_contains(url()->current(), ['messages']) ? 'active' : '' }}">
 								<div class="fa fa-fw fa-bullhorn"></div>
-							</div>
+							</div> --}}
+
 						</div>
 					</div>
 				</div>
@@ -122,12 +123,12 @@
 									</a>
 								</li>
 								{{-- remove this comment after the presentation --}}
-								<li>
+								{{-- <li>
 									<a href="{{ route('app.oic.index') }}">
 										<div class="nav-menu__ico"><i class="fa fa-fw fa-users"></i></div>
 										<div class="nav-menu__text"><span>OIC</span></div>
 									</a>
-								</li>
+								</li> --}}
 							</ul>
 
 							<div class="sidebar__title">Applications</div>
@@ -244,7 +245,7 @@
 						@endif
 
                         {{-- Message Board --}}
-						<div class="sidebar__menu">
+						{{-- <div class="sidebar__menu">
 							<div class="sidebar__title">Message Board</div>
 							<ul class="nav nav-menu">
 								<li>
@@ -254,7 +255,7 @@
 									</a>
 								</li>
 							</ul>
-						</div>
+						</div> --}}
 
 					</div>
 				</div>

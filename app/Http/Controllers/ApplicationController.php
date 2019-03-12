@@ -40,11 +40,14 @@ class ApplicationController extends Controller
 		// this will show all the applications base on which cl or tl is login
 
 		if (base64_decode(Auth::user()->role) == 'user'){
-			$applications = $applications->whereIn('team_id', Session::get('_t'))
-			->orWhereIn('cluster_id', Session::get('_c'))
+			$applications = $applications->whereIn('team_id', collect(Session::get('_t'))->map(function($r){
+				return $r['id'];
+			}))
+			->orWhereIn('cluster_id', collect(Session::get('_c'))->map(function($r){
+				return $r['cluster_id'];
+			}))
 			->orWhere('agent_id', Auth::user()->id);
 		}
-
 		// Sorting
         // params: sort_in & sort_by
         if (!empty($request->get('sort_in') && !empty($request->get('sort_by')))) $applications = $applications->sort($request);

@@ -34,7 +34,6 @@
 						<div class="panel-body">
 							<div class="row">
 
-
 								<div class="col-md-4 col-xs-4">
 									<div class="form-inline">
 										<div class="form-group">
@@ -63,6 +62,7 @@
 								</div>
 							</div>
 							<div class="clearfix"></div><br>
+                            @include('includes.notif')
 
 							<div class="table-responsive">
 								<table class="table table-hovered table-striped">

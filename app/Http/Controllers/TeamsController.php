@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Validator;
 use App\Teams;
+use App\Clusters;
 use Illuminate\Http\Request;
 
 class TeamsController extends Controller
@@ -96,9 +97,12 @@ class TeamsController extends Controller
 	public function show($id)
 	{
 		//
-		$teams = Teams::where('id', $id)->firstOrFail();
+		$clusters_m = new Clusters();
+		$team_m = new Teams();
 
-		return view('app.teams.show', ['team' => $teams]);
+		$teams = $team_m->where('id', $id)->firstOrFail();
+
+		return view('app.teams.show', ['team' => $teams, 'clusters_m' => $clusters_m, 'team_m' => $team_m]);
 	}
 
 	/**

@@ -67,7 +67,7 @@
                                     <div>
                                         <div class="col-md-3">Cluster Leader</div>
                                         <div class="col-md-7">
-                                            <select name="cl_ids[]" id="" class="form-control selectpicker" multiple>
+                                            <select name="cl_ids[]" id="" class="form-control" multiple  style="height: 200px;">
                                                 @foreach ($users as $user)
                                                 <option value="{{ $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
                                                 @endforeach
@@ -79,7 +79,7 @@
                                     <div>
                                         <div class="col-md-3">Team(s)</div>
                                         <div class="col-md-7">
-                                            <select name="team_ids[]" id="" class="form-control selectpicker" multiple="">
+                                            <select name="team_ids[]" id="" class="form-control" multiple=""  style="height: 200px;">
                                                 @foreach ($teams as $team)
                                                 <option value="{{ $team->id }}">{{ $team->team_name }}</option>
                                                 @endforeach

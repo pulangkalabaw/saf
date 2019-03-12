@@ -43,8 +43,8 @@
 									<div>
 										<div class="col-md-3">Cluster name</div>
 										<div class="col-md-7">
-											@if (count($team->getCluster($team->team_id)) != 0)
-												{{  $team->getCluster($team->team_id)[0]['cluster_name'] }}
+											@if (count($team_m->getCluster($team->id)) != 0)
+												{{  $team_m->getCluster($team->id)[0]['cluster_name'] }}
 											@else
 												No cluster
 											@endif
@@ -55,111 +55,119 @@
 									<div>
 										<div class="col-md-3">Cluster Leader</div>
 										<div class="col-md-7">
-											@if (count($team->getCluster($team->team_id)) != 0)
-												{{  $team->getCluster($team->team_id)[0]['get_cluster_leader']['fname'] }}
-												{{  $team->getCluster($team->team_id)[0]['get_cluster_leader']['lname'] }}
-											@else
-												No cluster
-											@endif
-										</div>
-									</div>
-									<div class="clearfix"></div>
-									<hr>
-
-
-									<div>
-										<div class="col-md-3">Team code</div>
-										<div class="col-md-7">
-											{{ $team->team_id }}
-										</div>
-									</div>
-									<div class="clearfix"></div><br>
-
-									<div>
-										<div class="col-md-3">Team name</div>
-										<div class="col-md-7">
-											{{ ucfirst($team->team_name) }}
-										</div>
-									</div>
-									<div class="clearfix"></div><br>
-
-									<div>
-										<div class="col-md-3">Team leader</div>
-										<div class="col-md-7">
-
-											@if(!empty($team->tl_ids))
-												@php $counter = 0; @endphp {{-- Counter --}}
-												@foreach ($team->getTeamLeader($team->tl_ids) as $key => $tl)
-
-													@php $counter++; @endphp {{-- Increment Counter --}}
-
-													<a href="{{ route('app.users.show', $tl->id) }}">
-														{{ $tl->fname }}
-														{{ $tl->lname }}
-													</a>
-
-													{{-- Comma --}}
-													{{ ($key != (count($team->getTeamLeader($team->tl_ids)) - 1)) ? ',' : '' }}
-
-													{{-- Check counter if 3 --}}
-													@if ($counter == 3)
-														{{-- if its 3, we need to change the value of counter to 0 then insert <BR> --}}
-														@php $counter = 0; @endphp
-														<br>
-													@endif
-
+											@if (count($team_m->getCluster($team->id)) != 0)
+												@foreach ($clusters_m->getClusterLeader($team_m->getCluster($team->id)[0]['cl_ids']) as $key => $value)
+													{{ $value['fname'] }}
+													{{ $value['lname'] }}
 												@endforeach
 											@else
 												Nothing selected
 											@endif
-
-
-											{{-- <a href="{{ route('app.users.show', $team->getTeamLeader->id) }}">{{ $team->getTeamLeader->fname . ' ' . $team->getTeamLeader->lname }}</a> --}}
-										</div>
-									</div>
-									<div class="clearfix"></div><br>
-
-
-									<div id="code">
-										<div class="col-md-3">Agent Code</div>
-										<div class="col-md-7">
-											@if(!empty($team->agent_ids))
-												@php $counter = 0; @endphp {{-- Counter --}}
-												@foreach ($team->getAgents($team->agent_ids) as $key => $agent)
-
-													@php $counter++; @endphp {{-- Increment Counter --}}
-
-													<a href="{{ route('app.users.show', $agent->id) }}">
-														{{ $agent->fname }}
-														{{ $agent->lname }}
-													</a>
-
-													{{-- Comma --}}
-													{{ ($key != (count($team->getAgents($team->agent_ids)) - 1)) ? ',' : '' }}
-
-													{{-- Check counter if 3 --}}
-													@if ($counter == 3)
-														{{-- if its 3, we need to change the value of counter to 0 then insert <BR> --}}
-														@php $counter = 0; @endphp
-														<br>
-													@endif
-
-												@endforeach
-											@else
-												Nothing selected
-											@endif
-										</div>
-										<div class="clearfix"></div><br>
-									</div>
-
-
-
+											{{-- @if (count($clusters_m->getCluster($team->id)) != 0)
+											{{  $team->getCluster($team->id)[0]['get_cluster_leader']['fname'] }}
+											{{  $team->getCluster($team->id)[0]['get_cluster_leader']['lname'] }}
+										@else
+										No cluster
+									@endif --}}
 								</div>
 							</div>
+							<div class="clearfix"></div>
+							<hr>
+
+
+							<div>
+								<div class="col-md-3">Team code</div>
+								<div class="col-md-7">
+									{{ $team->team_id }}
+								</div>
+							</div>
+							<div class="clearfix"></div><br>
+
+							<div>
+								<div class="col-md-3">Team name</div>
+								<div class="col-md-7">
+									{{ ucfirst($team->team_name) }}
+								</div>
+							</div>
+							<div class="clearfix"></div><br>
+
+							<div>
+								<div class="col-md-3">Team leader</div>
+								<div class="col-md-7">
+
+									@if(!empty($team->tl_ids))
+										@php $counter = 0; @endphp {{-- Counter --}}
+										@foreach ($team->getTeamLeader($team->tl_ids) as $key => $tl)
+
+											@php $counter++; @endphp {{-- Increment Counter --}}
+
+											<a href="{{ route('app.users.show', $tl->id) }}">
+												{{ $tl->fname }}
+												{{ $tl->lname }}
+											</a>
+
+											{{-- Comma --}}
+											{{ ($key != (count($team->getTeamLeader($team->tl_ids)) - 1)) ? ',' : '' }}
+
+											{{-- Check counter if 3 --}}
+											@if ($counter == 3)
+												{{-- if its 3, we need to change the value of counter to 0 then insert <BR> --}}
+												@php $counter = 0; @endphp
+												<br>
+											@endif
+
+										@endforeach
+									@else
+										Nothing selected
+									@endif
+
+
+									{{-- <a href="{{ route('app.users.show', $team->getTeamLeader->id) }}">{{ $team->getTeamLeader->fname . ' ' . $team->getTeamLeader->lname }}</a> --}}
+								</div>
+							</div>
+							<div class="clearfix"></div><br>
+
+
+							<div id="code">
+								<div class="col-md-3">Agent Code</div>
+								<div class="col-md-7">
+									@if(!empty($team->agent_ids))
+										@php $counter = 0; @endphp {{-- Counter --}}
+										@foreach ($team->getAgents($team->agent_ids) as $key => $agent)
+
+											@php $counter++; @endphp {{-- Increment Counter --}}
+
+											<a href="{{ route('app.users.show', $agent->id) }}">
+												{{ $agent->fname }}
+												{{ $agent->lname }}
+											</a>
+
+											{{-- Comma --}}
+											{{ ($key != (count($team->getAgents($team->agent_ids)) - 1)) ? ',' : '' }}
+
+											{{-- Check counter if 3 --}}
+											@if ($counter == 3)
+												{{-- if its 3, we need to change the value of counter to 0 then insert <BR> --}}
+												@php $counter = 0; @endphp
+												<br>
+											@endif
+
+										@endforeach
+									@else
+										Nothing selected
+									@endif
+								</div>
+								<div class="clearfix"></div><br>
+							</div>
+
+
+
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</div>
+</div>
 @endsection

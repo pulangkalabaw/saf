@@ -27,7 +27,9 @@ function getUserDetailClusterAndTeam($auth) {
 		// get teams inside the cluster
 		foreach($clusters_model as $cluster){
 			// array unique removes duplicate values
-			$team_ids = array_unique(array_merge($team_ids, $cluster['team_ids']));
+			if (!empty($cluster['team_ids'])) {
+				$team_ids = array_unique(array_merge($team_ids, $cluster['team_ids']));
+			}
 		}
 
 		$teams = $teams->whereIn('id', $team_ids)->get()->toArray();
@@ -35,7 +37,9 @@ function getUserDetailClusterAndTeam($auth) {
 		// get agents inside the team
 		foreach($teams as $team){
 			// array unique removes duplicate values
-			$agent_ids = array_unique(array_merge($agent_ids, $team['agent_ids']));
+			if (!empty($team['agent_ids'])) {
+				$agent_ids = array_unique(array_merge($agent_ids, $team['agent_ids']));
+			}
 		}
 		$agents = $agents->whereIn('id', $agent_ids)->get()->toArray();
 
@@ -59,7 +63,9 @@ function getUserDetailClusterAndTeam($auth) {
 		foreach($teams as $team){
 			// array unique removes duplicate values
 			// $team_ids[] = $team['id'];
-			$agent_ids = array_unique(array_merge($agent_ids, $team['agent_ids']));
+			if (!empty($team['agent_ids'])) {
+				$agent_ids = array_unique(array_merge($agent_ids, $team['agent_ids']));
+			}
 		}
 
 		$clusters = $cluster_model->get(['team_ids','id'])->toArray();
@@ -70,7 +76,7 @@ function getUserDetailClusterAndTeam($auth) {
 		//
 		// dd('end');
 		$agents = $agents->whereIn('id', $agent_ids)->get()->toArray();
-		
+
 		$r['_c'] = null;
 		$r['_t'] = $teams;
 		$r['_a'] = $agents;

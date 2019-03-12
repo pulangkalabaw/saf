@@ -75,7 +75,7 @@
 										<div>
 											<div class="col-md-3">Team Leader</div>
 											<div class="col-md-7">
-												<select name="tl_ids[]" id="" class="form-control selectpicker" multiple>
+												<select name="tl_ids[]" id="" class="form-control" multiple  style="height: 200px;">
 													{{-- Available --}}
 													@foreach ($team_leaders as $tl)
 														@if (!empty($team->agent_ids))
@@ -98,7 +98,7 @@
 										<div>
 											<div class="col-md-3">Agent</div>
 											<div class="col-md-7">
-												<select name="agent_ids[]" id="" class="form-control selectpicker" multiple>
+												<select name="agent_ids[]" id="" class="form-control" multiple  style="height: 200px;">
 
 													{{-- Available --}}
 													@foreach ($agents as $agent)

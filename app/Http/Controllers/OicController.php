@@ -30,10 +30,14 @@ class OicController extends Controller
             // get first all the agents available to the user
             // if login user is cl, all avaliable agents on its team will be shown
             // if login user is tl, all available agents in the team will be shown
-            foreach($data["_a"] as $agent){
-                $agent_ids = array_unique(array_merge($agent_ids,(array) $agent['id']));
+            if(!empty($data["_a"])){
+                foreach($data["_a"] as $agent){
+                    $agent_ids = array_unique(array_merge($agent_ids,(array) $agent['id']));
+                }
+                $oic = $oic->whereIn('user_id', $agent_ids);
+            } else {
+                dd('Your team has zero agent!');
             }
-            $oic = $oic->whereIn('user_id', $agent_ids);
         }
 
         // Sorting
@@ -97,12 +101,12 @@ class OicController extends Controller
         //Get the value of cluster id within the team
         $teams = new Teams();
         $clusters = $teams->clusters($request->team_id);
-
         // Get cluster id
         // this foreach will get the cluster id of the login user
         foreach($clusters as $cluster){
             $cluster_id = $cluster['cluster_id'];
         }
+
 
         $validate = Validator::make($request->all(),[
             'team_id' => 'required',
