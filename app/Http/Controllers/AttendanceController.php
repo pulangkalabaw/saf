@@ -5,6 +5,7 @@ use Auth;
 use Session;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Faker\Factory as Faker;
 use App\Attendance;
 use App\Attendance_image;
@@ -495,22 +496,85 @@ class AttendanceController extends Controller
 			}
 		}
 
+		// $this->validate($request, [
+		// 	'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+		// ]);
+		//
+		// if($request->hasFile('empImg')) {
+		// 	$image = $request->file('empImg');
+		// 	$name = time().'.'.$image->getClientOriginalExtension();
+		// 	$destinationPath = public_path('/images/attendance');
+		// 	$image->move($destinationPath, $name);
+		// 	$data_image = [
+		// 		'user_id' => Auth::user()->id,
+		// 		'image' => $name,
+		// 		'alt' => $name,
+		// 	];
+		// }
 
-		$this->validate($request, [
-			'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-		]);
+		if($image = $request->input('empImg')){
+			$this->validate($request, [
+				'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+			]);
+			$image = $request->input('empImg'); // image base64 encoded
+			preg_match("/data:image\/(.*?);/",$image,$image_extension); // extract the image extension
+			$image = preg_replace('/data:image\/(.*?);base64,/','',$image); // remove the type part
+			$image = str_replace(' ', '+', $image);
+			$imageName = 'image_' . time() . '.' . $image_extension[1]; //generating unique file name;
+			Storage::disk('public')->put($imageName,base64_decode($image));
+			Session::flash('success', "Your photo has been uploaded successfully");
+			$status	= $request->status = 0;
+			$has_date =	$request->has_date = 0;
 
-		if($request->hasFile('empImg')) {
-			$image = $request->file('empImg');
-			$name = time().'.'.$image->getClientOriginalExtension();
-			$destinationPath = public_path('/images/attendance');
-			$image->move($destinationPath, $name);
-			$data_image = [
-				'user_id' => Auth::user()->id,
-				'image' => $name,
-				'alt' => $name,
-			];
+		}else{
+			$this->validate($request, [
+				'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+			]);
+			if(\Carbon\Carbon::now()->format('H:i:s') >= \Carbon\Carbon::parse('10:30:00')->format('H:i:s')){
+				Session::flash('message', "Sorry you cannot upload this photo at this time");
+				return back();
+			}else{
+				$this->validate($request, [
+					'selected_user[]' => 'in:0,1',
+					'empImg' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+				]);
+
+				if(empty(exif_read_data($request->empImg)['DateTimeOriginal'])){
+					$file = $request->file('empImg');
+					$name = 'image_' . time().'.'.$file->getClientOriginalExtension();
+					Storage::disk('public')->put($name,file_get_contents($file));
+					Session::flash('success', "Your photo has been uploaded successfully");
+					$status	= $request->status = 1;
+					$has_date =	$request->has_date = 1;
+				}elseif(date("m/d/Y", strtotime(exif_read_data($request->empImg)['DateTimeOriginal'])) != Carbon::today()->format('m/d/Y')){
+					Session::flash('message', "Sorry this photo is not taken today");
+					return back();
+				} else{
+					if($request->hasFile('empImg')) {
+						// return $request->empImg;
+						// $image = $request->file('empImg');
+						// $name = time().'.'.$image->getClientOriginalExtension();
+						// $destinationPath = public_path('/images');
+						// $image->move($destinationPath, $name);
+						// return $name;
+						$file = $request->file('empImg');
+						$name = 'image_' . time().'.'.$file->getClientOriginalExtension();
+						Storage::disk('public')->put($name,file_get_contents($file));
+						Session::flash('success', "Your photo has been uploaded successfully");
+						$status	= $request->status = 1;
+						$has_date =	$request->has_date = 0;
+					}
+				}
+				$data_image = [
+					'user_id' => Auth::user()->id,
+					'image' => $name,
+					'alt' => $name,
+					'status' => $status,
+					'has_date' => $has_date,
+				];
+			}
 		}
+
 		if($request->mobile_version == null){
 			$get_user = $request->only('user')['user'];
 		} else {
@@ -667,7 +731,8 @@ class AttendanceController extends Controller
 		// return $data;
 		Attendance::insert($data);
 		if(!empty($data_image)){
-			Attendance_image::create([$data_image]);
+			// return $data_image;
+			Attendance_image::create($data_image);
 		}
 		return back();
 	}

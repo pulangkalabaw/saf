@@ -1,3 +1,20 @@
+@if (Session::has('message'))
+<div class="alert alert-dismissable alert-danger">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+        {{ Session::get('message') }}
+</div>
+@endif
+@if (Session::has('success'))
+   <!-- <div class="alert alert-success">{{ Session::get('success') }}</div> -->
+   <div class="alert alert-dismissable alert-success">
+       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+       </button>
+           {{ Session::get('success') }}
+   </div>
+@endif
 <div class="panel-body padding-left-0 padding-right-0">
     {{-- {{ dd(count($attendance['unpresent'])) }} --}}
     <input name="selected_date" type="hidden" value="{{ $date['selected'] }}">

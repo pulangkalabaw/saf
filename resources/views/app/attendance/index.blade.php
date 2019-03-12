@@ -123,6 +123,23 @@
                                             </div>
                                             @else
             								@include('includes.notif')
+                                            @if (Session::has('message'))
+                                            <div class="alert alert-dismissable alert-danger">
+                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                                    {{ Session::get('message') }}
+                                            </div>
+                                            @endif
+                                            @if (Session::has('success'))
+                                               <!-- <div class="alert alert-success">{{ Session::get('success') }}</div> -->
+                                               <div class="alert alert-dismissable alert-success">
+                                                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                       <span aria-hidden="true">&times;</span>
+                                                   </button>
+                                                       {{ Session::get('success') }}
+                                               </div>
+                                            @endif
                                             <form enctype="multipart/form-data" action="{{route('app.attendance.store')}}" method="POST">
                                                 {{ csrf_field() }}
                                                 {{-- <input type="hidden" name="cl_id" value="{{  }}"> --}}
