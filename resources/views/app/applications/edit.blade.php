@@ -173,7 +173,7 @@
 												@if (!empty($application->getPlan))
 													<select name="plan_id" class="form-control">
 														@foreach ($plans as $plan)
-															<option {{ $application->plan_id == $plan->id ? 'selected' : ''}} value="{{ $plan->id }}">{{ $plan->plan_name }}</option>
+															<option {{ $application->plan_id == $plan->id ? 'selected' : ''}} value="{{ $plan->id }}">{{ strtoupper($plan->product) }} - {{ $plan->plan_name }}</option>
 														@endforeach
 													</select>
 												@else
@@ -210,7 +210,7 @@
 											<div class="col-md-7 col-xs-7">
 												<select name="agent_id" class="form-control">
 													@foreach ($users as $user)
-														<option {{ $application->user_id == $user->id ? 'selected' : ''}}  value="{{ $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
+														<option {{ $user->id == $user->id ? 'selected' : '' }} value="{{$user->id}}">{{ $user->fname.' '.$user->lname }}</option>
 													@endforeach
 												</select>
 

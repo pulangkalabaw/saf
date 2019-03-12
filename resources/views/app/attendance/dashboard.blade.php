@@ -4,6 +4,11 @@
 
 @endsection
 
+<styles>
+    <link href="{{ asset('assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/libs/bootstrap-timepicker/css/bootstrap-timepicker.min.css') }}" rel="stylesheet">
+</styles>
+
 @section('content')
 
 <div class="main-heading">
@@ -52,7 +57,7 @@
                                 </div> -->
                                 <!-- <div class="col-md-4 col-xs-3 text-right"> -->
                                 <div class="col-md-6 col-xs-6 text-right">
-                                    @if( today() >= Carbon\Carbon::parse($myattendance['next']) )
+                                    @if(  today() >= Carbon\Carbon::parse($myattendance['next']) )
                                     <a href="{{ route('app.attendanceDashboard', ['date' => $myattendance['next']]) }}" class="btn btn-default btn-sm">{{ Carbon\Carbon::parse($myattendance['next'])->format('M Y') }} <i class="fa fa-arrow-right"></i></a>
                                     @endif
                                 </div>
@@ -64,12 +69,19 @@
 <br>
                                     <form action="{{ route('app.attendanceDashboard') }}" method="get">
                                         <div class="input-group">
-                                            <input type="date" class="form-control input-sm" name="exactdate" placeholder="Date">
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-info btn-sm" type="submit">
+                                            <!-- <input type="date" class="form-control input-sm" name="exactdate" placeholder="Date"> -->
+                                            <!-- <span class="input-group-btn">
+                                                <button class="btn btn-info" type="submit">
                                                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                                                 </button>
-                                            </span>
+                                            </span> -->
+                                            <div class="input-group date">
+                                                <input class="form-control input-sm" type="text" name="exactdate" value="{{ $myattendance['curr']->format('m/d/Y') }}">
+                                                <div class="input-group-addon">
+                                                  <div class="fa fa-calendar"></div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </form>
 
@@ -108,20 +120,14 @@
         <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-4' : 'col-md-12'  }}">
           <div class="panel panel-info">
               <div class="panel-heading">
-                  <!-- if the logged in user is an agent only  -->
-                  @if( count(checkPosition(auth()->user(), ['agent'], true)) )
-                      <h3 class="panel-title">My Today's Attendance</h3>
-                  @else
-                  <!-- if the logged in user is cl, admin, encoder -->
-                      <h3 class="panel-title">Today's Team Attendance</h3>
-                  @endif
+                  <h3 class="panel-title">Attendance</h3>
               </div>
               <div class="panel-body">
                 <!-- CLUSTER -->
                 <div class="row">
                   @if(!empty($heirarchy) && $heirarchy['clusters'])
-                  <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-12' : 'col-md-3'  }}">
-                    <h5>As of {{  now()->format('F d Y') }}</h5>
+                  <div class="col-md-3">
+                    <h5>As of <small>{{  now()->format('M d y g:i a') }}</small></h5>
                     <!-- <input type="date" class="form-control"> -->
                   </div>
                   @endif
@@ -135,15 +141,9 @@
                             @if(!empty($clus->teams))
                               @foreach($clus->teams as $team)
                                   @if(!empty($team))
-                                      <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-12' : 'col-md-4'  }}">
+                                      <div class="col-md-4">
                                         <div class="breadcrumb">
                                           <h5>{{ $team->team_name }} <small>Total Agents: {{ $team->total_agents }}</small></h5>
-                                          @if(isset($team->totaltl))
-                                                  <p>
-                                                      TL Attendance: <b class="{{ ($team->totaltl == $team->tlattendance) ? 'text-success' : 'text-danger' }}">{{ $team->tlattendance }}</b>
-                                                      <small class="text-muted">(Total TL: {{ $team->totaltl }})</small>
-                                                  </p>
-                                          @endif
                                           <p>Present: <b class="text-success">{{ $team->attendance['present'] }}</b></p>
                                           <p>Absent: <b class="text-danger">{{ $team->attendance['absent'] }}</b></p>
                                           <p>Unkown: <b class="text-warning">{{ $team->attendance['unkown'] }}</b></p>
@@ -160,9 +160,12 @@
                     <div class="col-md-12">
                         <br>
                         @foreach($heirarchy['myattendance'] as $team)
-                        <div class="col-md-12 mt-4 mb-4">
+                        <div class="col-md-4 mt-4 mb-4">
                           <div class="breadcrumb">
                             <h5>{{ $team->team_name }}</h5>
+                            <!-- <p>Present: <b class="text-success">30</b></p> -->
+                            <!-- <p>Absent: <b class="text-danger">2</b></p> -->
+                            <!-- <p>Unkown: <b class="text-warning">1</b></p> -->
                             <p>Your attendance is <span class="{{ ($team->attendance == 'Present') ? 'text-success' : (($team->attendance == 'Absent') ? 'text-danger' : 'text-warning') }}">{{ $team->attendance }}</span> today.</p>
                           </div>
                         </div>
@@ -177,8 +180,6 @@
           </div>
 
         </div>
-        <!-- END OF ATTENDANCE PART  -->
-
         @if( (empty(Session::get('_t')) && empty(Session::get('_a'))) || !empty(Session::get('_c')) )
         <div class="col-md-3">
           <!-- OVERVIEW -->
@@ -243,3 +244,21 @@
 {{-- @include('partials.scripts._datatables') --}}
 
 @endsection
+<script src="{{ asset('assets/libs/jquery/jquery.min.js') }}"></script>
+
+<script src="{{ asset('assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap-timepicker/js/bootstrap-timepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap-tabdrop/bootstrap-tabdrop.min.js') }}"></script>
+<script>
+$(document).ready(function(){
+    $('.date').datepicker({
+        endDate: '+0d',
+    }).on('changeDate', function(){
+        window.location = '{{ url('app/attendancedashboard') . '?exactdate=' }}' + $("input[name='exactdate']").val();
+    });
+	$('.input-daterange').datepicker();
+	$('.datepicker-embed').datepicker();
+	$('.timepicker input').timepicker({showMeridian: false, showSeconds: true});
+});
+
+</script>

@@ -39,7 +39,7 @@
                     {{-- Body start --}}
 
                     <div class="panel-body">
-                        <form action="{{ route('app.oic.store') }}" method="POST">
+                        <form action="{{ route('app.oic.store') }}" method="POST" id="form_id">
                             @include('includes.notif')
 
                             {{ csrf_field() }}
@@ -48,12 +48,20 @@
                                     <div>
                                         <div class="col-md-3">Team</div>
                                         <div class="col-md-7">
-                                            <select id="tl_id" class="form-control" name="team_id" onchange="enableSelectionAg()">
-                                                <option value="">Select Team</option>
-                                                @foreach ($teams as $team)
-                                                    <option {{ old('team_id') == $team['id'] ? 'selected' : '' }} value="{{ $team['team_id'] }}">{{ $team['team_name'] }}</option>
-                                                @endforeach
-                                            </select>
+											@if(count($teams) == 1)
+												<select class="form-control select_enable" name="team_id" disabled>
+													@foreach ($teams as $team)
+														<option selected value="{{ $team['team_id'] }}">{{ $team['team_name'] }}</option>
+													@endforeach
+												</select>
+											@else
+												<select id="tl_id" class="form-control" name="team_id" onchange="enableSelectionAg()">
+													<option value="">Select Team</option>
+													@foreach ($teams as $team)
+														<option {{ old('team_id') == $team['id'] ? 'selected' : '' }} value="{{ $team['team_id'] }}">{{ $team['team_name'] }}</option>
+													@endforeach
+												</select>
+											@endif
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -61,12 +69,21 @@
                                     <div>
                                         <div class="col-md-3">Agent</div>
                                         <div class="col-md-7">
-                                            <select class="form-control" name="user_id" disabled id="ag_id" required>
-                                                <option value="">Select Agent</option>
-                                                @foreach ($users as $user)
-                                                    <option value="{{ ((int)$user['id']) }}">{{ $user['fname'] . ' ' . $user['lname'] }}</option>
-                                                @endforeach
-                                            </select>
+											@if(count($users) == 1)
+												<select class="form-control select_enable" name="user_id" disabled>
+	                                                @foreach ($users as $user)
+	                                                    <option value="{{ ((int)$user['id']) }}">{{ $user['fname'] . ' ' . $user['lname'] }}</option>
+	                                                @endforeach
+	                                            </select>
+											@else
+												<select class="form-control" name="user_id" required>
+	                                                <option value="">Select Agent</option>
+	                                                @foreach ($users as $user)
+	                                                    <option value="{{ ((int)$user['id']) }}">{{ $user['fname'] . ' ' . $user['lname'] }}</option>
+	                                                @endforeach
+	                                            </select>
+											@endif
+
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -74,7 +91,7 @@
 									<div>
 										<div class="col-md-3">Assign Date</div>
 										<div class="col-md-3">
-										  <input class="form-control" type="text" id="datepicker" name="assign_date" required>
+										  <input class="form-control" type="text" id="datepicker" name="assign_date" required autocomplete="off">
 										</div>
 									</div>
 									<div class="clearfix"></div><br>
@@ -108,9 +125,8 @@
 	});
 </script>
 <script>
-    function enableSelectionAg() {
-        document.getElementById("ag_id").disabled = false;
-        var tl = document.getElementById("tl_id").value;
-    }
+	$('#form_id').submit(function() {
+    	$(".select_enable").prop('disabled', false);
+    })
 </script>
 @endsection

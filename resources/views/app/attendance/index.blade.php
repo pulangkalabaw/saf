@@ -173,6 +173,7 @@
                                                                                     value="0"
                                                                                 @endif
                                                                             @endif
+
                                                                             >
                                                                             <button type="button" name="changeStatus" id="changeStatus_{{ $value['id'] }}" onclick="changeButtonStatus('desktop', 'changeStatus_{{ $value['id'] }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]');
                                                                             @if(!empty($value['value_btn']))
@@ -469,9 +470,9 @@ function changeButtonStatus(view = "desktop",buttonName = "", status, activities
             $('#' + status).val(null);
             $('select[name="' + activities + '"]').prop("disabled", true);
             $('input[name="' + location + '"]').prop("disabled", true);
-            // $('input[name="' + location + '"]').val(null);
+            $('input[name="' + location + '"]').val(null);
             $('input[name="' + remarks + '"]').prop("disabled", true);
-            // $('input[name="' + remarks + '"]').val(null);
+            $('input[name="' + remarks + '"]').val(null);
         }
     } else {
         // alert(footer);
@@ -499,11 +500,11 @@ function changeButtonStatus(view = "desktop",buttonName = "", status, activities
             $('#user_mobile_activity_' + footer).prop('disabled', true);
             $('#user_mobile_location_' + footer).prop('disabled', true);
             $('#user_mobile_remarks_' + footer).prop('disabled', true);
-            // $('#user_mobile_activity_' + footer).val('Blitz');
-            // $('#user_mobile_location_' + footer).val(null);
-            // $('#user_mobile_remarks_' + footer).val(null);
-            $('#user_mobile_status_' + footer).val(null);
-            $('#user_mobile_userid_' + footer).val(null);
+            $('#user_mobile_activity_' + footer).val('Blitz');
+            $('#user_mobile_location_' + footer).val(null);
+            $('#user_mobile_remarks_' + footer).val(null);s
+            $('#user_mobile_status_' + footer).val(null);s
+            $('#user_mobile_userid_' + footer).val(null);s
         }
     }
 }
@@ -672,6 +673,5 @@ function showRemark(index, view = 'desktop'){
         }
     }
 }
-
 </script>
 @endsection

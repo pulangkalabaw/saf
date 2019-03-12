@@ -14,14 +14,14 @@ use Faker\Generator as Faker;
 */
 
 $factory->define(App\User::class, function (Faker $faker) {
-    $check_lelouch_email = App\User::where('email', 'lelouch0278@gmail.com')->first();
-    if($check_lelouch_email == null){
+    $check_jiromes_email = App\User::where('email', 'jiromes@gmail.com')->first();
+    if($check_jiromes_email == null){
         App\User::create([
-            'fname' => 'Ender Thompson',
+            'fname' => 'jiromes Angel',
             'lname' => 'Baril',
-            'email' => 'lelouch0278@gmail.com',
+            'email' => 'jiromes@gmail.com',
             'password' => bcrypt('sadsad'),
-            'role' => base64_encode('administrator'),
+            'role' => base64_encode('user'),
             'isActive' => 1,
             'remember_token' => str_random(10),
         ]);
@@ -44,7 +44,7 @@ $factory->define(App\User::class, function (Faker $faker) {
     $role = ['user', 'administrator', 'encoder'];
     $role_arr = array_random_assoc($role);
     $role = array_values($role_arr)[0];
-    //
+
     return [
         'fname' => $faker->firstname,
         'lname' => $faker->lastname,

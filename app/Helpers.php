@@ -24,24 +24,20 @@ function getUserDetailClusterAndTeam($auth) {
 		$agent_ids = [];
 
 		$clusters_model = fetchCluster($auth);
-
 		// get teams inside the cluster
 		foreach($clusters_model as $cluster){
-			if(!array_intersect($team_ids, $cluster['team_ids'])){
-				$team_ids = array_merge($team_ids, $cluster['team_ids']);
-			}
+			// array unique removes duplicate values
+			$team_ids = array_unique(array_merge($team_ids, $cluster['team_ids']));
 		}
 
-		$teams = $teams->whereIn('id', $team_ids)->get();
+		$teams = $teams->whereIn('id', $team_ids)->get()->toArray();
 
 		// get agents inside the team
 		foreach($teams as $team){
-			if(!array_intersect($agent_ids, $team['agent_ids'])){
-				$agent_ids = array_merge($agent_ids, $team['agent_ids']);
-			}
+			// array unique removes duplicate values
+			$agent_ids = array_unique(array_merge($agent_ids, $team['agent_ids']));
 		}
-
-		$agents = $agents->whereIn('id', $agent_ids)->get();
+		$agents = $agents->whereIn('id', $agent_ids)->get()->toArray();
 
 		$r['_c'] = $clusters_model;
 		$r['_t'] = $teams;
@@ -51,22 +47,30 @@ function getUserDetailClusterAndTeam($auth) {
 
 	// if the login user is tl get all the available agents under that tl
 	if(in_array('tl', checkPosition($auth))){
+		$cluster_model = new Clusters();
 		$agents = new User();
 
 		$agent_ids = [];
+		$team_arr = [];
 		$cluster_ids = [];
 
 		$teams = fetchTeams($auth);
-
 		// get agents inside the team
 		foreach($teams as $team){
-			if(!array_intersect($agent_ids, $team['agent_ids'])){
-				$agent_ids = array_merge($agent_ids, $team['agent_ids']);
-			}
+			// array unique removes duplicate values
+			// $team_ids[] = $team['id'];
+			$agent_ids = array_unique(array_merge($agent_ids, $team['agent_ids']));
 		}
 
-		$agents = $agents->whereIn('id', $agent_ids)->get();
+		$clusters = $cluster_model->get(['team_ids','id'])->toArray();
 
+		// foreach($clusters as $cluster){
+		// 	dump(in_array($teams, $cluster['team_ids']));
+		// }
+		//
+		// dd('end');
+		$agents = $agents->whereIn('id', $agent_ids)->get()->toArray();
+		
 		$r['_c'] = null;
 		$r['_t'] = $teams;
 		$r['_a'] = $agents;
@@ -506,8 +510,12 @@ function searchTeamAndCluster ($auth) {
 }
 
 // Function for getting dashbaord reports
-function getHeirarchy2(){
-	// $date = Carbon::now()->today()->format('"Y-m-d H:i:s"');
+
+function getHeirarchy2($date = null){
+	// $date = '28-03-2018';
+
+	$date = ($date !== null) ? Carbon::parse($date) : Carbon::now()->today();
+	// dd($date);
 
 	$teams_model = new Teams();
 	$clusters_model = new Clusters();
@@ -524,18 +532,18 @@ function getHeirarchy2(){
 
 	// FOR ADMIN
 	if(base64_decode(Auth()->user()->role) == $roles['administrator']){
-		$clusters = $clusters_model->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,$application_model){
+		$clusters = $clusters_model->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,$application_model,$date){
 			$count_applications = [
 				'new' => 0,
 				'activated' => 0,
 				'paid' => 0,
 				'target' => 0,
 			];
-			$res['teams'] = $teams_model->whereIn('id', collect($res['team_ids'])->toArray())->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,$application_model,&$count_applications){
+			$res['teams'] = $teams_model->whereIn('id', collect($res['team_ids'])->toArray())->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,$application_model,&$count_applications,$date){
 
 				// calcualting applications and saf
 				// dd( Carbon::parse('first day of February 2019')." ".Carbon::parse('last day of February 2019')->endOfMonth() );
-				$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications){
+				$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
 					if($res['status'] == 'new'){
 						(float)$count_applications['new'] += (float)$res['msf'];
 					}else if($res['status'] == 'activated'){
@@ -562,14 +570,13 @@ function getHeirarchy2(){
 					'present' => 0,
 					'absent' => 0,
 					'unkown' => 0,
-					'tl' => 0,  // FOR TL
 					'totaltarget' => 0, // ADD THIS
 				];
 				$agents = $user_model->whereIn('id',collect($res['agent_ids'])->toArray())->get();
-				$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
-					if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
+				$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count,$date){
+					if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', $date)->get()) > 0){
 						++$count['present'];
-					}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) >= 1){
+					}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', $date)->get()) >= 1){
 						++$count['absent'];
 					}else{
 						++$count['unkown'];
@@ -586,23 +593,12 @@ function getHeirarchy2(){
 				// end of calculate present, absent, unkown
 
 				// calculate/get attendance of tl on this day
-				$res['tlattendance'] = count($attendance_model->whereIn('user_id',collect($res['tl_ids'])->toArray())->where('created_at', '>=', Carbon::today())->get());
+				$res['tlattendance'] = count($attendance_model->whereIn('user_id',collect($res['tl_ids'])->toArray())->where('created_at', '>=', $date)->get());
 				$res['totaltl'] = count(collect($res['tl_ids'])->toArray());
 				// end of calculate/get attendance of tl on this day
 
 				// for percentage of this cutoff
-				$acc_total_target = $res['getallsafthiscutoff']['target']; // total current selled
-        $total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
-
-        if ($total_based_target == 0) {
-				  $res['pat'] = 0;
-				}
-				else {
-					$pat = ($acc_total_target / $total_based_target) * 100;
-					$res['pat'] = $pat;
-
-				}
-
+				$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
 				return $res;
 			});
 			return $res;
@@ -614,18 +610,18 @@ function getHeirarchy2(){
 
 		// FOR CLUSTER HEAD
 		if( !empty((Session::get('_c'))) ){
-			$clusters = $clusters_model->whereIn('id',collect(Session::get('_c'))->pluck('id'))->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model){
+			$clusters = $clusters_model->whereIn('id',collect(Session::get('_c'))->pluck('id'))->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,$date){
 				$count_applications = [
 					'new' => 0,
 					'activated' => 0,
 					'paid' => 0,
 					'target' => 0,
 				];
-				$res['teams'] = $teams_model->whereIn('id',collect(Session::get('_c')[0]['team_ids'])->toArray())->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,&$count_applications){
+				$res['teams'] = $teams_model->whereIn('id',collect(Session::get('_c')[0]['team_ids'])->toArray())->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,&$count_applications,$date){
 
 					// calcualting applications and saf
 					// dd( Carbon::parse('first day of February 2019')." ".Carbon::parse('last day of February 2019')->endOfMonth() );
-					$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications){
+					$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
 						if($res['status'] == 'new'){
 							(float)$count_applications['new'] += (float)$res['msf'];
 						}else if($res['status'] == 'activated'){
@@ -652,14 +648,13 @@ function getHeirarchy2(){
 						'present' => 0,
 						'absent' => 0,
 						'unkown' => 0,
-						'tl' => 0,  // FOR TL
 						'totaltarget' => 0, // ADD THIS
 					];
 					$agents = $user_model->whereIn('id',collect($res['agent_ids'])->toArray())->get();
-					$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
-						if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
+					$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count,$date){
+						if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', $date)->get()) > 0){
 							++$count['present'];
-						}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) >= 1){
+						}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', $date)->get()) >= 1){
 							++$count['absent'];
 						}else{
 							++$count['unkown'];
@@ -676,24 +671,12 @@ function getHeirarchy2(){
 					// end of calculate present, absent, unkown
 
 					// calculate/get attendance of tl on this day
-					$res['tlattendance'] = count($attendance_model->whereIn('user_id',collect($res['tl_ids'])->toArray())->where('created_at', '>=', Carbon::today())->get());
+					$res['tlattendance'] = count($attendance_model->whereIn('user_id',collect($res['tl_ids'])->toArray())->where('created_at', '>=', $date)->get());
 					$res['totaltl'] = count(collect($res['tl_ids'])->toArray());
 					// end of calculate/get attendance of tl on this day
 
 					// for percentage of this cutoff
-					// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
-					$acc_total_target = $res['getallsafthiscutoff']['target']; // total current selled
-					$total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
-
-					if ($total_based_target == 0) {
-						$res['pat'] = 0;
-					}
-					else {
-						$pat = ($acc_total_target / $total_based_target) * 100;
-						$res['pat'] = $pat;
-
-					}
-
+					$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
 					return $res;
 				});
 				return $res;
@@ -703,7 +686,7 @@ function getHeirarchy2(){
 		// FOR TEAM LEAD
 		else if( !empty((Session::get('_t'))) ){
 			// dd(collect(Session::get('_t'))->pluck('id'));
-			$clusters = $clusters_model->get()->map(function($res) use ($teams_model,$user_model,$attendance_model,$application_model){
+			$clusters = $clusters_model->get()->map(function($res) use ($teams_model,$user_model,$attendance_model,$application_model,$date){
 				$count_applications = [
 					'new' => 0,
 					'activated' => 0,
@@ -714,12 +697,12 @@ function getHeirarchy2(){
 
 					// dd(Session::get('_t'));
 					$team_ids = $res['team_ids'];
-					$res['teams'] = $teams_model->whereIn('id', collect($res['team_ids'])->toArray())->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,$team_ids,&$count_applications){
+					$res['teams'] = $teams_model->whereIn('id', collect($res['team_ids'])->toArray())->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,$team_ids,&$count_applications,$date){
 						if( in_array($res['id'],collect(Session::get('_t'))->pluck('id')->toArray()) ){
 
 							// calcualting applications and saf
 							// dd( Carbon::parse('first day of February 2019')." ".Carbon::parse('last day of February 2019')->endOfMonth() );
-							$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications){
+							$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
 								if($res['status'] == 'new'){
 									(float)$count_applications['new'] += (float)$res['msf'];
 								}else if($res['status'] == 'activated'){
@@ -749,10 +732,10 @@ function getHeirarchy2(){
 								'totaltarget' => 0, // ADD THIS
 							];
 							$agents = $user_model->whereIn('id',collect($res['agent_ids'])->toArray())->get();
-							$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count){
-								if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', Carbon::today())->get()) > 0){
+							$res['attendance'] = $agents->map(function($res) use ($attendance_model,&$count,$date){
+								if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 1])->where('created_at', '>=', $date)->get()) > 0){
 									++$count['present'];
-								}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', Carbon::today())->get()) >= 1){
+								}else if( count($attendance_model->where(['user_id' => $res['id'], 'status' => 0])->where('created_at', '>=', $date)->get()) >= 1){
 									++$count['absent'];
 								}else{
 									++$count['unkown'];
@@ -769,18 +752,7 @@ function getHeirarchy2(){
 							// end of calculate present, absent, unkown
 
 							// for percentage of this cutoff
-							$acc_total_target = $res['getallsafthiscutoff']['target']; // total current selled
-							$total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
-
-							if ($total_based_target == 0) {
-								$res['pat'] = 0;
-							}
-							else {
-								$pat = ($acc_total_target / $total_based_target) * 100;
-								$res['pat'] = $pat;
-
-							}
-
+							$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
 							return $res;
 						}
 					});
@@ -791,7 +763,7 @@ function getHeirarchy2(){
 		}
 		else if( !empty((Session::get('_a'))) ){
 
-			$myattendance = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model,$attendance_model){
+			$myattendance = $teams_model->whereIn('id',collect(Session::get('_a'))->pluck('id'))->get()->map(function($res) use ($user_model,$attendance_model,$date){
 				$agents = $user_model->where('id',Auth()->user()->id)->first();
 				$res['agents'] = $agents;
 				// $res['total_agents'] = count($agents);
@@ -802,7 +774,7 @@ function getHeirarchy2(){
 					'unkown' => 0,
 				];
 				// please add now date
-				$temp_myatt = $attendance_model->where([ 'user_id' => Auth()->user()->id, 'team_id' => $res['id']])->where('created_at', '>=', Carbon::today())->value('status');
+				$temp_myatt = $attendance_model->where([ 'user_id' => Auth()->user()->id, 'team_id' => $res['id']])->where('created_at', '>=', $date)->value('status');
 				$res['attendance'] = ($temp_myatt === null) ? 'Unkown' : (($temp_myatt == 1) ? 'Present' : 'Absent');
 				// dd($res['attendance']);
 				return $res;
@@ -829,61 +801,6 @@ function getHeirarchy2(){
 		'myattendance' => (!empty($myattendance)) ? $myattendance : [],
 	];
 
-
-}
-
- function computation($agent_ids,$date){
-
-	// get start and end of the month
-	$start = new Carbon($date->startOfMonth());
-	$end = $date->endOfMonth();
-
-	// get all data from saf_application table
-	$results = Application::whereIn('agent_id',$agent_ids)->whereBetween('created_at', array($start->startOfMonth(), $end->endOfMonth()))->get(['status','agent_id','msf'])->map(function($res){
-		// get msf of activated application
-		if($res['status'] == 'activated'){
-
-			$res['activated'] = $res['msf'];
-
-		}elseif($res['status'] == 'new'){
-			// get msf of new new application
-			$res['new'] = $res['msf'];
-
-		}
-
-		return $res;
-	});
-
-	$data = [];
-	foreach($agent_ids as $id){
-		// get user acount info, fname,laname,target
-		$user_data = User::where('id',$id)->first();
-
-		foreach($results as $result){
-			if($result['agent_id'] == $id){
-				// collect activated and new application
-				$activated[$id]['activated'][] = $result['activated'];
-				$activated[$id]['new'][] = $result['new'];
-				// name of the agent
-				$data[$id]['fname'] = $user_data['fname'];
-				$data[$id]['lname'] = $user_data['lname'];
-				// Sum of activated and and new application
-				$data[$id]['activated'] = array_sum($activated[$id]['activated']);
-				$data[$id]['new'] =array_sum($activated[$id]['new']);
-				// user target
-				$data[$id]['target'] =$user_data['target'];
-				// compute target percentage
-				$data[$id]['percentage'] = (int)round((array_sum($activated[$id]['activated']) + array_sum($activated[$id]['new']) / $user_data['target'] * 100));
-			}
-		}
-	}
-	// get next and previous date
- 	$previous = new Carbon($date->subMonths(1));
-	$next = $date->addMonth(1);
-
-	$datas =['previous' => $previous,'next' => $next,'data' => $data];
-
-	return $datas;
 
 }
 

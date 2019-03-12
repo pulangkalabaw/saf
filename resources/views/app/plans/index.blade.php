@@ -77,7 +77,7 @@
                                             <span class='fa fa-sort'></span>
                                         </a>
                                     </th>
-                                    <th>With Sim</th>
+                                    <th>Product</th>
                                     <th>With Device</th>
                                     <th>MSF</th>
                                     <th>Action</th>
@@ -87,7 +87,7 @@
                                 @foreach ($plans as $plan)
                                 <tr>
                                     <td>{{ $plan->plan_name }}</td>
-                                    <td>{{ ($plan->with_sim == 1) ? 'Yes' : 'No' }}</td>
+                                    <td>{{ strtoupper($plan->product) }}</td>
                                     <td>{{ ($plan->with_device == 1) ? 'Yes' : 'No' }}</td>
                                     <td>{{ $plan->msf }}</td>
                                     <td>

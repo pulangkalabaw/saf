@@ -23,27 +23,14 @@
             <div class="col-md-12">
                 <div class="panel panel-info">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Dashboard Applications</h3>
+                        <h3 class="panel-title">Applications</h3>
                     </div>
                     <div class="panel-body">
-                        @if(!isset($heirarchy['clusters']))
-                            @if( count(checkPosition(auth()->user(), ['agent'], true)) > 0 )
+                        @if(!isset($heirarchy['clusters'][0]['cluster_name']))
+                            @if(checkPosition(auth()->user(), ['a']))
                                 <h5 class="text-center text-info"><i class="fa fa-info-circle"></i> *Agents dashboard coming soon*</h5>
                             @else
-                                <!-- <h5 class="text-center text-warning"><i class="fa fa-warning"></i> You have no clusters or team</h5> -->
-                            @endif
-                        @else
-                            @if( in_array('agent',checkPosition(auth()->user(), ['agent'], true)) && (count(checkPosition(auth()->user(), ['agent'], true)) == 1) )
-                                {{-- <h5 class="text-center text-info"><i class="fa fa-info-circle"></i>You are an agent</h5> --}}
-                            @elseif( count(checkPosition(auth()->user(), ['cl','tl'])) > 0 )
-                                <!-- <h5 class="text-center text-warning"><i class="fa fa-warning"></i> TL CL ENCODER ADMIN</h5> -->
-                            @else
-                                @if( base64_decode(auth()->user()->role) == 'administrator' )
-                                    <h5 class="text-center text-info"><i class="fa fa-info-circle"></i> Admin privilege</h5>
-                                @else
-                                    <h5 class="text-center text-warning"><i class="fa fa-warning"></i> You have no cluster or teams</h5>
-                                @endif
-
+                                <h5 class="text-center text-warning"><i class="fa fa-warning"></i> You have no clusters or team</h5>
                             @endif
                         @endif
                         <!-- <h5>As of {{ now()->format('M d y g:i a') }} - {{ now()->format('M d y g:i a') }}</h5> -->
@@ -63,7 +50,7 @@
                                             <p>New: <b>{{ (float)$team->getallsafthiscutoff['new'] }}</b></p>
                                             <p>Activated: <b class="text-info">{{ (float)$team->getallsafthiscutoff['activated'] }}</b></p>
                                             <p>Paid: <b class="text-primary">{{ (float)$team->getallsafthiscutoff['paid'] }}</b></p>
-                                            <p>Target: <b class="text-success">{{ (float)$team->pat }}%</b></p>
+                                            <p>Target %: <b class="text-success">{{ (float)$team->pat }}%</b></p>
                                         </div>
                                     </div>
                                     @endif
@@ -76,52 +63,6 @@
                     </div>
                 </div>
             </div>
-            <!-- AGENT'S TARGET PERCENTAGE  -->
-            @if(in_array('tl',checkPosition(auth()->user())) || in_array('agent',checkPosition(auth()->user()))  )
-            @if(isset($percentage))
-            <div class="col-md-12">
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Agents Target Percentage</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="container">
-                            <div class="col-md-12">
-                                <h4></h4>
-                            </div>
-                            <!-- PUT FOREACH TEAM  -->
-                            @if($percentage['data_percentage']['data'] != null)
-                            <h4><b>{{$percentage['team_name']}}</b></h4>
-
-                            @foreach($percentage['data_percentage']['data'] as $percent)
-                                <div class="col-md-2">
-                                    <div class="breadcrumb">
-                                        <p>Agent Name:  <b>{{$percent['fname'] .' '. $percent['lname']}}</b></p>
-                                        <p>Activated: <b class="text-info">{{ $percent['activated']}}</b></p>
-                                        <p>Paid: <b class="text-primary">{{ $percent['new']}}</b></p>
-                                        <p>Target: <b class="text-success">{{ $percent['target']}}</b></p>
-                                        <p>Percentage: <b class="text-success">{{ $percent['percentage']}}%</b></p>
-                                    </div>
-                                </div>
-                                @endforeach
-
-                                @else
-
-                                <p class='text-center'> No data found</p>
-                                @endif
-                            <!-- PUT ENDFOREACH TEAM -->
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-            @endif
-            @endif
-
-
-
         </div>
         @endif
         <!-- PAT WIDGET -->

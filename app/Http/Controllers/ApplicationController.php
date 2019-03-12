@@ -36,12 +36,13 @@ class ApplicationController extends Controller
 		$applications = new Application();
 
 		$applications_total = $applications->count();
-
 		// Get the current login users cluster Id
+		// this will show all the applications base on which cl or tl is login
 
 		if (base64_decode(Auth::user()->role) == 'user'){
 			$applications = $applications->whereIn('team_id', Session::get('_t'))
-			->orWhereIn('cluster_id', Session::get('_c'));
+			->orWhereIn('cluster_id', Session::get('_c'))
+			->orWhere('agent_id', Auth::user()->id);
 		}
 
 		// Sorting
@@ -53,15 +54,19 @@ class ApplicationController extends Controller
 			// With search string parameter
 			$applications = $applications->search($request->get('search_string'));
 		}
-
+		// dd($applications->get());
 		$total = $applications->count();
 
 		// Insert pagination
 		$applications = $applications
-		->with(['getClusterName', 'getTeam', 'getAgentName'])
+		->with(['getClusterName', 'getTeam', 'getAgentName', 'getPlan'])
 		->paginate((!empty($request->show) ? $request->show : 10));
 
-		return view('app.applications.index', ['applications' => $applications, 'applications_total' => $applications_total, 'total' => $total]);
+		return view('app.applications.index', [
+			'applications' => $applications,
+			'applications_total' => $applications_total,
+			'total' => $total
+		]);
 	}
 
 	/**
@@ -99,6 +104,7 @@ class ApplicationController extends Controller
 	*/
 	public function store(Request $request)
 	{
+		// return $request->all();
 		$validate = Validator::make($request->all(),[
 			'customer_name' => 'required',
 			'contact' => 'required',
@@ -137,7 +143,13 @@ class ApplicationController extends Controller
 		// Get cluster
 		$team_model = new Teams();
 		$team_model = $team_model->getCluster($request['team_id']);
-		if (empty($team_model[0])) {
+
+		// Modified: get the cluster id
+		foreach($team_model as $cluster){
+			$cluster_id = $cluster['cluster_id'];
+		}
+
+		if (empty($cluster_id)) {
 			return back()->with([
 				'notif.style' => 'danger',
 				'notif.icon' => 'times-circle',
@@ -147,8 +159,9 @@ class ApplicationController extends Controller
 		// Data to be inserted to Application table
 		$application_data = [
 			'application_id' => $application_id,
-			'cluster_id' => $team_model[0]['cluster_id'],
+			'cluster_id' => $cluster_id,
 			'team_id' => $request['team_id'],
+			'product' => $plan->product,
 			'customer_name' => $request['customer_name'],
 			'contact' => $request['contact'],
 			'address' => $request['address'],
@@ -261,11 +274,13 @@ class ApplicationController extends Controller
 		$application_model = new Application();
 		$application = $application_model->where('application_id', $id)->firstOrFail();
 		$msf = Plans::where('id',$request['plan_id'])->value('msf');
+		$product = Plans::where('id',$request['plan_id'])->value('product');
 
 		// Place to $data variable
 		$data['customer_name'] = $request->post('customer_name');
 		$data['contact'] = $request->post('contact');
 		$data['address'] = $request->post('address');
+		$data['product'] = $product;
 		$data['plan_id'] = (int) $request->post('plan_id');
 		$data['sim'] = $request->post('sim');
 		$data['device_id'] = empty($request->post('device_id')) ? '-' : $request->post('device_id');

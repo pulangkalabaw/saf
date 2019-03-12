@@ -33,13 +33,25 @@
                         </div>
                     </div>
                     <div class="panel-body">
-                        <form action="{{ route('app.plans.update', $plan->plan_id) }}" method="POST">
+                        <form action="{{ route('app.plans.update', $plan->id) }}" method="POST">
                             @include('includes.notif')
 
                             {{ csrf_field() }}
                             {{ method_field('PUT') }}
                             <div class="row">
                                 <div class="col-md-7">
+
+                                    <div>
+                                        <div class="col-md-3">Product</div>
+                                        <div class="col-md-7">
+                                            <select class="form-control" name="product">
+                                                <option {{ ($plan->product == 'smart') ? 'selected' : '' }} value="smart">Smart</option>
+                                                <option {{ ($plan->product == 'smart_bro') ? 'selected' : '' }} value="smart_bro">Smart Bro</option>
+                                                <option {{ ($plan->product == 'sun') ? 'selected' : '' }} value="sun">Sun</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
 
                                     <div>
                                         <div class="col-md-3">Plans name</div>
@@ -50,23 +62,9 @@
                                     <div class="clearfix"></div><br>
 
                                     <div>
-                                        <div class="col-md-3">With Sim</div>
-                                        <div class="col-md-7">
-                                            <select class="form-control" name="with_sim" required>
-                                                <option {{ $plan->with_sim == '1' ? 'selected':'' }} value="1">YES</option>
-                                                <option {{ $plan->with_sim == '0' ? 'selected':'' }} value="0">NO</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div><br>
-
-                                    <div>
                                         <div class="col-md-3">With Device</div>
                                         <div class="col-md-7">
-                                            <select class="form-control" name="with_device" required>
-                                                <option {{ $plan->with_device == '1' ? 'selected':'' }} value="1">YES</option>
-                                                <option {{ $plan->with_device == '0' ? 'selected':'' }} value="0">NO</option>
-                                            </select>
+                                            <input {{ ($plan->with_device == 1) ? 'checked' : ''}} type="checkbox" name="with_device" value="1">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -75,6 +73,14 @@
                                         <div class="col-md-3">MSF</div>
                                         <div class="col-md-7">
                                             <input type="text" name="msf" id="" class="form-control" value="{{ $plan->msf }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
+                                    <div>
+                                        <div class="col-md-3">Description</div>
+                                        <div class="col-md-7">
+                                            <textarea name="description" rows="8" cols="80" class="form-control">{{ $plan->description }}</textarea>
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>

@@ -43,8 +43,8 @@
 									<div>
 										<div class="col-md-3">Cluster name</div>
 										<div class="col-md-7">
-											@if (count($team->getCluster($team->id)) != 0)
-												{{  $team->getCluster($team->id)[0]['cluster_name'] }}
+											@if (count($team->getCluster($team->team_id)) != 0)
+												{{  $team->getCluster($team->team_id)[0]['cluster_name'] }}
 											@else
 												No cluster
 											@endif
@@ -55,18 +55,9 @@
 									<div>
 										<div class="col-md-3">Cluster Leader</div>
 										<div class="col-md-7">
-											@if (count($team->getCluster($team->id)) != 0)
-												@php $ccounter = 0; @endphp
-												@foreach ($cluster_model->getClusterLeader($team->getCluster($team->id)[0]['cl_ids']) as $cls)
-													{{ $cls->fname }}
-													{{ $cls->lname }}
-													@php $ccounter ++; @endphp
-													@if ($ccounter == 3)
-														{{-- if its 3, we need to change the value of counter to 0 then insert <BR> --}}
-														@php $ccounter = 0; @endphp
-														<br>
-													@endif
-												@endforeach
+											@if (count($team->getCluster($team->team_id)) != 0)
+												{{  $team->getCluster($team->team_id)[0]['get_cluster_leader']['fname'] }}
+												{{  $team->getCluster($team->team_id)[0]['get_cluster_leader']['lname'] }}
 											@else
 												No cluster
 											@endif
@@ -160,6 +151,7 @@
 										</div>
 										<div class="clearfix"></div><br>
 									</div>
+
 
 
 								</div>
