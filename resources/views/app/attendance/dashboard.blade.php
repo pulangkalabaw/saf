@@ -4,6 +4,11 @@
 
 @endsection
 
+<styles>
+    <link href="{{ asset('assets/libs/bootstrap-datepicker/css/bootstrap-datepicker.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/libs/bootstrap-timepicker/css/bootstrap-timepicker.min.css') }}" rel="stylesheet">
+</styles>
+
 @section('content')
 
 <div class="main-heading">
@@ -52,7 +57,7 @@
                                 </div> -->
                                 <!-- <div class="col-md-4 col-xs-3 text-right"> -->
                                 <div class="col-md-6 col-xs-6 text-right">
-                                    @if( today() >= Carbon\Carbon::parse($myattendance['next']) )
+                                    @if(  today() >= Carbon\Carbon::parse($myattendance['next']) )
                                     <a href="{{ route('app.attendanceDashboard', ['date' => $myattendance['next']]) }}" class="btn btn-default btn-sm">{{ Carbon\Carbon::parse($myattendance['next'])->format('M Y') }} <i class="fa fa-arrow-right"></i></a>
                                     @endif
                                 </div>
@@ -64,12 +69,19 @@
 <br>
                                     <form action="{{ route('app.attendanceDashboard') }}" method="get">
                                         <div class="input-group">
-                                            <input type="date" class="form-control input-sm" name="exactdate" placeholder="Date">
-                                            <span class="input-group-btn">
-                                                <button class="btn btn-info btn-sm" type="submit">
+                                            <!-- <input type="date" class="form-control input-sm" name="exactdate" placeholder="Date"> -->
+                                            <!-- <span class="input-group-btn">
+                                                <button class="btn btn-info" type="submit">
                                                     <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                                                 </button>
-                                            </span>
+                                            </span> -->
+                                            <div class="input-group date">
+                                                <input class="form-control input-sm" type="text" name="exactdate" value="{{ $myattendance['curr']->format('m/d/Y') }}">
+                                                <div class="input-group-addon">
+                                                  <div class="fa fa-calendar"></div>
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </form>
 
@@ -243,3 +255,21 @@
 {{-- @include('partials.scripts._datatables') --}}
 
 @endsection
+<script src="{{ asset('assets/libs/jquery/jquery.min.js') }}"></script>
+
+<script src="{{ asset('assets/libs/bootstrap-datepicker/js/bootstrap-datepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap-timepicker/js/bootstrap-timepicker.min.js') }}"></script>
+    <script src="{{ asset('assets/libs/bootstrap-tabdrop/bootstrap-tabdrop.min.js') }}"></script>
+<script>
+$(document).ready(function(){
+    $('.date').datepicker({
+        endDate: '+0d',
+    }).on('changeDate', function(){
+        window.location = '{{ url('app/attendancedashboard') . '?exactdate=' }}' + $("input[name='exactdate']").val();
+    });
+	$('.input-daterange').datepicker();
+	$('.datepicker-embed').datepicker();
+	$('.timepicker input').timepicker({showMeridian: false, showSeconds: true});
+});
+
+</script>
