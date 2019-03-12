@@ -227,6 +227,33 @@ class AttendanceController extends Controller
             }
 		}
 		else if(count(session()->get('_t')) >= 1){
+
+			$check_if_has_cluster = null;
+			foreach(session()->get('_t') as $teams){
+				// return $teams['tl_ids'];
+				foreach($teams['tl_ids'] as $tl_id){
+					if(Auth::user()->id == $tl_id){
+						// return $teams['id'];
+						$find_clusters = Clusters::get();
+						foreach($find_clusters as $get_clusters){
+							// return $get_clusters;
+							foreach($get_clusters['team_ids'] as $get_team_id){
+								// return $get_team_id;
+								// return $teams['id'];
+								// dd($teams['id'] == $get_team_id);
+								if($teams['id'] == $get_team_id){
+									$check_if_has_cluster = 'meron nga';
+								}
+							}
+						}
+					}
+				}
+			}
+			// return $check_if_has_cluster;
+			if($check_if_has_cluster == null){
+				$dont_have_cl = 1;
+	    		return view('app.attendance.index', compact('dont_have_cl'));
+			}
 			$get_session = session()->get('_t');
 			$user_ids = session()->get('_t')[0];
 			if(count(session()->get('_t')) == 1){
@@ -565,6 +592,7 @@ class AttendanceController extends Controller
 				}
 			}
 			if(!empty($user['modified_status'])){
+						// return $user;
 				// return $selected_date;
 				$check_the_fucking_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', $selected_date)->first();
 				if(!empty($check_the_fucking_attendance)){
@@ -602,7 +630,12 @@ class AttendanceController extends Controller
 						// 	'modified_remarks' => $user['modified_remarks'],
 						// 	'created_at' => $selected_date,
 						// 	'updated_at' => date('Y-m-d H:i:s'),
-						// ];
+						// ];\
+						// return $request->all();
+						// return $selected_date;
+						// return Attendance::where('user_id', 52)->whereDate('created_at', $selected_date)->first();
+						// return $user;
+						// return $user['modified_remarks'];
 						Attendance::insert([
 							"cluster_id" => $cluster_id,
 							"team_id" => $team_id,
@@ -634,7 +667,7 @@ class AttendanceController extends Controller
 		// return $data;
 		Attendance::insert($data);
 		if(!empty($data_image)){
-			Attendance_image::create($data_image);
+			Attendance_image::create([$data_image]);
 		}
 		return back();
 	}
