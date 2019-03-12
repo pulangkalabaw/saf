@@ -125,10 +125,10 @@
                             <div class="col-md-12">
                                 <label class="text-light">Edit Remark</label>
                                 @if(!empty($value['value_location']) || request()->date != Carbon\Carbon::now()->toDateString())
+                                    <input type="hidden" name="date" value="{{ $date['selected'] }}">
                                     <input type="hidden" name="users[{{ $index }}][modified_status]" value="1">
                                 @endif
-                                <input name="users[{{ $index }}][modified_remarks]" id="user_mobile_modified_remarks_{{ $value['id'] }}" class="form-control text-light input-gray" required disabled type="text"
-                                >
+                                <input name="users[{{ $index }}][modified_remarks]" id="user_mobile_modified_remarks_{{ $value['id'] }}" class="form-control text-light" required disabled type="text">
                             </div>
                         </div>
                     </div>

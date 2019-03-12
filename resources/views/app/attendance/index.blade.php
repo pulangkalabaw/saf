@@ -261,7 +261,9 @@
                                                                                         <label class="pull-right">Remarks:</label>
                                                                                     </div>
                                                                                     <div class="col-md-10">
-                                                                                        @if(!empty($value['value_location']) || request()->date != Carbon\Carbon::now()->toDateString())
+                                                                                        {{-- {{ dd($date['selected']) }} --}}
+                                                                                        @if(!empty($value['value_location']) || $date['selected'] != Carbon\Carbon::now()->toDateString())
+                                                                                            <input type="hidden" name="date" value="{{ $date['selected'] }}">
                                                                                             <input type="hidden" name="user[{{ $index }}][modified_status]" value="1">
                                                                                         @endif
                                                                                         {{-- @if(request()->date != Carbon\Carbon::now()->toDateString())

@@ -15,16 +15,17 @@ class JiromesPersonalSeeder extends Seeder
     public function run()
     {
         $faker=faker::create();
-            // CREATE USER ADMIN
+
         User::create([
-            'fname' => 'Ender Thompson',
+            'fname' => 'jiromes Angel',
             'lname' => 'Baril',
-            'email' => 'lelouch0278@gmail.com',
+            'email' => 'jiromes@gmail.com',
             'password' => bcrypt('sadsad'),
-            'role' => base64_encode('administrator'),
+            'role' => base64_encode('user'),
             'isActive' => 1,
             'remember_token' => str_random(10),
         ]);
+            // CREATE USER ADMIN
         // CLUSTER LEADER
         $user_cl = User::insertGetId([
             'fname' => 'Sarah Jane',
