@@ -20,7 +20,6 @@ class CreateSafApplicationTable extends Migration
             $table->string('team_id'); // Team id
 			$table->string('customer_name');
             $table->string('product');
-            $table->string('product');
 			$table->string('contact');
 			$table->string('address');
 			$table->integer('plan_id')->unsigned();
