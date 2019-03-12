@@ -32,27 +32,37 @@ class Application extends Model
      * [ search: team_name ]
      *
      */
-    public  function scopeSearch($query, $value){
-        //
-        $user = new User();
+    public function scopeSearch($return_query, $value){
+        $plan = new Plans();
         $teams = new Teams();
         $val = trim($value);
 
         // Search from the application
-        $return_query = $query->where('so_no', 'LIKE', "%".$val."%")
-		->orWhere('sr_no', 'LIKE', '%'.$val.'%')
-		->orWhere('status', 'LIKE', '%'.$val.'%')
-        ->orWhere('customer_name', 'LIKE', '%'.$val.'%');
+        $return_query = $return_query->where('so_no', 'LIKE', "%".$val."%")
+        ->orWhere('sr_no', 'LIKE', '%'.$val.'%')
+        ->orWhere('status', 'LIKE', '%'.$val.'%')
+        ->orWhere('customer_name', 'LIKE', '%'.$val.'%')
+        ->orWhere('product', 'LIKE', '%'.$val.'%');
 
         // Search for Team
-        $team = $teams->where('team_name', 'LIKE', "%".$val."%")->first();
-        if (!empty($team)) {
-            $return_query = $return_query->orWhere('team_id', $team->id);
+        // Check Team if empty
+        $team = $teams->where('team_name', 'LIKE', "%".$val."%")->get();
+        if (!empty($team))
+        {
+            $return_query = $return_query->orWhereIn('team_id', $team->pluck('id'));
+        }
+
+        // Search for Plan
+        // Check plan if empty
+        $plan = $plan->where('plan_name', 'LIKE', "%".$val."%")->get();
+        if (!empty($plan))
+        {
+            $return_query = $return_query->orWhereIn('plan_id', $plan->pluck('id'));
+            //dd($return_query->get());
         }
 
         // Then try to search to teams
         return $return_query;
-
     }
 
 
@@ -93,7 +103,7 @@ class Application extends Model
     }
 
     public function getTeam () {
-        return $this->hasOne('App\Teams', 'id', 'team_id');
+        return $this->hasOne('App\Teams', 'team_id', 'team_id');
     }
 
     public function getDevice () {

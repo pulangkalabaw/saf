@@ -27,58 +27,8 @@
     color: white !important;
 }
 
-.bg-default {
-    background: #272C30 !important;
-}
-
 /* CUSTOM MARGIN */
 
-    /* MARGIN LEFT */
-    .margin-left-0 {
-        margin-left: 0px !important;
-    }
-
-    /* MARGIN RIGHT */
-    .margin-right-0 {
-        margin-right: 0px !important;
-    }
-
-    /* MARGIN BOTTOM */
-    .margin-bottom-20 {
-        margin-bottom: 20px !important;
-    }
-/* END OF CUSTOM MARGIN */
-
-
-
-/* CUSTOM PADDING */
-
-    /* PADDING LEFT */
-    .padding-left-0 {
-        padding-left: 0px !important;
-    }
-
-    /* PADDING RIGHT */
-    .padding-right-0 {
-        padding-right: 0px !important;
-    }
-    .padding-right-2 {
-        padding-right: 8px !important;
-    }
-
-    /* PADDING BOTTOM */
-    .padding-top-0 {
-        padding-top: 0px !important;
-    }
-
-    /* PADDING BOTTOM */
-    .padding-bottom-0 {
-        padding-bottom: 0px !important;
-    }
-    .padding-bottom-20 {
-        padding-bottom: 20px !important;
-    }
-/* END OF CUSTOM PADDING */
 
 /* DESKTOP AND MOBILE VIEW */
 #mobile-view {

@@ -96,20 +96,17 @@
 							@endif
 
 							@if(accessControl(['administrator', 'user']))
+								@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
 								{{-- @if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl") --}}
 									<div class="quickmenu__item {{ str_contains(url()->current(), ['attendance','attendancedashboard']) ? 'active' : '' }}">
 										<div class="fa fa-clock-o"></div>
 									</div>
-							@endif
-
-							@if(accessControl(['administrator', 'user']))
-								@if(count(checkPosition(auth()->user(), ['cl', 'tl', 'agent'], true)) != 0)
-									<div class="quickmenu__item {{ str_contains(url()->current(), ['messages']) ? 'active' : '' }}">
-										<div class="fa fa-fw fa-bullhorn"></div>
-									</div>
 								@endif
 							@endif
-
+							{{-- dissable for presentation --}}
+							<div class="quickmenu__item {{ str_contains(url()->current(), ['messages']) ? 'active' : '' }}">
+								<div class="fa fa-fw fa-bullhorn"></div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -233,14 +230,14 @@
 	                                        <div class="nav-menu__text"><span>Dashboard</span></div>
 	                                    </a>
 	                                </li>
-									{{-- @if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0) --}}
+									@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
 	                                <li>
 	                                    <a href="{{ route('app.attendance.index') }}">
 	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
 	                                        <div class="nav-menu__text"><span>Users Attendance</span></div>
 	                                    </a>
 	                                </li>
-									{{-- @endif --}}
+									@endif
 	                            </ul>
 	                        </div>
 

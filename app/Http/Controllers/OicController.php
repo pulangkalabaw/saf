@@ -19,7 +19,22 @@ class OicController extends Controller
      */
     public function index(Request $request)
     {
+        $data = getUserDetailClusterAndTeam(Auth::user());
         $oic = new Oic();
+        $cluster = new Clusters();
+
+        $agent_ids = [];
+
+        if(base64_decode(Auth::user()->role) == 'user')
+        {
+            // get first all the agents available to the user
+            // if login user is cl, all avaliable agents on its team will be shown
+            // if login user is tl, all available agents in the team will be shown
+            foreach($data["_a"] as $agent){
+                $agent_ids = array_unique(array_merge($agent_ids,(array) $agent['id']));
+            }
+            $oic = $oic->whereIn('user_id', $agent_ids);
+        }
 
         // Sorting
         // params: sort_in & sort_by
@@ -33,7 +48,8 @@ class OicController extends Controller
 
         $total = $oic->count();
 
-        $oic = $oic->with(['getCluster','getTeam','getAgent'])
+        $oic = $oic
+        ->with(['getTeam','getAgent'])
         ->paginate((!empty($request->show) ? $request->show : 10));
 
         return view('app.oic.index',[
@@ -49,34 +65,20 @@ class OicController extends Controller
      */
     public function create(Request $request)
     {
-        $users = Auth::user();
-        $getClusterAndTeam = getMyClusterAndTeam(Auth::user());
-        // (!empty($getClusterAndTeam['_c'])) ? $getClusterOrTeam = $getClusterAndTeam['_c'] : $getClusterOrTeam = $getClusterAndTeam['_t'];
+        $data = getUserDetailClusterAndTeam(Auth::user());
+        $user = Auth::user();
 
-        // if the login user is cl
-        // then show all available tl and agents for that cl leader
-        if(!empty($getClusterAndTeam["_c"]))
+        if(base64_decode($user->role) == 'administrator')
         {
-            $getClusterOrTeam = $getClusterAndTeam['_c'];
-            $team_ids = collect($getClusterOrTeam)->pluck('team_ids');
-            $agent = Teams::whereIn('id', $team_ids[0])->get()->pluck('agent_ids');
-            $user_teams = Teams::whereIn('id', $team_ids[0])->get();
+            $users = User::get();
+            $user_teams = Teams::get();
         }
-        // else if the login user is tl
-        // then show all available teams
-        else if (!empty($getClusterAndTeam["_t"]))
+        else if(base64_decode($user->role) == 'user')
         {
-            $getClusterOrTeam = $getClusterAndTeam['_t'];
-            $team_ids = collect($getClusterOrTeam)->pluck('team_id');
-            $agent = Teams::whereIn('team_id', $team_ids)->get()->pluck('agent_ids');
-            $user_teams = fetchTeams(Auth::user());
+            // checkPosition(Auth::user())
+            $user_teams = $data['_t'];
+            $users = $data['_a'];
         }
-
-        // $getClusterOrTeam = $getClusterAndTeam['_t'];
-        // $team_ids = collect($getClusterOrTeam)->pluck('team_id');
-
-        $agent_decoded = json_decode($agent);
-        $users = $users->whereIn('id', $agent_decoded)->get();
 
         return view('app.oic.create', [
             'users' => $users,
@@ -94,8 +96,13 @@ class OicController extends Controller
     {
         //Get the value of cluster id within the team
         $teams = new Teams();
-        $teams = $teams->clusters($request->team_id);
-        $cluster_id = $teams[0]['cluster_id'];
+        $clusters = $teams->clusters($request->team_id);
+
+        // Get cluster id
+        // this foreach will get the cluster id of the login user
+        foreach($clusters as $cluster){
+            $cluster_id = $cluster['cluster_id'];
+        }
 
         $validate = Validator::make($request->all(),[
             'team_id' => 'required',

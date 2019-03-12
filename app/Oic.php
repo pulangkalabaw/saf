@@ -10,7 +10,7 @@ class Oic extends Model
     protected $guarded = [];
     protected $dates = ['created_at','updated_at'];
 
-    public function getCluster () {
+    public function getCluster() {
         return $this->hasOne('App\Clusters', 'cluster_id', 'cluster_id');
     }
 

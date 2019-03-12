@@ -34,7 +34,7 @@
 						{{-- Body start --}}
 
 						<div class="panel-body">
-	                        <form action="{{ route('app.applications.store') }}" method="POST">
+	                        <form id="form_id" action="{{ route('app.applications.store') }}" method="POST">
 	                            @include('includes.notif')
 
 	                            {{ csrf_field() }}
@@ -47,14 +47,22 @@
 												<span class="required">*</span>
 											@endif
 	                                        <div class="col-md-7">
-												<select name="team_id" class="form-control">
-													@if (empty(old('team_id')))
-														<option value="" selected>Select Team (required)</option>
-													@endif
-													@foreach($teams as $team)
-														<option {{ old('team_id') == $team['id'] ? 'selected' : '' }} value="{{ $team['id'] }}">{{ $team['team_name'] }}</option>
-													@endforeach
-												</select>
+												@if(count($teams) == 1)
+													<select class="form-control select_enable" name="team_id" disabled>
+														@foreach ($teams as $team)
+															<option selected value="{{ $team['team_id'] }}">{{ $team['team_name'] }}</option>
+														@endforeach
+													</select>
+												@else
+													<select name="team_id" class="form-control">
+														@if (empty(old('team_id')))
+															<option value="" selected>Select Team (required)</option>
+														@endif
+														@foreach($teams as $team)
+															<option {{ old('team_id') == $team['team_id'] ? 'selected' : '' }} value="{{ $team['team_id'] }}">{{ $team['team_name'] }}</option>
+														@endforeach
+													</select>
+												@endif
 
 	                                        </div>
 	                                    </div>
@@ -104,7 +112,7 @@
 														<option value="" selected>Select plan (required)</option>
 													@endif
 													@foreach ($plans as $plan)
-														<option {{ old('plan_applied') == $plan->id ? 'selected' : ''}} value="{{ $plan->id }}">{{ $plan->plan_name }}</option>
+														<option {{ old('plan_applied') == $plan->id ? 'selected' : ''}} value="{{ $plan->id }}">{{ strtoupper($plan->product) }} - {{ $plan->plan_name }}</option>
 													@endforeach
 												</select>
 	                                        </div>
@@ -125,14 +133,22 @@
 												<span class="required">*</span>
 											@endif
 	                                        <div class="col-md-7">
-												<select name="user_id" class="form-control">
-													@if (empty(old('id')))
-														<option value="" selected>Select agent (required)</option>
-													@endif
-													@foreach ($agents as $agent)
-														<option {{ old('id') == $agent['id'] ? 'selected' : '' }} value="{{ $agent['id'] }}">{{ $agent['fname'] }} {{ $agent['lname'] }}</option>
-													@endforeach
-												</select>
+												@if (count($agents) == 1)
+													<select class="form-control select_enable" name="user_id" disabled>
+														@foreach ($agents as $agent)
+															<option value="{{ $agent['id'] }}" selected>{{ $agent['fname'] }} {{ $agent['lname'] }}</option>
+														@endforeach
+													</select>
+												@else
+													<select name="user_id" class="form-control">
+														@if (empty(old('id')))
+															<option value="" selected>Select agent (required)</option>
+														@endif
+														@foreach ($agents as $agent)
+															<option {{ old('id') == $agent['id'] ? 'selected' : '' }} value="{{ $agent['id'] }}">{{ $agent['fname'] }} {{ $agent['lname'] }}</option>
+														@endforeach
+													</select>
+												@endif
 	                                        </div>
 	                                    </div>
 	                                    <div class="clearfix"></div><br>
@@ -157,4 +173,12 @@
 		</div>
 	</div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+$('#form_id').submit(function() {
+	$(".select_enable").prop('disabled', false);
+})
+</script>
 @endsection

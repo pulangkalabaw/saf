@@ -136,6 +136,17 @@
 									</div>
 									<div class="clearfix"></div><br>
 
+									<div>
+										<div class="col-md-3 col-xs-3">Product:</div>
+										<div class="col-md-7 col-xs-7">
+											@if (!empty($application->getPlan))
+												{{ strtoupper($application->getPlan->product) }}
+											@else
+												-
+											@endif
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
 
 									<div>
 										<div class="col-md-3 col-xs-3">Plan applied:</div>
