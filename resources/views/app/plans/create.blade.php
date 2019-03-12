@@ -40,6 +40,18 @@
                             {{ csrf_field() }}
                             <div class="row">
                                 <div class="col-md-7">
+                                    <div>
+                                        <div class="col-md-3">Product</div>
+                                        <div class="col-md-7">
+                                            <select class="form-control" name="product">
+                                                <option value="" disable="" selected="">Select Product (required)</option>
+                                                <option {{ old('product') == 'smart' ? 'selected': '' }} value="smart">SMART</option>
+                                                <option {{ old('product') == 'smart_bro' ? 'selected': '' }} value="smart_bro">SMART BRO</option>
+                                                <option {{ old('product') == 'sun' ? 'selected': '' }} value="sun">SUN</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
 
                                     <div>
                                         <div class="col-md-3">Plan name</div>
@@ -50,25 +62,9 @@
                                     <div class="clearfix"></div><br>
 
                                     <div>
-                                        <div class="col-md-3">With Sim</div>
-                                        <div class="col-md-7">
-                                            <input type="checkbox" name="with_sim" value="1">
-                                            {{-- <select class="form-control" name="with_sim" required>
-                                                <option {{ old('with_sim') == '1' ? 'selected': '' }} value="1">YES</option>
-                                                <option {{ old('with_sim') == '0' ? 'selected': '' }} value="0">NO</option>
-                                            </select> --}}
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div><br>
-
-                                    <div>
                                         <div class="col-md-3">With Device</div>
                                         <div class="col-md-7">
                                             <input type="checkbox" name="with_device" value="1">
-                                            {{-- <select class="form-control" name="with_device" required>
-                                                <option {{ old('with_device') == '1' ? 'selected': '' }} value="1">YES</option>
-                                                <option {{ old('with_device') == '0' ? 'selected': '' }} value="0">NO</option>
-                                            </select> --}}
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -77,6 +73,14 @@
                                         <div class="col-md-3">MSF</div>
                                         <div class="col-md-7">
                                             <input type="text" name="msf" id="" class="form-control" required value="{{ old('plan_name') }}">
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
+                                    <div>
+                                        <div class="col-md-3">Description</div>
+                                        <div class="col-md-7">
+                                            <textarea name="description" rows="8" cols="80" class="form-control"></textarea>
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>

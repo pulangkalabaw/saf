@@ -75,14 +75,20 @@
 										</tr>
 									</thead>
 									<tbody>
-                                        @foreach($oics as $oic)
+                                        @if(count($oics) == 0)
                                             <tr>
-                                                <th>{{ $oic->getCluster->cluster_name }}</th>
-                                                <th>{{ $oic->getTeam->team_name }}</th>
-                                                <th>{{ $oic->getAgent->fname }} {{ $oic->getAgent->lname }}</th>
-                                                <th>{{ $oic->assign_date }}</th>
+                                                <th colspan="4" style="text-align:center;">No Assigned OIC!</th>
                                             </tr>
-                                        @endforeach
+                                        @else
+                                            @foreach($oics as $oic)
+                                                <tr>
+                                                    <th>{{ $oic->getCluster->cluster_name }}</th>
+                                                    <th>{{ $oic->getTeam->team_name }}</th>
+                                                    <th>{{ $oic->getAgent->fname }} {{ $oic->getAgent->lname }}</th>
+                                                    <th>{{ $oic->assign_date }}</th>
+                                                </tr>
+                                            @endforeach
+                                        @endif
 									</tbody>
 								</table>
 							</div>

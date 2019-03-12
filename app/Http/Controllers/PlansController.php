@@ -112,7 +112,8 @@ class PlansController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        if(empty($request['with_device'])) $request['with_device'] = 0;
+
         $plan = Plans::where('id', $id)->firstOrFail();
 
         $request->validate([
@@ -120,7 +121,7 @@ class PlansController extends Controller
         ]);
 
         // Once validated
-        if ($plan->update($request->only('plan_name'))) {
+        if ($plan->update($request->except(['_token','_method']))) {
             return back()->with([
                 'notif.style' => 'success',
                 'notif.icon' => 'plus-circle',

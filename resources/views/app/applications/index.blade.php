@@ -65,7 +65,7 @@
 									<form action="{{ url()->current() }}" method="GET">
 										<div class="input-group">
 											<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control"
-											placeholder="Search for customer, teams, sr and so">
+											placeholder="Search for customer, teams, sr, so, plan, and product">
 											<span class="input-group-btn">
 												<button class="btn btn-primary"><span class='fa fa-search'></span> </button>
 											</span>
@@ -89,6 +89,8 @@
 													<span class='fa fa-sort'></span>
 												</a>
 											</th>
+											<th>Product</th>
+											<th>Plan</th>
 											<th>Team</th>
 											<th>
 												SR
@@ -113,24 +115,36 @@
 										</tr>
 									</thead>
 									<tbody>
-										@foreach ($applications as $application)
+										@if(count($applications) == 0)
 											<tr>
-												<td>
-													<a data-toggle="tooltip" title="View Application" href="{{ route('app.applications.show', $application->application_id) }}">
-														<span class="fa fa-sign-in"></span>
-														{{ $application->customer_name }}
-													</a>
-												</td>
-												<td>
-													{{ $application->getTeam->team_name }}
-												</td>
-												<td>{{ $application->sr_no == '' ? '-' : $application->sr_no }}</td>
-												<td>{{ $application->so_no == '' ? '-' : $application->so_no }}</td>
-												<td>{{ $application->getAgentName->fname . ' ' . $application->getAgentName->lname }}</td>
-												<td>{{ $application->created_at->diffForHumans() }}</td>
-												<td>{{ ucfirst($application->status) }}</td>
+												<th colspan="9" style="text-align:center;">No Applications Found!</th>
 											</tr>
-										@endforeach
+										@else
+											@foreach ($applications as $application)
+												<tr>
+													<td>
+														<a data-toggle="tooltip" title="View Application" href="{{ route('app.applications.show', $application->application_id) }}">
+															<span class="fa fa-sign-in"></span>
+															{{ $application->customer_name }}
+														</a>
+													</td>
+													<td> {{ strtoupper($application->getPlan->product) }} </td>
+													<td> {{ $application->getPlan->plan_name }} </td>
+													<td>
+														@if(empty($application->getTeam->team_name))
+														 	{{ "- - -" }}
+														@else
+															{{ $application->getTeam->team_name }}
+														@endif
+													</td>
+													<td>{{ $application->sr_no == '' ? '-' : $application->sr_no }}</td>
+													<td>{{ $application->so_no == '' ? '-' : $application->so_no }}</td>
+													<td>{{ $application->getAgentName->fname . ' ' . $application->getAgentName->lname }}</td>
+													<td>{{ $application->created_at->diffForHumans() }}</td>
+													<td>{{ ucfirst($application->status) }}</td>
+												</tr>
+											@endforeach
+										@endif
 									</tbody>
 								</table>
 							</div>
@@ -144,6 +158,7 @@
 										<h4>
 											Customer: {{ $application->customer_name }}
 										</h4>
+										Product: {{ strtoupper($application->getPlan->product) }} - {{ $application->getPlan->plan_name }} <br/>
 										Team: {{ $application->getTeam->team_name }} <br />
 										SR: {{ $application->sr_no }} <br />
 										SO: {{ $application->so_no }} <br />

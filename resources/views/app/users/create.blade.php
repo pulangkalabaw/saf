@@ -75,7 +75,7 @@
                                         <div class="col-md-3">Role</div>
                                         <div class="col-md-7">
                                             <select name="role" id="roles" class="form-control" required>
-                                                <option   value="" disabled="" selected="">Please select for role</option>
+                                                <option  value="" disabled="" selected="">Please select for role</option>
                                                 <option  {{ old('role') == 'administrator' ? 'selected': ''  }} value="administrator">Administrator</option>
                                                 <option  {{ old('role') == 'encoder' ? 'selected': ''  }} value="encoder">Encoder</option>
                                                 <option  {{ old('role') == 'user' ? 'selected': ''  }} value="user">User</option>

@@ -16,8 +16,9 @@ class CreatePlansTable extends Migration
         Schema::create('plans', function (Blueprint $table) {
             $table->increments('id');
             $table->string('plan_name');
-            $table->tinyInteger('with_sim');
             $table->tinyInteger('with_device');
+            $table->string('product');
+            $table->text('description');
             $table->double('msf');
             $table->timestamps();
         });
