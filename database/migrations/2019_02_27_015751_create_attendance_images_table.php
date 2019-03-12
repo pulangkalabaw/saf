@@ -18,6 +18,8 @@ class CreateAttendanceImagesTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->string('image');
             $table->string('alt');
+            $table->string('status');
+            $table->string('has_date');
             $table->timestamps();
         });
     }

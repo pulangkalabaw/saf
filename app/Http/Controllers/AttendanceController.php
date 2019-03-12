@@ -5,6 +5,7 @@ use Auth;
 use Session;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Faker\Factory as Faker;
 use App\Attendance;
 use App\Attendance_image;
@@ -227,6 +228,33 @@ class AttendanceController extends Controller
             }
 		}
 		else if(count(session()->get('_t')) >= 1){
+
+			$check_if_has_cluster = null;
+			foreach(session()->get('_t') as $teams){
+				// return $teams['tl_ids'];
+				foreach($teams['tl_ids'] as $tl_id){
+					if(Auth::user()->id == $tl_id){
+						// return $teams['id'];
+						$find_clusters = Clusters::get();
+						foreach($find_clusters as $get_clusters){
+							// return $get_clusters;
+							foreach($get_clusters['team_ids'] as $get_team_id){
+								// return $get_team_id;
+								// return $teams['id'];
+								// dd($teams['id'] == $get_team_id);
+								if($teams['id'] == $get_team_id){
+									$check_if_has_cluster = 'meron nga';
+								}
+							}
+						}
+					}
+				}
+			}
+			// return $check_if_has_cluster;
+			if($check_if_has_cluster == null){
+				$dont_have_cl = 1;
+	    		return view('app.attendance.index', compact('dont_have_cl'));
+			}
 			$get_session = session()->get('_t');
 			$user_ids = session()->get('_t')[0];
 			if(count(session()->get('_t')) == 1){
@@ -472,22 +500,85 @@ class AttendanceController extends Controller
 			}
 		}
 
+		// $this->validate($request, [
+		// 	'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+		// ]);
+		//
+		// if($request->hasFile('empImg')) {
+		// 	$image = $request->file('empImg');
+		// 	$name = time().'.'.$image->getClientOriginalExtension();
+		// 	$destinationPath = public_path('/images/attendance');
+		// 	$image->move($destinationPath, $name);
+		// 	$data_image = [
+		// 		'user_id' => Auth::user()->id,
+		// 		'image' => $name,
+		// 		'alt' => $name,
+		// 	];
+		// }
 
-		$this->validate($request, [
-			'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-		]);
+		if($image = $request->input('empImg')){
+			$this->validate($request, [
+				'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+			]);
+			$image = $request->input('empImg'); // image base64 encoded
+			preg_match("/data:image\/(.*?);/",$image,$image_extension); // extract the image extension
+			$image = preg_replace('/data:image\/(.*?);base64,/','',$image); // remove the type part
+			$image = str_replace(' ', '+', $image);
+			$imageName = 'image_' . time() . '.' . $image_extension[1]; //generating unique file name;
+			Storage::disk('public')->put($imageName,base64_decode($image));
+			Session::flash('success', "Your photo has been uploaded successfully");
+			$status	= $request->status = 0;
+			$has_date =	$request->has_date = 0;
 
-		if($request->hasFile('empImg')) {
-			$image = $request->file('empImg');
-			$name = time().'.'.$image->getClientOriginalExtension();
-			$destinationPath = public_path('/images/attendance');
-			$image->move($destinationPath, $name);
-			$data_image = [
-				'user_id' => Auth::user()->id,
-				'image' => $name,
-				'alt' => $name,
-			];
+		}else{
+			$this->validate($request, [
+				'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+			]);
+			if(\Carbon\Carbon::now()->format('H:i:s') >= \Carbon\Carbon::parse('10:30:00')->format('H:i:s')){
+				Session::flash('message', "Sorry you cannot upload this photo at this time");
+				return back();
+			}else{
+				$this->validate($request, [
+					'selected_user[]' => 'in:0,1',
+					'empImg' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+				]);
+
+				if(empty(exif_read_data($request->empImg)['DateTimeOriginal'])){
+					$file = $request->file('empImg');
+					$name = 'image_' . time().'.'.$file->getClientOriginalExtension();
+					Storage::disk('public')->put($name,file_get_contents($file));
+					Session::flash('success', "Your photo has been uploaded successfully");
+					$status	= $request->status = 1;
+					$has_date =	$request->has_date = 1;
+				}elseif(date("m/d/Y", strtotime(exif_read_data($request->empImg)['DateTimeOriginal'])) != Carbon::today()->format('m/d/Y')){
+					Session::flash('message', "Sorry this photo is not taken today");
+					return back();
+				} else{
+					if($request->hasFile('empImg')) {
+						// return $request->empImg;
+						// $image = $request->file('empImg');
+						// $name = time().'.'.$image->getClientOriginalExtension();
+						// $destinationPath = public_path('/images');
+						// $image->move($destinationPath, $name);
+						// return $name;
+						$file = $request->file('empImg');
+						$name = 'image_' . time().'.'.$file->getClientOriginalExtension();
+						Storage::disk('public')->put($name,file_get_contents($file));
+						Session::flash('success', "Your photo has been uploaded successfully");
+						$status	= $request->status = 1;
+						$has_date =	$request->has_date = 0;
+					}
+				}
+				$data_image = [
+					'user_id' => Auth::user()->id,
+					'image' => $name,
+					'alt' => $name,
+					'status' => $status,
+					'has_date' => $has_date,
+				];
+			}
 		}
+
 		if($request->mobile_version == null){
 			$get_user = $request->only('user')['user'];
 		} else {
@@ -568,7 +659,9 @@ class AttendanceController extends Controller
 				}
 			}
 			if(!empty($user['modified_status'])){
-				$check_the_fucking_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', Carbon::today())->first();
+
+				$check_the_fucking_attendance = Attendance::where('user_id', $user['user_id'])->whereDate('created_at', $selected_date)->first();
+
 				if(!empty($check_the_fucking_attendance)){
 					if($user['status'] == null){
 						Attendance::where('user_id', $user['user_id'])->delete();
@@ -586,6 +679,45 @@ class AttendanceController extends Controller
 							Attendance::where('user_id', $user['user_id'])->update($set_data);
 						}
 					}
+				} else {
+					if($user['status'] != null){
+						// return $team_id;
+						// return $cluster_id;
+						// return $user['user_id'];
+						// return [
+						// 	"cluster_id" => $cluster_id,
+						// 	"team_id" => $team_id,
+						// 	"user_id" => $user['user_id'],
+						// 	"activities" => $user['activities'],
+						// 	"location" => $user['location'],
+						// 	"remarks" => $user['remarks'],
+						// 	"status" => $user['status'],
+						// 	'created_by' => Auth::user()->id,
+						// 	'modified_by' => Auth::user()->id,
+						// 	'modified_remarks' => $user['modified_remarks'],
+						// 	'created_at' => $selected_date,
+						// 	'updated_at' => date('Y-m-d H:i:s'),
+						// ];\
+						// return $request->all();
+						// return $selected_date;
+						// return Attendance::where('user_id', 52)->whereDate('created_at', $selected_date)->first();
+						// return $user;
+						// return $user['modified_remarks'];
+						Attendance::insert([
+							"cluster_id" => $cluster_id,
+							"team_id" => $team_id,
+							"user_id" => $user['user_id'],
+							"activities" => $user['activities'],
+							"location" => $user['location'],
+							"remarks" => $user['remarks'],
+							"status" => $user['status'],
+							'created_by' => Auth::user()->id,
+							'modified_by' => Auth::user()->id,
+							'modified_remarks' => $user['modified_remarks'],
+							'created_at' => $selected_date,
+							'updated_at' => date('Y-m-d H:i:s'),
+						]);
+					}
 				}
 			}
 		}
@@ -602,6 +734,7 @@ class AttendanceController extends Controller
 		// return $data;
 		Attendance::insert($data);
 		if(!empty($data_image)){
+			// return $data_image;
 			Attendance_image::create($data_image);
 		}
 		return back();

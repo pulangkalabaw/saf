@@ -1,5 +1,23 @@
-<div class="panel-body">
+@if (Session::has('message'))
+<div class="alert alert-dismissable alert-danger">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+        {{ Session::get('message') }}
+</div>
+@endif
+@if (Session::has('success'))
+   <!-- <div class="alert alert-success">{{ Session::get('success') }}</div> -->
+   <div class="alert alert-dismissable alert-success">
+       <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+           <span aria-hidden="true">&times;</span>
+       </button>
+           {{ Session::get('success') }}
+   </div>
+@endif
+<div class="panel-body padding-left-0 padding-right-0">
     {{-- {{ dd(count($attendance['unpresent'])) }} --}}
+    <input name="selected_date" type="hidden" value="{{ $date['selected'] }}">
     @foreach($attendance['unpresent'] as $index => $value)
         {{-- {{ dd($value) }} --}}
     <div class="form-group">
@@ -22,7 +40,16 @@
                                 @endif
                             @endif
                             >
-                            <button type="button" name="changeStatus" id="changeStatus_{{ $index }}" onclick="changeButtonStatus('mobile', 'changeStatus_{{ $index }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]', '{{ $value['id'] }}')"
+                            <button type="button" name="changeStatus" id="changeMobileStatus_{{ $value['id'] }}" onclick="changeButtonStatus('mobile', 'changeMobileStatus_{{ $value['id'] }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]', '{{ $value['id'] }}');
+                            @if(!empty($value['value_btn']))
+                                showMobileClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}');
+                            @endif
+                            @if(!empty(request()->date))
+                                @if(request()->date != Carbon\Carbon::now()->toDateString())
+                                    showRemark('{{ $value['id'] }}', 'mobile');
+                                @endif
+                            @endif
+                            "
                             class="btn pull-right
                             @if(!empty($value['value_btn']))
                                 {{ $value['value_btn']['class'] }}
@@ -90,6 +117,19 @@
                                     disabled
                                 @endif
                             >
+                        </div>
+                    </div>
+                    <div class="row" id="row-accordion-container-{{ $value['id'] }}">
+                        <div class="collapse" id="accordion-mobile-container-{{ $value['id'] }}">
+                            <hr>
+                            <div class="col-md-12">
+                                <label class="text-light">Edit Remark</label>
+                                @if(!empty($value['value_location']) || request()->date != Carbon\Carbon::now()->toDateString())
+                                    <input type="hidden" name="users[{{ $index }}][modified_status]" value="1">
+                                @endif
+                                <input name="users[{{ $index }}][modified_remarks]" id="user_mobile_modified_remarks_{{ $value['id'] }}" class="form-control text-light input-gray" required disabled type="text"
+                                >
+                            </div>
                         </div>
                     </div>
                 </div>
