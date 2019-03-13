@@ -84,7 +84,7 @@
 			<div class="clearfix"></div><Br />
 		@endif
 	@endif
-	
+
         <!-- PAT WIDGET  -->
         @if( (!empty(checkPosition(auth()->user(), ['tl','cl'])) || accessControl(['administrator','user'])) && isset($heirarchy) )
         <div class="row">
@@ -106,8 +106,8 @@
                             @if(count(checkPosition(auth()->user(), ['tl','cl'], true)) || accessControl(['administrator']))
                                 <div class="row">
                                     <form action="{{ route('app.dashboard') }}" method="get">
-                                        <div class="col-md-2 col-xs-5">From<input type="date" name="from" class="form-control input-sm"></div>
-                                        <div class="col-md-2 col-xs-5">To<input type="date" name="to" class="form-control input-sm"></div>
+                                        <div class="col-md-2 col-xs-5">From<input type="date" name="from" value="{{ request()->get('from') }}" class="form-control input-sm"></div>
+                                        <div class="col-md-2 col-xs-5">To<input type="date" name="to" value="{{ request()->get('to') }}" class="form-control input-sm"></div>
                                         <div class="col-md-2 col-xs-2"><br><button class="btn btn-primary btn-sm"><i class="fa fa-search"></i></button></div>
                                     </form>
                                 </div>
