@@ -37,7 +37,7 @@
 								@foreach ($application_model->allStatus($application->application_id) as $appli)
 									<tr>
 										<td>
-											{{ ucfirst($appli->status_id) }}
+											{{ $appli->application_id }}
 										</td>
 										<td>
 											{{ $application_status->addedBy($appli->application_id)->fname }}

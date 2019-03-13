@@ -16,8 +16,9 @@ class ApplicationStatus extends Model
     }
 
     public function addedBy ($application_id) {
-        $application_status = $this->where('application_id', $application_id)->firstOrFail();
-        return User::where('id', $application_status->added_by)->firstOrFail();
+        $as = new ApplicationStatus();
+        $application_status = $as->where('application_id', $application_id)->first();
+        return User::where('id', $application_status->added_by)->first();
     }
     // Shows all the edited application status
     public function editedStatuses ($application_id) {

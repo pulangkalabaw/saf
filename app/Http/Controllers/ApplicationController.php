@@ -146,7 +146,6 @@ class ApplicationController extends Controller
 		// Get cluster
 		$team_model = new Teams();
 		$team_model = $team_model->getCluster($request['team_id']);
-
 		// Modified: get the cluster id
 		foreach($team_model as $cluster){
 			$cluster_id = $cluster['cluster_id'];

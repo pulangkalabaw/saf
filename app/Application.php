@@ -103,7 +103,7 @@ class Application extends Model
     }
 
     public function getTeam () {
-        return $this->hasOne('App\Teams', 'team_id', 'team_id');
+        return $this->hasOne('App\Teams', 'id', 'team_id');
     }
 
     public function getDevice () {

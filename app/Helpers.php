@@ -604,7 +604,18 @@ function getHeirarchy2($date = null){
 				// end of calculate/get attendance of tl on this day
 
 				// for percentage of this cutoff
-				$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
+				// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
+$acc_total_target = $res['getallsafthiscutoff']['target']; // total current selled
+        $total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
+        if ($total_based_target == 0) {
+				  $res['pat'] = 0;
+				}
+				else {
+					$pat = ($acc_total_target / $total_based_target) * 100;
+					$res['pat'] = $pat;
+				}
+
+
 				return $res;
 			});
 			return $res;
@@ -682,7 +693,17 @@ function getHeirarchy2($date = null){
 					// end of calculate/get attendance of tl on this day
 
 					// for percentage of this cutoff
-					$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
+					// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
+$acc_total_target = $res['getallsafthiscutoff']['target']; // total current selled
+        $total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
+        if ($total_based_target == 0) {
+				  $res['pat'] = 0;
+				}
+				else {
+					$pat = ($acc_total_target / $total_based_target) * 100;
+					$res['pat'] = $pat;
+				}
+
 					return $res;
 				});
 				return $res;
@@ -758,7 +779,16 @@ function getHeirarchy2($date = null){
 							// end of calculate present, absent, unkown
 
 							// for percentage of this cutoff
-							$res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
+							// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
+$acc_total_target = $res['getallsafthiscutoff']['target']; // total current selled
+        $total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
+        if ($total_based_target == 0) {
+				  $res['pat'] = 0;
+				}
+				else {
+					$pat = ($acc_total_target / $total_based_target) * 100;
+					$res['pat'] = $pat;
+				}
 							return $res;
 						}
 					});
