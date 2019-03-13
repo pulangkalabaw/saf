@@ -34,17 +34,12 @@
 								</tr>
 							</thead>
 							<tbody>
-								@foreach ($application_model->allStatus($application->application_id) as $appli)
-									<tr>
-										<td>
-											{{ ucfirst($appli->status_id) }}
-										</td>
-										<td>
-											{{ $application_status->addedBy($appli->application_id)->fname }}
-											{{ $application_status->addedBy($appli->application_id)->lname }}
-										</td>
-										<td>{{ $appli->created_at->diffForHumans() }}</td>
-									</tr>
+								@foreach($application_status as $app)
+								<tr>
+									<td>{{ ucfirst($app->status_id) }}</td>
+									<td>{{ $app->added_by->fname }} {{ $app->added_by->lname }}</td>
+									<td>{{ $app->created_at->diffForHumans() }}</td>
+								</tr>
 								@endforeach
 							</tbody>
 						</table>

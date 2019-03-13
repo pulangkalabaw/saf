@@ -6,209 +6,258 @@
 
 @section('content')
 
-<div class="main-heading">
-    <ol class="breadcrumb">
-        <li class="">{{ strtoupper(env('APP_NAME')) }}</li>
-        <li class="">Users</li>
-        <li class="active">Dashboard</li>
-    </ol>
-</div>
-<!-- {{ base64_encode('administrator') }} -->
-<div class="container-fluid half-padding">
-    <div class="template template__blank">
+	<div class="main-heading">
+		<ol class="breadcrumb">
+			<li class="">{{ strtoupper(env('APP_NAME')) }}</li>
+			<li class="">Users</li>
+			<li class="active">Dashboard</li>
+		</ol>
+	</div>
 
-        <!-- PAT WIDGET  -->
-        @if( (!empty(checkPosition(auth()->user(), ['tl','cl'])) || accessControl(['administrator','user'])) && isset($heirarchy) )
-        <div class="row">
-            <div class="col-md-12">
-                <div class="panel panel-info">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Applications</h3>
-                    </div>
-                    <div class="panel-body">
-                        @if(!isset($heirarchy['clusters'][0]['cluster_name']))
-                            @if(checkPosition(auth()->user(), ['a']))
-                                <h5 class="text-center text-info"><i class="fa fa-info-circle"></i> *Agents dashboard coming soon*</h5>
-                            @else
-                                <h5 class="text-center text-warning"><i class="fa fa-warning"></i> You have no clusters or team</h5>
-                            @endif
-                        @endif
-                        <!-- <h5>As of {{ now()->format('M d y g:i a') }} - {{ now()->format('M d y g:i a') }}</h5> -->
-                        <!-- PUT FOREACH TEAM  -->
-                        @foreach($heirarchy['clusters'] as $clus)
-                            @if($clus) <!-- FOR CATCHING NULL ERRORS -->
-                            <div class="container">
-                                <div class="col-md-12">
-                                    <h4>{{ $clus->cluster_name }}</h4>
-                                </div>
-                                <!-- PUT FOREACH TEAM  -->
-                                @foreach($clus->teams as $team)
-                                    @if($team)
-                                    <div class="col-md-2">
-                                        <div class="breadcrumb">
-                                            <h5><b>{{ $team->team_name }}</b></h5>
-                                            <p>New: <b>{{ (float)$team->getallsafthiscutoff['new'] }}</b></p>
-                                            <p>Activated: <b class="text-info">{{ (float)$team->getallsafthiscutoff['activated'] }}</b></p>
-                                            <p>Paid: <b class="text-primary">{{ (float)$team->getallsafthiscutoff['paid'] }}</b></p>
-                                            <p>PAT: <b class="text-success">{{ (float)number_format($team->pat, 2) }}%</b></p>
-                                        </div>
-                                    </div>
-                                    @endif
-                                @endforeach
-                                <!-- PUT ENDFOREACH TEAM -->
-                            </div>
-                            @endif
-                        @endforeach
-                        <!-- PUT ENDFOREACH CLUSTER  -->
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
-        <!-- PAT WIDGET -->
+	<div class="container-fluid half-padding">
+		<div class="template template__blank">
 
-        <!-- START OF GRAPHS  -->
-        <!-- <div class="row">
-            <div class="col-md-6">
-                <div class="panel panel-danger">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Application counter (Cluster)</h3>
-                    </div>
-                    <div class="panel-body">
-                        <canvas id="application_counter_by_cluster"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="panel panel-primary">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Application counter (Team)</h3>
-                    </div>
-                    <div class="panel-body">
-                        <canvas id="application_counter_by_teams"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
+			{{-- Product chart --}}
+			@if (count($_w_product_chart) != 0)
+				@if ($_w_product_chart[0]['count'] != 0)
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								Product Chart
+							</h3>
+						</div>
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-md-8">
+									<canvas id="product_chart"></canvas>
+								</div>
+								<div class="col-md-4">
+									<h2>Product chart</h2>
+									<ul>
+										@foreach ($_w_product_chart as $key => $pc)
+											@if ($pc['count'] != 0)
+												<li>
+													{{ productNameConvert($pc['product']) }}:
+													{{ $pc['count'] }}
+												</li>
+											@endif
+										@endforeach
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="clearfix"></div><Br />
+				@endif
+			@endif
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="panel panel-warning">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Status application</h3>
-                    </div>
-                    <div class="panel-body">
-                        <canvas id="no_of_status_that_used"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-        <!-- END OF GRAPHS  -->
-    </div>
-</div>
+
+			{{-- Appplication Status --}}
+			@if (count($_w_application_status_counter['application_status_c']) != 0)
+				@if ($_w_application_status_counter['application_status_c'][0]['count'] != 0)
+
+					<div class="panel panel-info">
+						<div class="panel-heading">
+							<h3 class="panel-title">
+								Application Status
+							</h3>
+						</div>
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-md-8">
+									<canvas id="application_status"></canvas>
+								</div>
+								<div class="col-md-4">
+									<h2>Application statuses</h2>
+									<ul>
+										@foreach ($_w_application_status_counter['application_status_c'] as $key => $asc)
+											@if ($asc['count'] != 0)
+												<li>
+													{{ ucfirst($asc['status']) }}:
+													{{ $asc['count'] }}
+												</li>
+											@endif
+										@endforeach
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="clearfix"></div><Br />
+				@endif
+			@endif
+
+
+			<!-- PAT WIDGET  -->
+			@if( (!empty(checkPosition(auth()->user(), ['tl','cl'])) || accessControl(['administrator','user'])) && isset($heirarchy) )
+				<div class="row">
+					<div class="col-md-12">
+						<div class="panel panel-info">
+							<div class="panel-heading">
+								<h3 class="panel-title">Applications</h3>
+							</div>
+							<div class="panel-body">
+								@if(!isset($heirarchy['clusters'][0]['cluster_name']))
+									@if(checkPosition(auth()->user(), ['a']))
+										<h5 class="text-center text-info"><i class="fa fa-info-circle"></i> *Agents dashboard coming soon*</h5>
+									@else
+										<h5 class="text-center text-warning"><i class="fa fa-warning"></i> You have no clusters or team</h5>
+									@endif
+								@endif
+								<!-- <h5>As of {{ now()->format('M d y g:i a') }} - {{ now()->format('M d y g:i a') }}</h5> -->
+								<!-- PUT FOREACH TEAM  -->
+								@foreach($heirarchy['clusters'] as $clus)
+									@if($clus) <!-- FOR CATCHING NULL ERRORS -->
+										<div class="container">
+											<div class="col-md-12">
+												<h4>{{ $clus->cluster_name }}</h4>
+											</div>
+											<!-- PUT FOREACH TEAM  -->
+											@foreach($clus->teams as $team)
+												@if($team)
+													<div class="col-md-2">
+														<div class="breadcrumb">
+															<h5><b>{{ $team->team_name }}</b></h5>
+															<p>New: <b>{{ (float)$team->getallsafthiscutoff['new'] }}</b></p>
+															<p>Activated: <b class="text-info">{{ (float)$team->getallsafthiscutoff['activated'] }}</b></p>
+															<p>Paid: <b class="text-primary">{{ (float)$team->getallsafthiscutoff['paid'] }}</b></p>
+															<p>PAT: <b class="text-success">{{ (float)number_format($team->pat, 2) }}%</b></p>
+														</div>
+													</div>
+												@endif
+											@endforeach
+											<!-- PUT ENDFOREACH TEAM -->
+										</div>
+									@endif
+								@endforeach
+								<!-- PUT ENDFOREACH CLUSTER  -->
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="clearfix"></div><br />
+			@endif
+			<!-- PAT WIDGET -->
+		</div>
+	</div>
 
 @endsection
 
 @section ('scripts')
-{{-- @include('partials.scripts._datatables') --}}
 
-<script src="{{ asset('assets/js/Chart.bundle.js') }}"></script>
-<script src="{{ asset('assets/js/Chart.js') }}"></script>
+	<script src="{{ asset('assets/js/Chart.bundle.js') }}"></script>
+	<script src="{{ asset('assets/js/Chart.js') }}"></script>
 
-<script>
+	<script>
 
-// Dashboard Widgets (Cluster)
-var acbc_ctx = document.getElementById("application_counter_by_cluster").getContext('2d');
-var acbc_labels = {!! $application_counter_by_cluster->map(function ($r) {return " (".$r['total_count']. ") " .$r['getClusterName']['cluster_name']; }) !!};
-var acbc_data = {!! $application_counter_by_cluster->map(function ($r) {return $r['total_count']; }) !!};
-var acbc_myChart = new Chart(acbc_ctx, {
-    type: 'horizontalBar',
-    data: {
-        labels: acbc_labels,
-        datasets: [
-            {label: 'Application counter', data: acbc_data, backgroundColor:'rgba(255, 99, 132, 0.2)', borderColor: '#ed4949', borderWidth: 3 }
-        ]
-    },
-    options: {
-        scales: {
-            xAxes: [{
-                ticks: {
-                    beginAtZero:true,
-                }
-            }],
-            yAxes: [{
-                ticks: {
-                    maxRotation: 30,
-                    minRotation: 30
-                }
-            }] },
-            responsive: true,
-        },
-    });
+	{{--
+	***
+	Application Status
+	***
+	--}}
 
-    // Dashboard Widgets (Team)
-    var acbt_ctx = document.getElementById("application_counter_by_teams").getContext('2d');
-    var acbt_labels = {!! $application_counter_by_teams->map(function ($r) {return "(".$r['total_count']. ") " .$r['getTeam']['team_name']; }) !!};
-    var acbt_data = {!! $application_counter_by_teams->map(function ($r) {return $r['total_count']; }) !!};
-    console.log(acbt_data)
-    var acbt_myChart = new Chart(acbt_ctx, {
-        type: 'horizontalBar',
-        data: {
-            labels: acbt_labels,
-            datasets: [
-                {label: 'Application counter', data: acbt_data, backgroundColor:'rgba(54, 162, 235, 0.2)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 3 }
-            ]
-        },
-        options: {
-            scales: {
-                xAxes: [{
-                    ticks: {
-                        beginAtZero:true,
-                    }
-                }],
-                yAxes: [{
-                    ticks: {
-                        maxRotation: 30,
-                        minRotation: 30
-                    }
-                }]
-            },
-            responsive: true,
-        },
-    });
+	var aps_ctx = document.getElementById("application_status").getContext('2d');
 
-    {{-- Status Application --}}
-    var nostu_ctx = document.getElementById("no_of_status_that_used").getContext('2d');
-    var nostu_labels = {!! $no_of_status_that_used->map(function ($r) {return "(".$r['total_count']. ") " .$r['status']; }) !!};
-    var nostu_data = {!! $no_of_status_that_used->map(function ($r) {return $r['total_count']; }) !!};
-    var nostu_myChart = new Chart(nostu_ctx, {
-        type: 'bar',
-        data: {
-            labels: nostu_labels,
-            datasets: [
-                {label: 'Status used', data: nostu_data, backgroundColor:'rgba(255, 206, 86, 0.2)', borderColor: 'rgba(255, 206, 86, 1)', borderWidth: 3 }
-            ]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero:true,
-                    }
-                }],
-                xAxes: [{
-                    ticks: {
-                        maxRotation: 30,
-                        minRotation: 30
-                    }
-                }]
-            },
-            responsive: true,
-        }
-    });
+	var aps_labels = {!! collect($_w_application_status_counter['application_status_c'])->map(function ($r) {
+		return '('.$r['count'].') '. ucfirst($r['status']);
+	}) !!};
+
+	var aps_data = {!! collect($_w_application_status_counter['application_status_c'])->map(function ($r) {
+		return ucfirst($r['count']);
+	}) !!}
 
 
+	var aps_myChart = new Chart(aps_ctx, {
+		type: 'pie',
+		data: {
+			labels: aps_labels,
+			datasets: [
+				{
+					label: 'Application counter',
+					data: aps_data,
+					backgroundColor:[
+						'rgb(220,20,60)',
+						'rgb(30,144,255)',
+						'rgb(173,255,47)',
+						'rgb(143,188,143)',
+					],
+					borderWidth: 3
+				}
+			]
+		},
+		options: {
+			scales: {
+				xAxes: [{
+					ticks: {
+						beginAtZero:true,
+					}
+				}],
+				yAxes: [{
+					ticks: {
+						maxRotation: 30,
+						minRotation: 30
+					}
+				}] },
+				responsive: true,
+			},
+		});
 
-</script>
 
-@endsection
+		{{--
+		***
+		Product Chart
+		***
+		--}}
+
+		var acbc_ctx = document.getElementById("product_chart").getContext('2d');
+
+		var acbc_labels = {!! collect(array_filter(collect($_w_product_chart)->map(function ($r) {
+			if ($r['count'] != 0) {
+				return " (".$r['count']. ") " .productNameConvert($r['product']);
+			}
+		})->toArray())) !!};
+
+		var acbc_data = {!! collect(array_filter(collect($_w_product_chart)->map(function ($r) {
+			if ($r['count'] != 0) {
+				return $r['count'];
+			}
+		})->toArray())) !!}
+
+
+		var acbc_myChart = new Chart(acbc_ctx, {
+			type: 'pie',
+			data: {
+				labels: acbc_labels,
+				datasets: [
+					{
+						label: 'Application counter',
+						data: acbc_data,
+						backgroundColor:[
+							'rgb(220,20,60)',
+							'rgb(30,144,255)',
+							'rgb(173,255,47)',
+						],
+						borderWidth: 3
+					}
+				]
+			},
+			options: {
+				scales: {
+					xAxes: [{
+						ticks: {
+							beginAtZero:true,
+						}
+					}],
+					yAxes: [{
+						ticks: {
+							maxRotation: 30,
+							minRotation: 30
+						}
+					}] },
+					responsive: true,
+				},
+			});
+
+			</script>
+
+		@endsection

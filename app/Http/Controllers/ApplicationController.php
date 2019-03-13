@@ -36,18 +36,11 @@ class ApplicationController extends Controller
 		$applications = new Application();
 
 		$applications_total = $applications->count();
+
 		// Get the current login users cluster Id
 		// this will show all the applications base on which cl or tl is login
+		$applications = $applications->applicationSubmitted(Auth::user());
 
-		if (base64_decode(Auth::user()->role) == 'user'){
-			$applications = $applications->whereIn('team_id', collect(Session::get('_t'))->map(function($r){
-				return $r['id'];
-			}))
-			->orWhereIn('cluster_id', collect(Session::get('_c'))->map(function($r){
-				return $r['cluster_id'];
-			}))
-			->orWhere('agent_id', Auth::user()->id);
-		}
 		// Sorting
         // params: sort_in & sort_by
         if (!empty($request->get('sort_in') && !empty($request->get('sort_by')))) $applications = $applications->sort($request);
@@ -86,12 +79,25 @@ class ApplicationController extends Controller
 		$agents = User::get();
 
 		if(base64_decode(Auth::user()->role) != 'administrator'){
-			$clusters = $data['_c'];
-			$teams = $data['_t'];
-			$agents = $data['_a'];
+
+			if(!empty(checkUserAgents(Auth::user())))
+			{
+				$clusters = $data['_c'];
+				$teams = $data['_t'];
+				$agents = $data['_a'];
+			}
+			else
+			{
+				return back()->with([
+                    'notif.style' => 'danger',
+                    'notif.icon' => 'times-circle',
+                    'notif.message' => 'Failed to access module!',
+                ]);
+			}
 		}
 
 		return view('app.applications.create', [
+			'status' => 'success',
 			'plans' => $plans,
 			'clusters' => $clusters,
 			'teams' => $teams,
@@ -148,7 +154,7 @@ class ApplicationController extends Controller
 		$team_model = $team_model->getCluster($request['team_id']);
 		// Modified: get the cluster id
 		foreach($team_model as $cluster){
-			$cluster_id = $cluster['cluster_id'];
+			$cluster_id = $cluster['id'];
 		}
 
 		if (empty($cluster_id)) {
@@ -257,7 +263,7 @@ class ApplicationController extends Controller
 		return view('app.applications.edit', [
 			'application' => $application,
 			'application_model' => $application_model,
-			'application_status' => $application_status,
+			'application_status' => $application_status->appStatus($id),
 			'users' => $users->get(), // !!! FIX THIS: this code will show all users, but we need is the users or agents that is in this team. !!!
 			'plans' => $plans,
 		]);

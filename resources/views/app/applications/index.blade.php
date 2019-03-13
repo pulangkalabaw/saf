@@ -23,10 +23,12 @@
 								</div>
 								<div class="col-md-4 col-xs-4 text-right">
 
-									@if (count(checkPosition(auth()->user(), ['tl', 'cl'], true)) != 0 || accessControl(['administrator']))
-										<a href="{{ route('app.applications.create') }}" class="btn btn-sm btn-primary">
-											<span class='fa fa-plus-circle'></span> Add Application
-										</a>
+									@if(!empty(checkUserAgents(auth()->user())))
+										@if (count(checkPosition(auth()->user(), ['tl', 'cl'], true)) != 0 || accessControl(['administrator']))
+											<a href="{{ route('app.applications.create') }}" class="btn btn-sm btn-primary">
+												<span class='fa fa-plus-circle'></span> Add Application
+											</a>
+										@endif
 									@endif
 
 								</div>
@@ -131,8 +133,8 @@
 													<td> {{ strtoupper($application->getPlan->product) }} </td>
 													<td> {{ $application->getPlan->plan_name }} </td>
 													<td>
-														@if(empty($application->getTeam->team_name))
-														 	{{ "- - -" }}
+														@if(empty($application->getTeam))
+															{{ "- - -" }}
 														@else
 															{{ $application->getTeam->team_name }}
 														@endif
@@ -159,7 +161,13 @@
 											Customer: {{ $application->customer_name }}
 										</h4>
 										Product: {{ strtoupper($application->getPlan->product) }} - {{ $application->getPlan->plan_name }} <br/>
-										Team: {{ $application->getTeam->team_name }} <br />
+										Team:
+										@if(empty($application->getTeam))
+											{{ "- - -" }}
+										@else
+											{{ $application->getTeam->team_name }}
+										@endif
+										<br />
 										SR: {{ $application->sr_no }} <br />
 										SO: {{ $application->so_no }} <br />
 										Agent: {{ $application->getAgentName->fname }} {{ $application->getAgentName->lname }} <br />

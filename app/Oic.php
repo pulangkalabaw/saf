@@ -11,11 +11,11 @@ class Oic extends Model
     protected $dates = ['created_at','updated_at'];
 
     public function getCluster() {
-        return $this->hasOne('App\Clusters', 'cluster_id', 'cluster_id');
+        return $this->hasOne('App\Clusters', 'id', 'cluster_id');
     }
 
     public function getTeam () {
-        return $this->hasOne('App\Teams', 'team_id', 'team_id');
+        return $this->hasOne('App\Teams', 'id', 'team_id');
     }
 
     public function getAgent () {
