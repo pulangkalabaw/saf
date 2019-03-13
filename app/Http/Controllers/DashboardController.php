@@ -54,7 +54,7 @@ class DashboardController extends Controller
 
         // dd($application_counter_by_teams);
 
-        // dd(getHeirarchy2());
+        // dd($request->from);
 
         return view('app.dashboard', [
             'no_of_status_that_used' => $no_of_status_that_used,
@@ -62,7 +62,7 @@ class DashboardController extends Controller
             'application_counter_by_teams' => $application_counter_by_teams,
             // 'clusters' => (!empty($clusters)) ? $clusters : null,
             // 'teams' => (!empty($teams)) ? $teams : null,
-            'heirarchy' => getHeirarchy2(),
+            'heirarchy' => getHeirarchy2($request->from,$request->to),
         ]);
     }
 
@@ -104,6 +104,7 @@ class DashboardController extends Controller
         // RETURN VIEW
         return view('app.attendance.dashboard', [
             'heirarchy' => getHeirarchy2(),
+            'myattendance' => $myattendance,
         ]);
     }
 }

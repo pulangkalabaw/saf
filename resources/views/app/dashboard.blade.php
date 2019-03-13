@@ -34,23 +34,47 @@
                             @endif
                         @endif
                         <!-- <h5>As of {{ now()->format('M d y g:i a') }} - {{ now()->format('M d y g:i a') }}</h5> -->
+                        @if(isset($heirarchy['clusters']))
+                            @if(count(checkPosition(auth()->user(), ['tl','cl'], true)) || accessControl(['administrator']))
+                                <div class="row">
+                                    <form action="{{ route('app.dashboard') }}" method="get">
+                                        <div class="col-md-2 col-xs-5">From<input type="date" name="from" class="form-control input-sm"></div>
+                                        <div class="col-md-2 col-xs-5">To<input type="date" name="to" class="form-control input-sm"></div>
+                                        <div class="col-md-2 col-xs-2"><br><button class="btn btn-primary btn-sm"><i class="fa fa-search"></i></button></div>
+                                    </form>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <br>
+                                        @if( (app('request')->input('to') != null) && (app('request')->input('from') != null) )
+                                            <b>From {{ Carbon\Carbon::parse(app('request')->input('from'))->format('M d Y') }} to {{ (app('request')->input('to') == null) ? '--': (Carbon\Carbon::parse(app('request')->input('to'))->format('M d Y')) }}</b>
+                                        @elseif( (app('request')->input('to') == null) && (app('request')->input('from') != null) )
+                                            <b>Data from {{ Carbon\Carbon::parse(app('request')->input('from'))->format('M d Y') }}</b>
+                                        @elseif((app('request')->input('to') != null) && (app('request')->input('from') == null))
+                                            <b>From {{ Carbon\Carbon::parse(app('request')->input('from'))->format('M d Y') }} to {{ Carbon\Carbon::parse(app('request')->input('to'))->format('M d Y') }}</b>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                        @endif
                         <!-- PUT FOREACH TEAM  -->
                         @foreach($heirarchy['clusters'] as $clus)
                             @if($clus) <!-- FOR CATCHING NULL ERRORS -->
-                            <div class="container">
+                            <div class="container-fluid">
                                 <div class="col-md-12">
                                     <h4>{{ $clus->cluster_name }}</h4>
                                 </div>
                                 <!-- PUT FOREACH TEAM  -->
                                 @foreach($clus->teams as $team)
                                     @if($team)
-                                    <div class="col-md-2">
+                                    <div class="col-md-3">
                                         <div class="breadcrumb">
                                             <h5><b>{{ $team->team_name }}</b></h5>
-                                            <p>New: <b>{{ (float)$team->getallsafthiscutoff['new'] }}</b></p>
-                                            <p>Activated: <b class="text-info">{{ (float)$team->getallsafthiscutoff['activated'] }}</b></p>
-                                            <p>Paid: <b class="text-primary">{{ (float)$team->getallsafthiscutoff['paid'] }}</b></p>
-                                            <p>PAT: <b class="text-success">{{ (float)number_format($team->pat, 2) }}%</b></p>
+                                            <p>New Applications: <b>{{ (float)$team->getallsafthiscutoff['new'] }}</b></p>
+                                            <p>Activated Applications: <b class="text-info">{{ (float)$team->getallsafthiscutoff['activated'] }}</b></p>
+                                            <p>Paid Applications: <b class="text-primary">{{ (float)$team->getallsafthiscutoff['paid'] }}</b></p>
+                                            <p>Total Target: <b class="text-success">{{ $team->total_target }}</b> <small class="text-muted">({{ (float)number_format($team->pat, 2) }}%)</small></p>
                                         </div>
                                     </div>
                                     @endif
