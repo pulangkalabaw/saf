@@ -12,6 +12,7 @@ use App\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Session;
+use Auth;
 
 class DashboardController extends Controller
 {
@@ -21,8 +22,8 @@ class DashboardController extends Controller
         return view ('welcome');
     }
 
-    public function dashboard (Request $request) {
 
+    public function dashboard (Request $request) {
 
         $application_status_model = new ApplicationStatus();
         $application_model = new Application();
@@ -31,6 +32,13 @@ class DashboardController extends Controller
         $clusters_model = new Clusters();
         $attendance_model = new Attendance();
         $user_model = new User();
+
+
+		// Widget for counting all application submitted
+		$_w = $application_model->applicationStatusCounterWidget(Auth::user());
+
+		// Widget for product chart
+		$_p = $application_model->productChart(Auth::user());
 
         //
         $no_of_status_that_used = $statuses_model->get(['id', 'status'])->map(function ($r) use ($application_model){
@@ -60,9 +68,10 @@ class DashboardController extends Controller
             'no_of_status_that_used' => $no_of_status_that_used,
             'application_counter_by_cluster' => $application_counter_by_cluster,
             'application_counter_by_teams' => $application_counter_by_teams,
-            // 'clusters' => (!empty($clusters)) ? $clusters : null,
-            // 'teams' => (!empty($teams)) ? $teams : null,
             'heirarchy' => getHeirarchy2($request->from,$request->to),
+            '_w_application_status_counter' => $_w,
+            '_w_product_chart' => $_p,
+
         ]);
     }
 

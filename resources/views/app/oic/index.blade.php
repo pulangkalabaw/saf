@@ -21,60 +21,58 @@
 									</h3>
 								</div>
                                 <div class="col-md-4 text-right">
-									@if (accessControl(['administrator','user']))
-										@if (count(checkPosition(auth()->user(), ['tl', 'cl'], true)) != 0 || accessControl(['administrator']))
-        									<a href="{{ route('app.oic.create') }}" class="btn btn-xs btn-default">
-        										<span class='fa fa-plus-circle'></span> Add Application
-        									</a>
-										@endif
-									@endif
+                                    @if (accessControl(['administrator','user']))
+                                        @if (count(checkPosition(auth()->user(), ['tl', 'cl'], true)) != 0 || accessControl(['administrator']))
+                                            <a href="{{ route('app.oic.create') }}" class="btn btn-xs btn-default">
+                                                <span class='fa fa-plus-circle'></span> Add Application
+                                            </a>
+                                        @endif
+                                    @endif
 								</div>
 							</div>
 						</div>
 						<div class="panel-body">
-							<div class="row">
-
-								<div class="col-md-4 col-xs-4">
-									<div class="form-inline">
-										<div class="form-group">
-											<label>Number of rows: </label>
-
-											<select name="" id="" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value)" class="form-control">
-												<option {{ !empty(request()->get('show') && request()->get('show') == 10) ? 'selected' : ''  }} value="{{ route('app.oic.index') }}?show=10">10</option>
-												<option {{ !empty(request()->get('show') && request()->get('show') == 25) ? 'selected' : ''  }} value="{{ route('app.oic.index') }}?show=25">25</option>
-												<option {{ !empty(request()->get('show') && request()->get('show') == 50) ? 'selected' : ''  }} value="{{ route('app.oic.index') }}?show=50">50</option>
-												<option {{ !empty(request()->get('show') && request()->get('show') == 100) ? 'selected' : ''  }} value="{{ route('app.oic.index') }}?show=100">100</option>
-											</select>
-
-										</div>
-									</div>
-								</div>
-								<div class="col-md-2 col-xs-2"></div>
-								<div class="col-md-6 col-xs-6">
-									<form action="{{ url()->current() }}" method="GET">
-										<div class="input-group">
-											<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control" placeholder="Search for Application #, Encoder, Team, Customer and SR #">
-											<span class="input-group-btn">
-												<button class="btn btn-primary"><span class='fa fa-search'></span> </button>
-											</span>
-										</div>
-									</form>
-								</div>
-							</div>
-							<div class="clearfix"></div><br>
                             @include('includes.notif')
+                                <div class="row">
+    								<div class="col-md-4 col-xs-4">
+    									<div class="form-inline">
+    										<div class="form-group">
+    											<label>Number of rows: </label>
 
-							<div class="table-responsive">
-								<table class="table table-hovered table-striped">
-									<thead>
-										<tr>
+    											<select name="" id="" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value)" class="form-control">
+    												<option {{ !empty(request()->get('show') && request()->get('show') == 10) ? 'selected' : ''  }} value="{{ route('app.oic.index') }}?show=10">10</option>
+    												<option {{ !empty(request()->get('show') && request()->get('show') == 25) ? 'selected' : ''  }} value="{{ route('app.oic.index') }}?show=25">25</option>
+    												<option {{ !empty(request()->get('show') && request()->get('show') == 50) ? 'selected' : ''  }} value="{{ route('app.oic.index') }}?show=50">50</option>
+    												<option {{ !empty(request()->get('show') && request()->get('show') == 100) ? 'selected' : ''  }} value="{{ route('app.oic.index') }}?show=100">100</option>
+    											</select>
+
+    										</div>
+    									</div>
+    								</div>
+    								<div class="col-md-2 col-xs-2"></div>
+    								<div class="col-md-6 col-xs-6">
+    									<form action="{{ url()->current() }}" method="GET">
+    										<div class="input-group">
+    											<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control" placeholder="Search for Application #, Encoder, Team, Customer and SR #">
+    											<span class="input-group-btn">
+    												<button class="btn btn-primary"><span class='fa fa-search'></span> </button>
+    											</span>
+    										</div>
+    									</form>
+    								</div>
+    							</div>
+    							<div class="clearfix"></div><br>
+    						<div class="table-responsive">
+    							<table class="table table-hovered table-striped">
+    								<thead>
+    									<tr>
                                             <th>Cluster Name</th>
                                             <th>Team Name</th>
                                             <th>Agent Name</th>
                                             <th>Assign Date</th>
-										</tr>
-									</thead>
-									<tbody>
+    									</tr>
+    								</thead>
+    								<tbody>
                                         @if(count($oics) == 0)
                                             <tr>
                                                 <th colspan="4" style="text-align:center;">No Assigned OIC!</th>
@@ -89,19 +87,19 @@
                                                 </tr>
                                             @endforeach
                                         @endif
-									</tbody>
-								</table>
-							</div>
-							<br>
-							<div class="row">
-								<div class="col-md-10">
-								{{ $oics->appends(request()->input())->links() }}
-								</div>
-								<div class="col-md-2 text-right">
-									Total <b>{{ $total }}</b> result(s)
-								</div>
-							</div>
-						</div>
+    								</tbody>
+    							</table>
+    						</div>
+    						<br>
+    						<div class="row">
+    							<div class="col-md-10">
+    							{{ $oics->appends(request()->input())->links() }}
+    							</div>
+    							<div class="col-md-2 text-right">
+    								Total <b>{{ $total }}</b> result(s)
+    							</div>
+    						</div>
+                        </div>
 					</div>
 				</div>
 			</div>

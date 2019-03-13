@@ -36,7 +36,11 @@ class OicController extends Controller
                 }
                 $oic = $oic->whereIn('user_id', $agent_ids);
             } else {
-                dd('Your team has zero agent!');
+                return back()->with([
+                    'notif.style' => 'danger',
+                    'notif.icon' => 'times-circle',
+                    'notif.message' => 'Failed to access module!',
+                ]);
             }
         }
 
@@ -79,10 +83,19 @@ class OicController extends Controller
         }
         else if(base64_decode($user->role) == 'user')
         {
+            if(empty($data['_a']))
+            {
+                return back()->with([
+                    'notif.style' => 'danger',
+    				'notif.icon' => 'times-circle',
+    				'notif.message' => 'Failed to access module!',
+                ]);
+            }
             // checkPosition(Auth::user())
             $user_teams = $data['_t'];
             $users = $data['_a'];
         }
+
 
         return view('app.oic.create', [
             'users' => $users,
@@ -101,12 +114,12 @@ class OicController extends Controller
         //Get the value of cluster id within the team
         $teams = new Teams();
         $clusters = $teams->clusters($request->team_id);
+        $data = getUserDetailClusterAndTeam(Auth::user());
         // Get cluster id
         // this foreach will get the cluster id of the login user
         foreach($clusters as $cluster){
-            $cluster_id = $cluster['cluster_id'];
+            $cluster_id = $cluster['id'];
         }
-
 
         $validate = Validator::make($request->all(),[
             'team_id' => 'required',
@@ -114,8 +127,8 @@ class OicController extends Controller
         ]);
 
         $oic_data = [
-            'cluster_id' => $cluster_id,
-            'team_id' => $request['team_id'],
+            'cluster_id' => (int) $cluster_id,
+            'team_id' => (int) $request['team_id'],
             'user_id' => $request['user_id'],
             'assign_date' => $request['assign_date'],
             'insert_by' => Auth::user()->id,

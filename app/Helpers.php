@@ -6,6 +6,68 @@ use App\Attendance;
 use App\Application;
 use Carbon\Carbon;
 
+// check if login user has agents for cl and tl
+function checkUserAgents($auth) {
+	if(in_array('cl', checkPosition($auth))){
+		$teams = new Teams();
+		$agents = new User();
+
+		$team_ids = [];
+		$agent_ids = [];
+
+		$clusters_model = fetchCluster($auth);
+		// get teams inside the cluster
+		foreach($clusters_model as $cluster){
+			// array unique removes duplicate values
+			if (!empty($cluster['team_ids'])) {
+				$team_ids = array_unique(array_merge($team_ids, $cluster['team_ids']));
+			}
+		}
+
+		$teams = $teams->whereIn('id', $team_ids)->get()->toArray();
+
+		// get agents inside the team
+		foreach($teams as $team){
+			// array unique removes duplicate values
+			if (!empty($team['agent_ids'])) {
+				$agent_ids = array_unique(array_merge($agent_ids, $team['agent_ids']));
+			}
+		}
+		$agents = $agents->whereIn('id', $agent_ids)->get()->toArray();
+
+		return $r = $agents;
+	}
+
+	// if the login user is tl get all the available agents under that tl
+	if(in_array('tl', checkPosition($auth))){
+		$cluster_model = new Clusters();
+		$agents = new User();
+
+		$agent_ids = [];
+		$team_arr = [];
+		$cluster_ids = [];
+
+		$teams = fetchTeams($auth);
+		// get agents inside the team
+		foreach($teams as $team){
+			// array unique removes duplicate values
+			// $team_ids[] = $team['id'];
+			if (!empty($team['agent_ids'])) {
+				$agent_ids = array_unique(array_merge($agent_ids, $team['agent_ids']));
+			}
+		}
+
+		$agents = $agents->whereIn('id', $agent_ids)->get()->toArray();
+
+		return $r = $agents;
+	}
+}
+
+function productNameConvert ($pname) {
+	return ucwords(str_replace('_', ' ', $pname));
+}
+
+
 /*
 *
 *

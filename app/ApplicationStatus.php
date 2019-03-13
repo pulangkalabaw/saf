@@ -27,4 +27,12 @@ class ApplicationStatus extends Model
 			return $response;
 		});
     }
+
+    public function appStatus ($app_id) {
+        return $this->where('application_id', $app_id)->get()->map(function ($r) {
+			$agents = User::get();
+			$r['added_by'] = $agents->where('id',$r['added_by'])->first();
+			return $r;
+		});
+    }
 }

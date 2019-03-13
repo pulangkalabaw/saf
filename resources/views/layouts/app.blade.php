@@ -122,15 +122,9 @@
 										<div class="nav-menu__text"><span>Dashboard</span></div>
 									</a>
 								</li>
-								{{-- remove this comment after the presentation --}}
-								{{-- <li>
-									<a href="{{ route('app.oic.index') }}">
-										<div class="nav-menu__ico"><i class="fa fa-fw fa-users"></i></div>
-										<div class="nav-menu__text"><span>OIC</span></div>
-									</a>
-								</li> --}}
 							</ul>
 
+							@if(!empty(checkUserAgents(auth()->user())) || accessControl(['administrator']))
 							<div class="sidebar__title">Applications</div>
 							<ul class="nav nav-menu">
 								<li>
@@ -148,6 +142,26 @@
 									</li>
 								@endif
 							</ul>
+							@endif
+
+							@if(!empty(checkUserAgents(auth()->user())) || accessControl(['administrator']))
+							<div class="sidebar__title">OIC</div>
+							<ul class="nav nav-menu">
+								<li>
+									<a href="{{ route('app.oic.index') }}">
+										<div class="nav-menu__ico"><i class="fa fa-fw fa-folder-o"></i></div>
+										<div class="nav-menu__text"><span>List OIC</span></div>
+									</a>
+								</li>
+
+								<li>
+									<a href="{{ route('app.oic.create') }}">
+										<div class="nav-menu__ico"><i class="fa fa-fw fa-plus-circle"></i></div>
+										<div class="nav-menu__text"><span>Assign OIC</span></div>
+									</a>
+								</li>
+							</ul>
+							@endif
 
 						</div>
 

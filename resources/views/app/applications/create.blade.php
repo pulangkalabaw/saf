@@ -50,7 +50,7 @@
 												@if(count($teams) == 1)
 													<select class="form-control select_enable" name="team_id" disabled>
 														@foreach ($teams as $team)
-															<option selected value="{{ $team['id'] }}">{{ $team['team_name'] }}</option>
+															<option selected value="{{ (int)$team['id'] }}">{{ $team['team_name'] }}</option>
 														@endforeach
 													</select>
 												@else
@@ -59,7 +59,7 @@
 															<option value="" selected>Select Team (required)</option>
 														@endif
 														@foreach($teams as $team)
-															<option {{ old('team_id') == $team['id'] ? 'selected' : '' }} value="{{ $team['id'] }}">{{ $team['team_name'] }}</option>
+															<option {{ old('team_id') == $team['id'] ? 'selected' : '' }} value="{{ (int)$team['id'] }}">{{ $team['team_name'] }}</option>
 														@endforeach
 													</select>
 												@endif
