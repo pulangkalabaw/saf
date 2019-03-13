@@ -51,6 +51,21 @@
                         @foreach($heirarchy['clusters'] as $clus)
                             @if($clus) <!-- FOR CATCHING NULL ERRORS -->
                             <div class="container">
+                                <!-- <div class="row">
+                                    <div class="col-md-2">
+                                        <span for="">From</span>
+                                        <input type="date" class="form-control" >
+                                    </div>
+                                    <div class="col-md-2">
+                                        <span for="">To</span>
+                                        <input type="date" class="form-control" >
+                                    </div>
+                                    <div class="col-md-2">
+                                        <br>
+                                        <button class="btn btn-info"><i class="fa fa-search"></i></button>
+                                    </div>
+                                </div> -->
+
                                 <div class="col-md-12">
                                     <h4>{{ $clus->cluster_name }}</h4>
                                 </div>

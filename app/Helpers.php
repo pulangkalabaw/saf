@@ -506,11 +506,11 @@ function searchTeamAndCluster ($auth) {
 }
 
 // Function for getting dashbaord reports
-function getHeirarchy2($date = null){
+function getHeirarchy2($date = null,$dateto = null){
 	// $date = '28-03-2018';
 
 	$date = ($date !== null) ? Carbon::parse($date) : Carbon::now()->today();
-	// dd($date);
+	// dd($dateto);
 
 	$teams_model = new Teams();
 	$clusters_model = new Clusters();
