@@ -141,9 +141,10 @@
                             @if(!empty($clus->teams))
                               @foreach($clus->teams as $team)
                                   @if(!empty($team))
-                                      <div class="col-md-4">
+                                      <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-12' : 'col-md-4'  }}">
                                         <div class="breadcrumb">
                                           <h5>{{ $team->team_name }} <small>Total Agents: {{ $team->total_agents }}</small></h5>
+                                          <!-- <p>TL Present: <b class="{{ ($team->tlattendance > 0) ? 'text-success' : 'text-danger' }}">{{ $team->tlattendance }}<span class="text-muted">/{{ $team->totaltl }}</span></b></p> -->
                                           <p>Present: <b class="text-success">{{ $team->attendance['present'] }}</b></p>
                                           <p>Absent: <b class="text-danger">{{ $team->attendance['absent'] }}</b></p>
                                           <p>Unkown: <b class="text-warning">{{ $team->attendance['unkown'] }}</b></p>

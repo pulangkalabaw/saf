@@ -579,11 +579,15 @@ function searchTeamAndCluster ($auth) {
 
 // Function for getting dashbaord reports
 
-function getHeirarchy2($date = null){
+function getHeirarchy2($date = null,$dateto = null){
 	// $date = '28-03-2018';
-
+	$isSearching = 0;
+	if($date != null && $dateto != null){
+		$isSearching = 1;
+	}
 	$date = ($date !== null) ? Carbon::parse($date) : Carbon::now()->today();
-	// dd($date);
+	$dateto = ($dateto !== null) ? Carbon::parse($dateto) : Carbon::now()->today();
+	// dd($isSearching);
 
 	$teams_model = new Teams();
 	$clusters_model = new Clusters();
@@ -600,33 +604,53 @@ function getHeirarchy2($date = null){
 
 	// FOR ADMIN
 	if(base64_decode(Auth()->user()->role) == $roles['administrator']){
-		$clusters = $clusters_model->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,$application_model,$date){
+		$clusters = $clusters_model->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,$application_model,$date,$dateto,$isSearching){
 			$count_applications = [
 				'new' => 0,
 				'activated' => 0,
 				'paid' => 0,
 				'target' => 0,
 			];
-			$res['teams'] = $teams_model->whereIn('id', collect($res['team_ids'])->toArray())->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,$application_model,&$count_applications,$date){
+			$res['teams'] = $teams_model->whereIn('id', collect($res['team_ids'])->toArray())->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,$application_model,&$count_applications,$date,$dateto,$isSearching){
 
 				// calcualting applications and saf
-				// dd( Carbon::parse('first day of February 2019')." ".Carbon::parse('last day of February 2019')->endOfMonth() );
-				$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
-					if($res['status'] == 'new'){
-						(float)$count_applications['new'] += (float)$res['msf'];
-					}else if($res['status'] == 'activated'){
-						$count_applications['activated'] += $res['msf'];
-					}else if($res['status'] == 'paid'){
-						$count_applications['paid'] += $res['msf'];
-					}
-					$count_applications['target'] += (float)$res['msf'];
-					return [
-						'new' => $count_applications['new'],
-						'activated' => $count_applications['activated'],
-						'paid' => $count_applications['paid'],
-						'target' => $count_applications['target'],
-					];
-				});
+
+				if($isSearching == 1){
+					$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->whereBetween('created_at', [$date,$dateto])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
+						if($res['status'] == 'new'){
+							(float)$count_applications['new'] += (float)$res['msf'];
+						}else if($res['status'] == 'activated'){
+							$count_applications['activated'] += $res['msf'];
+						}else if($res['status'] == 'paid'){
+							$count_applications['paid'] += $res['msf'];
+						}
+						$count_applications['target'] += (float)$res['msf'];
+						return [
+							'new' => $count_applications['new'],
+							'activated' => $count_applications['activated'],
+							'paid' => $count_applications['paid'],
+							'target' => $count_applications['target'],
+						];
+					});
+				}else{
+					$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->whereDate('created_at', $date)->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
+						if($res['status'] == 'new'){
+							(float)$count_applications['new'] += (float)$res['msf'];
+						}else if($res['status'] == 'activated'){
+							$count_applications['activated'] += $res['msf'];
+						}else if($res['status'] == 'paid'){
+							$count_applications['paid'] += $res['msf'];
+						}
+						$count_applications['target'] += (float)$res['msf'];
+						return [
+							'new' => $count_applications['new'],
+							'activated' => $count_applications['activated'],
+							'paid' => $count_applications['paid'],
+							'target' => $count_applications['target'],
+						];
+					});
+				}
+
 				$res['getallsafthiscutoff'] = $res['getallsafthiscutoff']->values()->last();
 				// end of calculating applications and saf
 
@@ -667,16 +691,15 @@ function getHeirarchy2($date = null){
 
 				// for percentage of this cutoff
 				// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
-$acc_total_target = $res['getallsafthiscutoff']['target']; // total current selled
-        $total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
-        if ($total_based_target == 0) {
-				  $res['pat'] = 0;
+				$res['total_target'] = $res['getallsafthiscutoff']['target']; // total current selled
+        		$total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
+        		if ($total_based_target == 0) {
+			  		$res['pat'] = 0;
 				}
 				else {
-					$pat = ($acc_total_target / $total_based_target) * 100;
+					$pat = ($res['total_target'] / $total_based_target) * 100;
 					$res['pat'] = $pat;
 				}
-
 
 				return $res;
 			});
@@ -689,33 +712,52 @@ $acc_total_target = $res['getallsafthiscutoff']['target']; // total current sell
 
 		// FOR CLUSTER HEAD
 		if( !empty((Session::get('_c'))) ){
-			$clusters = $clusters_model->whereIn('id',collect(Session::get('_c'))->pluck('id'))->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,$date){
+			$clusters = $clusters_model->whereIn('id',collect(Session::get('_c'))->pluck('id'))->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,$date,$dateto,$isSearching){
 				$count_applications = [
 					'new' => 0,
 					'activated' => 0,
 					'paid' => 0,
 					'target' => 0,
 				];
-				$res['teams'] = $teams_model->whereIn('id',collect(Session::get('_c')[0]['team_ids'])->toArray())->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,&$count_applications,$date){
+				$res['teams'] = $teams_model->whereIn('id',collect(Session::get('_c')[0]['team_ids'])->toArray())->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,&$count_applications,$date,$dateto,$isSearching){
 
 					// calcualting applications and saf
-					// dd( Carbon::parse('first day of February 2019')." ".Carbon::parse('last day of February 2019')->endOfMonth() );
-					$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
-						if($res['status'] == 'new'){
-							(float)$count_applications['new'] += (float)$res['msf'];
-						}else if($res['status'] == 'activated'){
-							$count_applications['activated'] += $res['msf'];
-						}else if($res['status'] == 'paid'){
-							$count_applications['paid'] += $res['msf'];
-						}
-						$count_applications['target'] += (float)$res['msf'];
-						return [
-							'new' => $count_applications['new'],
-							'activated' => $count_applications['activated'],
-							'paid' => $count_applications['paid'],
-							'target' => $count_applications['target'],
-						];
-					});
+					if($isSearching == 1){
+						$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->whereBetween('created_at',[$date,$dateto])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
+							if($res['status'] == 'new'){
+								(float)$count_applications['new'] += (float)$res['msf'];
+							}else if($res['status'] == 'activated'){
+								$count_applications['activated'] += $res['msf'];
+							}else if($res['status'] == 'paid'){
+								$count_applications['paid'] += $res['msf'];
+							}
+							$count_applications['target'] += (float)$res['msf'];
+							return [
+								'new' => $count_applications['new'],
+								'activated' => $count_applications['activated'],
+								'paid' => $count_applications['paid'],
+								'target' => $count_applications['target'],
+							];
+						});
+					}else{
+						$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->whereDate('created_at',$date)->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
+							if($res['status'] == 'new'){
+								(float)$count_applications['new'] += (float)$res['msf'];
+							}else if($res['status'] == 'activated'){
+								$count_applications['activated'] += $res['msf'];
+							}else if($res['status'] == 'paid'){
+								$count_applications['paid'] += $res['msf'];
+							}
+							$count_applications['target'] += (float)$res['msf'];
+							return [
+								'new' => $count_applications['new'],
+								'activated' => $count_applications['activated'],
+								'paid' => $count_applications['paid'],
+								'target' => $count_applications['target'],
+							];
+						});
+					}
+
 					$res['getallsafthiscutoff'] = $res['getallsafthiscutoff']->values()->last();
 					// end of calculating applications and saf
 
@@ -750,21 +792,21 @@ $acc_total_target = $res['getallsafthiscutoff']['target']; // total current sell
 					// end of calculate present, absent, unkown
 
 					// calculate/get attendance of tl on this day
-					$res['tlattendance'] = count($attendance_model->whereIn('user_id',collect($res['tl_ids'])->toArray())->where('created_at', '>=', $date)->get());
+					$res['tlattendance'] = count($attendance_model->whereIn('user_id',collect($res['tl_ids'])->toArray())->where('status',1)->where('created_at', '>=', $date)->get());
 					$res['totaltl'] = count(collect($res['tl_ids'])->toArray());
 					// end of calculate/get attendance of tl on this day
 
 					// for percentage of this cutoff
 					// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
-$acc_total_target = $res['getallsafthiscutoff']['target']; // total current selled
-        $total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
-        if ($total_based_target == 0) {
-				  $res['pat'] = 0;
-				}
-				else {
-					$pat = ($acc_total_target / $total_based_target) * 100;
-					$res['pat'] = $pat;
-				}
+					$res['total_target'] = $res['getallsafthiscutoff']['target']; // total current selled
+	        		$total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
+	        		if ($total_based_target == 0) {
+				  		$res['pat'] = 0;
+					}
+					else {
+						$pat = ($res['total_target'] / $total_based_target) * 100;
+						$res['pat'] = $pat;
+					}
 
 					return $res;
 				});
@@ -775,7 +817,7 @@ $acc_total_target = $res['getallsafthiscutoff']['target']; // total current sell
 		// FOR TEAM LEAD
 		else if( !empty((Session::get('_t'))) ){
 			// dd(collect(Session::get('_t'))->pluck('id'));
-			$clusters = $clusters_model->get()->map(function($res) use ($teams_model,$user_model,$attendance_model,$application_model,$date){
+			$clusters = $clusters_model->get()->map(function($res) use ($teams_model,$user_model,$attendance_model,$application_model,$date,$dateto,$isSearching){
 				$count_applications = [
 					'new' => 0,
 					'activated' => 0,
@@ -786,27 +828,46 @@ $acc_total_target = $res['getallsafthiscutoff']['target']; // total current sell
 
 					// dd(Session::get('_t'));
 					$team_ids = $res['team_ids'];
-					$res['teams'] = $teams_model->whereIn('id', collect($res['team_ids'])->toArray())->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,$team_ids,&$count_applications,$date){
+					$res['teams'] = $teams_model->whereIn('id', collect($res['team_ids'])->toArray())->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,$team_ids,&$count_applications,$date,$dateto,$isSearching){
 						if( in_array($res['id'],collect(Session::get('_t'))->pluck('id')->toArray()) ){
 
 							// calcualting applications and saf
-							// dd( Carbon::parse('first day of February 2019')." ".Carbon::parse('last day of February 2019')->endOfMonth() );
-							$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
-								if($res['status'] == 'new'){
-									(float)$count_applications['new'] += (float)$res['msf'];
-								}else if($res['status'] == 'activated'){
-									$count_applications['activated'] += $res['msf'];
-								}else if($res['status'] == 'paid'){
-									$count_applications['paid'] += $res['msf'];
-								}
-								$count_applications['target'] += (float)$res['msf'];
-								return [
-									'new' => $count_applications['new'],
-									'activated' => $count_applications['activated'],
-									'paid' => $count_applications['paid'],
-									'target' => $count_applications['target'],
-								];
-							});
+							if($isSearching == 1){
+								$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->whereBetween('created_at', [$date,$dateto])->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
+									if($res['status'] == 'new'){
+										(float)$count_applications['new'] += (float)$res['msf'];
+									}else if($res['status'] == 'activated'){
+										$count_applications['activated'] += $res['msf'];
+									}else if($res['status'] == 'paid'){
+										$count_applications['paid'] += $res['msf'];
+									}
+									$count_applications['target'] += (float)$res['msf'];
+									return [
+										'new' => $count_applications['new'],
+										'activated' => $count_applications['activated'],
+										'paid' => $count_applications['paid'],
+										'target' => $count_applications['target'],
+									];
+								});
+							}else{
+								$res['getallsafthiscutoff'] = $application_model->where('team_id', $res['id'])->whereDate('created_at', $date)->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,&$count_applications,$date){
+									if($res['status'] == 'new'){
+										(float)$count_applications['new'] += (float)$res['msf'];
+									}else if($res['status'] == 'activated'){
+										$count_applications['activated'] += $res['msf'];
+									}else if($res['status'] == 'paid'){
+										$count_applications['paid'] += $res['msf'];
+									}
+									$count_applications['target'] += (float)$res['msf'];
+									return [
+										'new' => $count_applications['new'],
+										'activated' => $count_applications['activated'],
+										'paid' => $count_applications['paid'],
+										'target' => $count_applications['target'],
+									];
+								});
+							}
+
 							$res['getallsafthiscutoff'] = $res['getallsafthiscutoff']->values()->last();
 							// end of calculating applications and saf
 
@@ -842,15 +903,17 @@ $acc_total_target = $res['getallsafthiscutoff']['target']; // total current sell
 
 							// for percentage of this cutoff
 							// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
-$acc_total_target = $res['getallsafthiscutoff']['target']; // total current selled
-        $total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
-        if ($total_based_target == 0) {
-				  $res['pat'] = 0;
-				}
-				else {
-					$pat = ($acc_total_target / $total_based_target) * 100;
-					$res['pat'] = $pat;
-				}
+							$res['total_target'] = $res['getallsafthiscutoff']['target']; // total current selled
+			        		$total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
+			        		if ($total_based_target == 0) {
+						  		$res['pat'] = 0;
+							}
+							else {
+								$pat = ($res['total_target'] / $total_based_target) * 100;
+								$res['pat'] = $pat;
+							}
+
+
 							return $res;
 						}
 					});
