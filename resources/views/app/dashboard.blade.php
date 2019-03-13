@@ -62,7 +62,8 @@
                         @foreach($heirarchy['clusters'] as $clus)
                             @if($clus) <!-- FOR CATCHING NULL ERRORS -->
                             <div class="container-fluid">
-                                <div class="col-md-4" style="float:none;margin: 0 auto;">
+                                <!-- <div class="col-md-4" style="float:none;margin: 0 auto;"> -->
+                                <div class="col-md-12">
                                     <h4 class="alert alert-primary text-center">{{ $clus->cluster_name }}</h4>
                                 </div>
                                 <!-- PUT FOREACH TEAM  -->
