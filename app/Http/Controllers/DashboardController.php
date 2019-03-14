@@ -40,6 +40,22 @@ class DashboardController extends Controller
 		// Widget for product chart
 		$_p = $application_model->productChart(Auth::user());
 
+    // For product bug *ASK PAUL REAL FOR ANY CHANGES ON THIS CODE
+    $_p_prod['prod'] = collect($_p)->filter(function($res){
+      if($res['count'] != 0){
+        return $res['product'];
+      }
+    })->pluck('product')->toArray();
+
+
+    $_p_prod['count'] = collect($_p)->filter(function($res){
+      if($res['count'] != 0){
+        return $res['count'];
+      }
+    })->pluck('count')->toArray();
+    // END For product bug *ASK PAUL REAL FOR ANY CHANGES ON THIS CODE
+
+
         //
         $no_of_status_that_used = $statuses_model->get(['id', 'status'])->map(function ($r) use ($application_model){
             $r['total_count'] = $application_model->where('status', $r['id'])->count();
@@ -71,6 +87,7 @@ class DashboardController extends Controller
             'heirarchy' => getHeirarchy2($request->from,$request->to),
             '_w_application_status_counter' => $_w,
             '_w_product_chart' => $_p,
+            // '_w_prod_data' => $_p_prod,
 
         ]);
     }

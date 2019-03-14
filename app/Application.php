@@ -96,7 +96,6 @@ class Application extends Model
 				}))
 				->orWhere('agent_id', $auth->id);
 
-
 			}
 			else {
 				return back()->with([
@@ -109,7 +108,6 @@ class Application extends Model
 		else {
 			$applications = $applications;
 		}
-
 		return $applications;
 	}
 

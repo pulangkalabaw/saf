@@ -144,7 +144,7 @@
 							</ul>
 							@endif
 
-							@if(!empty(checkUserAgents(auth()->user())) || accessControl(['administrator']))
+							{{-- @if(!empty(checkUserAgents(auth()->user())) || accessControl(['administrator']))
 							<div class="sidebar__title">OIC</div>
 							<ul class="nav nav-menu">
 								<li>
@@ -161,7 +161,7 @@
 									</a>
 								</li>
 							</ul>
-							@endif
+							@endif --}}
 
 						</div>
 

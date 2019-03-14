@@ -269,17 +269,17 @@
 
 		var acbc_ctx = document.getElementById("product_chart").getContext('2d');
 
-		var acbc_labels = {!! collect(array_filter(collect($_w_product_chart)->map(function ($r) {
-			if ($r['count'] != 0) {
-				return " (".$r['count']. ") " .productNameConvert($r['product']);
-			}
-		})->toArray())) !!};
+    var acbc_labels = {!! collect(array_filter(collect($_w_product_chart)->filter(function ($r) {
+      if ($r['count'] != 0) {
+        return $r['product'];
+      }
+    })->pluck('product')->toArray())) !!};
 
-		var acbc_data = {!! collect(array_filter(collect($_w_product_chart)->map(function ($r) {
-			if ($r['count'] != 0) {
-				return $r['count'];
-			}
-		})->toArray())) !!}
+    var acbc_data = {!! collect(array_filter(collect($_w_product_chart)->filter(function ($r) {
+      if ($r['count'] != 0) {
+        return $r['count'];
+      }
+    })->pluck('count')->toArray())) !!}
 
 
 		var acbc_myChart = new Chart(acbc_ctx, {
