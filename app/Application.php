@@ -77,29 +77,37 @@ class Application extends Model
 		$applications = new Application();
 
 		if (base64_decode($auth->role) == 'user'){
-				// Filter application status
-				if (!empty($status_filter)) {
 
-					// Check what status they want to filter
-					$col = $status_filter['col'];
-					$value = $status_filter['value'];
-					$applications = $applications->where($col, $value);
-				}
+			// Filter application status
+			if (!empty($status_filter)) {
 
-				//
+				// Check what status they want to filter
+				$col = $status_filter['col'];
+				$value = $status_filter['value'];
+				$applications = $applications->where($col, $value);
+			}
+
+			// Agent
+			if (in_array('agent', checkPosition($auth, ['agent']))) {
+				$applications = $applications->where('agent_id', $auth->id);
+			}
+
+			// TL and CL
+			else {
+
 				$applications = $applications->whereIn('team_id', collect(Session::get('_t'))->map(function($r){
 					return $r['id'];
 				}))
 				->orWhereIn('cluster_id', collect(Session::get('_c'))->map(function($r){
 					return $r['cluster_id'];
-				}))
-				->orWhere('agent_id', $auth->id);
+				}));
+			}
 
-			
 		}
 		else {
 			$applications = $applications;
 		}
+
 		return $applications;
 	}
 
