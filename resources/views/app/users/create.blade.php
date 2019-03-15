@@ -32,6 +32,21 @@
                         </div>
                     </div>
                     <div class="panel-body">
+                        {{-- <form action="{{ route('app.import-users') }}" method="POST" enctype="multipart/form-data">
+                            {{ csrf_field() }}
+                            <label>Import Users</label>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="col-sm-7">
+                                        <input type="file" name="file" class="form-control">
+                                    </div>
+                                    <div class="col-sm-5">
+                                        <button class="btn btn-success">Import</button>
+                                    </div>
+                                    <div class="clearfix"></div><br><br>
+                                </div>
+                            </div>
+                        </form> --}}
                         <form action="{{ route('app.users.store') }}" method="POST">
                             @include('includes.notif')
 

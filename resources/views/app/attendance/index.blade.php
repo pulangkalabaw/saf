@@ -150,7 +150,7 @@
                                                 </div>
                                                 <div class="panel-body">
                                                     @if(base64_decode(auth()->user()->role) != 'administrator' && count(session()->get('_c')) == 0)
-                                                        <label class="text-danger">You can't use attendance because it's pass 10:30am</label>
+                                                        <label class="text-danger">You can't use attendance because it's passed 10:30am</label>
                                                     @endif
                                                     <div class="table-responsive">
                                                         <table class="table table-hovered table-striped">
@@ -421,7 +421,7 @@
                                     </div>
                                     <div class="form-group">
                                         @if(base64_decode(auth()->user()->role) != 'administrator' && count(session()->get('_c')) == 0)
-                                            <label class="text-danger">You can't use attendance because it's pass 10:30am</label>
+                                            <label class="text-danger">You can't use attendance because it's passed 10:30am</label>
                                         @endif
                                     </div>
                                     <div class="form-group">

@@ -31,6 +31,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
 
 
     // Users
+    Route::post('users/import-users', 'UserController@importUsers')->name('import-users');
     Route::resource('users', 'UserController')->middleware('access_control:administrator');
 
     // Teams

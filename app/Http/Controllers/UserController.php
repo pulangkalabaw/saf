@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Schema;
+use File;
 use Validator;
 use App\User;
 use App\Teams;
@@ -252,5 +253,13 @@ class UserController extends Controller
             ]);
         }
 
+    }
+
+    public function importUsers(Request $request){
+        // return $request->all();
+        // dd($request->hasFile('file'));
+        if($request->hasFile('file')) {
+            return $extension = File::extension($request->file->getClientOriginalName()); // GET FILE EXTENSION
+        }
     }
 }
