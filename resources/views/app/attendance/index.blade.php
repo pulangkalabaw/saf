@@ -149,6 +149,9 @@
                                                     {{-- <button type="button" class="btn btn-danger pull-right" id="buttonTop">toggle</button> --}}
                                                 </div>
                                                 <div class="panel-body">
+                                                    @if(base64_decode(auth()->user()->role) != 'administrator' && count(session()->get('_c')) == 0)
+                                                        <label class="text-danger">You can't use attendance because it's pass 10:30am</label>
+                                                    @endif
                                                     <div class="table-responsive">
                                                         <table class="table table-hovered table-striped">
                                                             <thead>
@@ -417,6 +420,11 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        @if(base64_decode(auth()->user()->role) != 'administrator' && count(session()->get('_c')) == 0)
+                                            <label class="text-danger">You can't use attendance because it's pass 10:30am</label>
+                                        @endif
+                                    </div>
+                                    <div class="form-group">
                                         @include('app.attendance.mobile-view')
                                     </div>
                                     <div class="form-group">
@@ -533,8 +541,8 @@ var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds(
 var thisMonth = (today.getUTCMonth() + 1) < 10 ? "0" + (today.getUTCMonth() + 1) : today.getUTCMonth()
 var thisDate = today.getUTCDate() < 10 ? "0" + today.getUTCDate() : today.getUTCDate()
 var date = today.getUTCFullYear() + "-" + thisMonth + "-" + thisDate;
-var timein = 10 + ":" + 30 + ":" + 00;
-
+var timein = ' {{ Carbon\Carbon::parse("10:30:00")->toTimeString() }}';
+// alert(timein);
 // alert(time + ">=" +  timein + " = " + time >= timein);
 // alert(time);
 
@@ -561,16 +569,20 @@ jQuery(document).ready(function () {
         window.location = '{{ url('app/attendance') . '?date=' }}' + this.value;
     });
 });
-if(time <= timein){
-    $('#buttonButtom').attr('disabled', true);
-    $('#buttonTop').attr('disabled', true);
-    $('.attendance').attr('disabled', true);
-    $('#browseImg').attr('disabled', true);
-}
+@if(base64_decode(auth()->user()->role) != 'administrator' && count(session()->get('_c')) == 0)
+    if(time >= timein){
+        $('#buttonButtom').attr('disabled', true);
+        $('#buttonTop').attr('disabled', true);
+        $('.attendance').attr('disabled', true);
+        $('#browseImg').attr('disabled', true);
+        $('#browseImgMobile').attr('disabled', true);
+        $('.btn-mobile-submit').attr('disabled', true);
+        $('.btn-mobile-status').attr('disabled', true);
+    }
+@endif
 
 var selected_date = "{{ request()->date != null ? request()->date : Carbon\Carbon::now() }}";
 
-// alert({{base64_encode(auth()->user())}});
 @if(count(session()->get('_c')) == 0 )
     @if(auth()->user()->role == base64_encode('administrator'))
     if(selected_date < date){

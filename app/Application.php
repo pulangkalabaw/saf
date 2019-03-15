@@ -77,7 +77,6 @@ class Application extends Model
 		$applications = new Application();
 
 		if (base64_decode($auth->role) == 'user'){
-			if(!empty(checkUserAgents($auth))) {
 				// Filter application status
 				if (!empty($status_filter)) {
 
@@ -96,14 +95,7 @@ class Application extends Model
 				}))
 				->orWhere('agent_id', $auth->id);
 
-			}
-			else {
-				return back()->with([
-					'notif.style' => 'danger',
-					'notif.icon' => 'times-circle',
-					'notif.message' => 'Failed to access module!',
-				]);
-			}
+			
 		}
 		else {
 			$applications = $applications;

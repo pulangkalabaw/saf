@@ -35,10 +35,12 @@ class DashboardController extends Controller
 
 
 		// Widget for counting all application submitted
-		$_w = $application_model->applicationStatusCounterWidget(Auth::user());
+        $_w = $application_model->applicationStatusCounterWidget(Auth::user());
+
+        $_p = $application_model->productChart(Auth::user());
+
 
 		// Widget for product chart
-		$_p = $application_model->productChart(Auth::user());
 
     // For product bug *ASK PAUL REAL FOR ANY CHANGES ON THIS CODE
     $_p_prod['prod'] = collect($_p)->filter(function($res){
