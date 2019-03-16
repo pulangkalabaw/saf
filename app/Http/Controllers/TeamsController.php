@@ -49,9 +49,11 @@ class TeamsController extends Controller
 	public function create()
 	{
 		//
-		$users = User::get();
+		$users_m = new User();
+		$users = $users_m->get();
 		return view('app.teams.create', [
-			'users' => $users
+			'users' => $users,
+			'users_m' => $users_m,
 		]);
 	}
 
@@ -116,10 +118,14 @@ class TeamsController extends Controller
 		$users = new User();
 		$teams = Teams::where('id', $id)->firstOrFail();
 
-		$agents = $users->getAvailableAgent();
-		$team_leaders = $users->getAvailableTeamLeader();
+		$agents = $users->getAvailableAgent($teams->agent_ids);
+		$team_leaders = $users->getAvailableTeamLeader($teams->tl_ids);
 
-		return view('app.teams.edit', ['team' => $teams, 'team_leaders' => $team_leaders, 'agents' => $agents]);
+		return view('app.teams.edit', [
+			'team' => $teams,
+			'team_leaders' => $team_leaders,
+			'agents' => $agents,
+		]);
 	}
 
 	/**

@@ -178,13 +178,17 @@
 
 	var aps_ctx = document.getElementById("application_status").getContext('2d');
 
-	var aps_labels = {!! collect($_w_application_status_counter['application_status_c'])->map(function ($r) {
-		return '('.$r['count'].') '. ucfirst($r['status']);
-	}) !!};
+	var aps_labels = {!! collect(array_filter(collect($_w_application_status_counter['application_status_c'])->filter(function ($r) {
+		if ($r['count'] != 0) {
+			return '('.$r['count'].') '. ucfirst($r['status']);
+		}
+	})->pluck('status')->toArray())) !!};
 
-	var aps_data = {!! collect($_w_application_status_counter['application_status_c'])->map(function ($r) {
-		return ucfirst($r['count']);
-	}) !!}
+	var aps_data = {!! collect(array_filter(collect($_w_application_status_counter['application_status_c'])->filter(function ($r) {
+		if ($r['count'] != 0) {
+			return ucfirst($r['count']);
+		}
+	})->pluck('count')->toArray())) !!}
 
 
 	var aps_myChart = new Chart(aps_ctx, {
@@ -233,7 +237,7 @@
 
 		var acbc_labels = {!! collect(array_filter(collect($_w_product_chart)->filter(function ($r) {
 			if ($r['count'] != 0) {
-				return $r['product'];
+				return 'asd'.productNameConvert($r['product']);
 			}
 		})->pluck('product')->toArray())) !!};
 

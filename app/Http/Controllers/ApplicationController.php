@@ -35,11 +35,12 @@ class ApplicationController extends Controller
 	{
 		$applications = new Application();
 
-		$applications_total = $applications->count();
 
 		// Get the current login users cluster Id
 		// this will show all the applications base on which cl or tl is login
 		$applications = $applications->applicationSubmitted(Auth::user());
+		$applications_total = $applications->count();
+
 
 		// Sorting
         // params: sort_in & sort_by
@@ -238,7 +239,8 @@ class ApplicationController extends Controller
 
 		return view('app.applications.show', [
 			'application' => $application,
-			'application_model' => $application_model, 'application_status' => $application_status
+			'application_status' => $application_status->appStatus($id),
+			'application_model' => $application_model
 		]);
 	}
 

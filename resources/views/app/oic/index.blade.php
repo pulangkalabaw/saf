@@ -32,8 +32,10 @@
 							</div>
 						</div>
 						<div class="panel-body">
-                            @include('includes.notif')
                                 <div class="row">
+                                    @include('includes.notif')
+                                    @include('includes.filter')
+
     								<div class="col-md-4 col-xs-4">
     									<div class="form-inline">
     										<div class="form-group">
@@ -53,7 +55,7 @@
     								<div class="col-md-6 col-xs-6">
     									<form action="{{ url()->current() }}" method="GET">
     										<div class="input-group">
-    											<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control" placeholder="Search for Application #, Encoder, Team, Customer and SR #">
+    											<input type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control" placeholder="Search...">
     											<span class="input-group-btn">
     												<button class="btn btn-primary"><span class='fa fa-search'></span> </button>
     											</span>
@@ -66,24 +68,33 @@
     							<table class="table table-hovered table-striped">
     								<thead>
     									<tr>
+                                            <th>Agent Name</th>
                                             <th>Cluster Name</th>
                                             <th>Team Name</th>
-                                            <th>Agent Name</th>
                                             <th>Assign Date</th>
     									</tr>
     								</thead>
     								<tbody>
                                         @if(count($oics) == 0)
                                             <tr>
-                                                <th colspan="4" style="text-align:center;">No Assigned OIC!</th>
+                                                <td colspan="4" style="text-align:center;">No OIC Found!</td>
                                             </tr>
                                         @else
                                             @foreach($oics as $oic)
                                                 <tr>
-                                                    <th>{{ $oic->getCluster->cluster_name }}</th>
-                                                    <th>{{ $oic->getTeam->team_name }}</th>
-                                                    <th>{{ $oic->getAgent->fname }} {{ $oic->getAgent->lname }}</th>
-                                                    <th>{{ $oic->assign_date }}</th>
+                                                    <td>
+                                                        <a data-toggle="tooltip" title="View OIC" href="{{ route('app.oic.show', $oic->id) }}">
+															<span class="fa fa-sign-in"></span>
+                                                            {{ $oic->getAgent->fname }} {{ $oic->getAgent->lname }}
+														</a>
+                                                    </td>
+                                                    <td>
+                                                        {{ $oic->getCluster->cluster_name }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $oic->getTeam->team_name }}
+                                                    </td>
+                                                    <td>{{ \Carbon\Carbon::parse($oic->assign_date)->format('d/m/Y') }}</td>
                                                 </tr>
                                             @endforeach
                                         @endif

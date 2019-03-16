@@ -78,15 +78,9 @@
 												<select name="tl_ids[]" id="" class="form-control" multiple  style="height: 200px;">
 													{{-- Available --}}
 													@foreach ($team_leaders as $tl)
-														@if (!empty($team->agent_ids))
-															<option {{ in_array($tl->id, $team->tl_ids) ? 'selected' : '' }} value="{{ (int) $tl->id }}">
-																{{ $tl->fname . ' ' . $tl->lname }}
+															<option {{ in_array($tl['id'], $team['tl_ids']) ? 'selected' : '' }} value="{{ (int) $tl['id'] }}">
+																{{ $tl['fname'] . ' ' . $tl['lname'] }}
 															</option>
-														@else
-															<option value="{{ (int)$tl->id }}">
-																{{ $tl->fname . ' ' . $tl->lname }}
-															</option>
-														@endif
 													@endforeach
 												</select>
 
@@ -102,16 +96,10 @@
 
 													{{-- Available --}}
 													@foreach ($agents as $agent)
-														@if (!empty($team->agent_ids))
-															<option {{ in_array($agent->id, $team->agent_ids) ? 'selected' : '' }}
-																value="{{ (int)$agent->id }}">
-																{{ $agent->fname . ' ' . $agent->lname }}
+															<option {{ in_array($agent['id'], $team['agent_ids']) ? 'selected' : '' }}
+																value="{{ (int)$agent['id'] }}">
+																{{ $agent['fname'] . ' ' . $agent['lname'] }}
 															</option>
-														@else
-															<option value="{{ (int)$agent->id }}">
-																{{ $agent->fname . ' ' . $agent->lname }}
-															</option>
-														@endif
 
 													@endforeach
 

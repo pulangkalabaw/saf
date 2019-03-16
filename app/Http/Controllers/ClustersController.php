@@ -52,6 +52,8 @@ class ClustersController extends Controller
         return view('app.clusters.create', [
             'users' => $users->get(), // clusters
             'teams' => $teams->get(),
+			'teams_m' => $teams,
+			'users_m' => $users,
         ]);
     }
 
@@ -120,13 +122,17 @@ class ClustersController extends Controller
         //
         $users = new User();
         $teams = new Teams();
-        $clusters = new Clusters();
-		$cluster = $clusters->findOrFail($id);
+        $clusters_m = new Clusters();
+		$cluster = $clusters_m->findOrFail($id);
+		$cluster_leaders = $users->getAvailableClusterLeader($cluster->cl_ids);
+		$teams = $teams->getAvailableTeams($cluster->team_ids);
 
-		$cluster_leaders = $users->getAvailableClusterLeader();
-		$teams = $teams->get();
-
-		return view('app.clusters.edit', ['cluster' => $cluster, 'teams' => $teams, 'cluster_leaders' => $cluster_leaders]);
+		return view('app.clusters.edit', [
+			'cluster' => $cluster,
+			'clusters_m' => $clusters_m,
+			'teams' => $teams,
+			'cluster_leaders' => $cluster_leaders
+		]);
 
 
         $cluster = Clusters::where('id', $id)->with([

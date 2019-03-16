@@ -13,7 +13,10 @@
 		<li class="">
 			<a href="{{ route('app.oic.index') }}">Officer In Charge</a>
 		</li>
-		<li class="active">Create</li>
+        <li class="">
+			<a href="{{ route('app.oic.show',$oic->id) }}">{{ $oic->getAgent->fname }} {{ $oic->getAgent->lname }}</a>
+		</li>
+		<li class="active">Edit</li>
 	</ol>
 </div>
 
@@ -26,7 +29,7 @@
                         <div class="row">
                             <div class="col-md-8">
                                 <h3 class="panel-title">
-                                    Officer In Charge Form
+                                    Application Form
                                 </h3>
                             </div>
                             <div class="col-md-4 text-right">
@@ -39,10 +42,12 @@
                     {{-- Body start --}}
 
                     <div class="panel-body">
-                        <form action="{{ route('app.oic.store') }}" method="POST" id="form_id">
+                        <form action="{{ route('app.oic.update', $oic->id) }}" method="POST" id="form_id">
+                            {{ csrf_field() }}
+                            {{ method_field('PUT') }}
+
                             @include('includes.notif')
 
-                            {{ csrf_field() }}
                             <div class="row">
                                 <div class="col-md-7">
                                     <div>
@@ -58,7 +63,7 @@
 												<select id="tl_id" class="form-control" name="team_id" onchange="enableSelectionAg()">
 													<option value="">Select Team</option>
 													@foreach ($teams as $team)
-														<option {{ old('team_id') == $team['id'] ? 'selected' : '' }} value="{{ $team['id'] }}">{{ $team['team_name'] }}</option>
+														<option {{ $oic['team_id'] == $team['id'] ? 'selected' : '' }} value="{{ $team['id'] }}">{{ $team['team_name'] }}</option>
 													@endforeach
 												</select>
 											@endif
@@ -77,10 +82,9 @@
 	                                            </select>
 											@else
 												<select class="form-control" name="user_id" required>
-	                                                <option value="">Select Agent</option>
 	                                                @foreach ($users as $user)
-	                                                    <option value="{{ ((int)$user['id']) }}">{{ $user['fname'] . ' ' . $user['lname'] }}</option>
-	                                                @endforeach
+                                                        <option {{ $oic->user_id == $user['id'] ? 'selected' : '' }} value="{{ ((int)$user['id']) }}">{{ $user['fname'] . ' ' . $user['lname'] }}</option>
+                                                    @endforeach
 	                                            </select>
 											@endif
 
@@ -91,7 +95,7 @@
 									<div>
 										<div class="col-md-3">Assign Date</div>
 										<div class="col-md-3">
-										  <input class="form-control" type="text" id="datepicker" name="assign_date" required autocomplete="off">
+										  <input class="form-control" type="text" id="datepicker" name="assign_date" required autocomplete="off" value="{{ $oic->assign_date }}">
 										</div>
 									</div>
 									<div class="clearfix"></div><br>
@@ -99,7 +103,7 @@
                                     <div>
                                         <div class="col-md-3"></div>
                                         <div class="col-md-7 text-right">
-                                            <button class="btn btn-xs btn-primary">Submit <span class='fa fa-plus-circle'></span> </button>
+                                            <button class="btn btn-xs btn-success">Update <span class='fa fa-plus-circle'></span> </button>
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>

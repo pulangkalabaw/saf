@@ -199,13 +199,12 @@
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
-
 										<div>
 											<div class="col-md-3 col-xs-3">Agent:</div>
 											<div class="col-md-7 col-xs-7">
 												<select name="agent_id" class="form-control">
 													@foreach ($users as $user)
-														<option {{ $user->id == $user->id ? 'selected' : '' }} value="{{$user->id}}">{{ $user->fname.' '.$user->lname }}</option>
+														<option {{ $application->agent_id == $user->id ? 'selected' : '' }} value="{{$user->id}}">{{ $user->fname.' '.$user->lname }}</option>
 													@endforeach
 												</select>
 

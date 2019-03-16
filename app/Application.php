@@ -76,16 +76,17 @@ class Application extends Model
 
 		$applications = new Application();
 
+		// Filter application status
+		if (!empty($status_filter)) {
+
+			// Check what status they want to filter
+			$col = $status_filter['col'];
+			$value = $status_filter['value'];
+			$applications = $applications->where($col, $value);
+		}
+
+
 		if (base64_decode($auth->role) == 'user'){
-
-			// Filter application status
-			if (!empty($status_filter)) {
-
-				// Check what status they want to filter
-				$col = $status_filter['col'];
-				$value = $status_filter['value'];
-				$applications = $applications->where($col, $value);
-			}
 
 			// Agent
 			if (in_array('agent', checkPosition($auth, ['agent']))) {
@@ -99,12 +100,13 @@ class Application extends Model
 					return $r['id'];
 				}))
 				->orWhereIn('cluster_id', collect(Session::get('_c'))->map(function($r){
-					return $r['cluster_id'];
+					return $r['id'];
 				}));
 			}
 
 		}
 		else {
+
 			$applications = $applications;
 		}
 

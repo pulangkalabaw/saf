@@ -68,8 +68,8 @@
 											<div class="col-md-3">Team Leader</div>
 											<div class="col-md-7">
 												<select name="tl_ids[]" id="" class="form-control" multiple="" style="height: 200px;">
-													@foreach ($users as $user)
-														<option value="{{ (int) $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
+													@foreach ($users_m->getAvailableTeamLeader() as $user)
+														<option value="{{ (int) $user['id'] }}">{{ $user['fname'] . ' ' . $user['lname'] }}</option>
 													@endforeach
 												</select>
 
@@ -81,8 +81,8 @@
 											<div class="col-md-3">Agent</div>
 											<div class="col-md-7">
 												<select name="agent_ids[]" id="" class="form-control" multiple="" style="height: 200px;">
-													@foreach ($users as $user)
-														<option value="{{ ((int)$user->id) }}">{{ $user->fname . ' ' . $user->lname }}</option>
+													@foreach ($users_m->getAvailableAgent() as $user)
+														<option value="{{ ((int)$user['id']) }}">{{ $user['fname'] . ' ' . $user['lname'] }}</option>
 													@endforeach
 												</select>
 

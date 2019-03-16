@@ -99,12 +99,24 @@ class Teams extends Model
 	* Get available Teams
 	*
 	*/
-	public function getAvailableTeams() {
-		// Get all tl created
+	public function getAvailableTeams($team_ids = []) {
+
+		$cl_m = new Clusters();
+		$return = [];
+
 		$cl = Clusters::get()->pluck('team_ids');
 		$cl_decoded = json_decode($cl);
-		if (empty($cl_decoded[0]))  return $this->get();
-		return $this->whereNotIn('id', $cl_decoded)->get();
+		if (empty($cl_decoded[0]))  $return = $this->get()->toArray();
+		$return = $this->whereNotIn('id', $cl_decoded)->get()->toArray();
+
+
+		if (count($team_ids) != 0) {
+			// add the current team(s) when returning
+			$current_teams = $cl_m->getTeams($team_ids)->toArray();
+			$return = array_unique(array_merge($return, $current_teams), SORT_REGULAR);
+		}
+
+		return $return;
 	}
 
 	/**

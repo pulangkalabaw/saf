@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use Auth;
 use Session;
 use Validator;
+
 use App\Teams;
 use App\Clusters;
+use App\Oic;
+
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class LoginController extends Controller
@@ -26,6 +30,10 @@ class LoginController extends Controller
 
 		// Authentication
 		if (Auth::attempt(['email' => $request->post('email'), 'password' => $request->post('password')])) {
+
+			// delete OIC from OIC table if date is today
+			$oic = new Oic();
+			$oic->where('expired_at', Carbon::now()->toDateString())->delete();
 
 			if (Auth::user()->isActive != 1) {
 				return back()->with([
