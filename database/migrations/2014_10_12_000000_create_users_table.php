@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->string('password');
             $table->string('role');
-            $table->string('isActive');
+            $table->string('isActive')->default(1);
             $table->string('agent_code')->nullable();
             $table->string('target')->nullable();
             $table->rememberToken();

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Schema;
 use File;
+use Excel;
 use Validator;
+use Carbon\Carbon;
 use App\User;
 use App\Teams;
 use App\Clusters;
@@ -259,7 +261,73 @@ class UserController extends Controller
         // return $request->all();
         // dd($request->hasFile('file'));
         if($request->hasFile('file')) {
-            return $extension = File::extension($request->file->getClientOriginalName()); // GET FILE EXTENSION
+            $extension = File::extension($request->file->getClientOriginalName()); // GET FILE EXTENSION
+            if($extension == "xlsx" || $extension == "xls" || $extension == "csv") {
+                $path = $request->file->getRealPath(); // GET THE REAL PATH OF THE FILE
+                $data = Excel::load($path, function($reader){})->get(); // GET THE CONTENT INSIDE THE FILE (THIS IS WHERE THE MAGIC HAPPENS)
+                $get_users = [];
+                $get_teams_clusters = [];
+                foreach($data as $index => $user){
+
+                    // get firtname acronym
+                    $tl_name = explode(',', trim($user->name));
+                    $words = explode(" ", trim($tl_name[1]));
+                    $acronym = "";
+                    foreach ($words as $w) {
+                        $acronym .= $w[0];
+                    }
+
+                    // INSERT USERS ON USERS TABLE
+                    $get_users['fname'] = trim($tl_name[1]);
+                    $get_users['lname'] = trim($tl_name[0]);
+                    $get_users['email'] = strtolower($acronym . $tl_name[0]) . '@bizherd.com';
+                    $get_users['password'] = bcrypt('Password123');
+                    $get_users['role'] = base64_encode('user');
+                    $get_users['created_at'] = Carbon::now();
+                    $get_users['updated_at'] = Carbon::now();
+                    // check if existing
+                    if(empty(user::where('email', $get_users['email'])->first())){
+                        $user_id = User::insertGetId($get_users);
+                    }
+
+                    // CREATE CLUSTERS IF USER IS CL
+                    if($user->position == 'cl'){
+                        // CHECK CLUSTER IF EXISTING
+                        $check_cluster = Clusters::where('cluster_name', $user->title)->first();
+                        if(empty($check_cluster)){
+                            Clusters::create([
+                                'cluster_name' => trim($user->title),
+                                'cl_ids' => [(string)$user_id],
+                            ]);
+                        }
+                    }
+
+                    // // CREATE TEAMS IF USER IS TL
+                    if($user->position == 'tl'){
+                        Teams::create([
+                            'team_name' => trim($user->name),
+                            'tl_ids' => [(string)$user_id],
+                        ]);
+
+                        // CHECK TLS CLUSTER
+                        // return $user->title;
+                        $check_position = Clusters::where('cluster_name', 'like', '%' . $user->title . '%')->first();
+                        if(!empty($check_position)){
+                            if(empty($check_position->team_ids)){
+                                $get_teams_clusters[] = (string)$user_id;
+                            } else {
+                                $get_teams_clusters = $check_position->team_ids;
+                                $get_teams_clusters[] = (string)$user_id;
+                            }
+                            Clusters::where('cluster_name', 'like', '%' . $user->title . '%')->update(['team_ids' => json_encode($get_teams_clusters)]);
+                        } else {
+                        }
+                    }
+
+                }
+                    return $get_teams_clusters;
+                // return $get_users;
+            }
         }
     }
 }
