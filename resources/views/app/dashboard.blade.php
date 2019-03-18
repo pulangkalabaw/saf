@@ -133,6 +133,7 @@
 											<!-- <div class="col-md-4" style="float:none;margin: 0 auto;"> -->
 											<div class="col-md-12">
 												<h4 class="alert alert-primary text-center">{{ $clus->cluster_name }}</h4>
+                                                <b>TEAMS</b><br><br>
 											</div>
 											<!-- PUT FOREACH TEAM  -->
 											@foreach($clus->teams as $team)
@@ -143,7 +144,8 @@
 															<p>New Applications: <b>{{ (float)$team->getallsafthiscutoff['new'] }}</b></p>
 															<p>Activated Applications: <b class="text-info">{{ (float)$team->getallsafthiscutoff['activated'] }}</b></p>
 															<p>Paid Applications: <b class="text-primary">{{ (float)$team->getallsafthiscutoff['paid'] }}</b></p>
-															<p>Total Target: <b class="text-success">{{ $team->total_target }}</b> <small class="text-muted">({{ (float)number_format($team->pat, 2) }}%)</small></p>
+                                                            <p>Total Target: <b class="text-success">{{ ($team->total_target == null) ? 0 : $team->total_target }}</b></p>
+															<p>Percentage against target: <b class="text-success">{{ (float)number_format($team->pat, 2) }}%</p>
 														</div>
 													</div>
 												@endif
@@ -159,6 +161,52 @@
 				</div>
 			@endif
 			<!-- PAT WIDGET -->
+
+			<!-- AGENT'S TARGET PERCENTAGE  -->
+            @if(in_array('tl',checkPosition(auth()->user())) || in_array('agent',checkPosition(auth()->user()))  )
+            @if(isset($percentage))
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Agents Target Percentage</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="container">
+                                <div class="col-md-12">
+                                    <h4></h4>
+                                </div>
+                                <!-- PUT FOREACH TEAM  -->
+                                @if($percentage['data_percentage']['data'] != null)
+                                <h4><b>{{$percentage['team_name']}}</b></h4>
+
+                                @foreach($percentage['data_percentage']['data'] as $percent)
+                                    <div class="col-md-2">
+                                        <div class="breadcrumb">
+                                            <p>Agent Name:  <b>{{$percent['fname'] .' '. $percent['lname']}}</b></p>
+                                            <p>Activated: <b class="text-info">{{ $percent['activated']}}</b></p>
+                                            <p>Paid: <b class="text-primary">{{ $percent['new']}}</b></p>
+                                            <p>Target: <b class="text-success">{{ $percent['target']}}</b></p>
+                                            <p>Percentage: <b class="text-success">{{ $percent['percentage']}}%</b></p>
+                                        </div>
+                                    </div>
+                                    @endforeach
+
+                                    @else
+
+                                    <p class='text-center'> No data found</p>
+                                    @endif
+                                <!-- PUT ENDFOREACH TEAM -->
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            @endif
+            @endif
 		</div>
 	</div>
 @endsection

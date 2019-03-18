@@ -25,6 +25,7 @@ class DashboardController extends Controller
 
 	public function dashboard (Request $request) {
 
+		$agents_percentage = $this->percentageDashboard();
 		$application_status_model = new ApplicationStatus();
 		$application_model = new Application();
 		$statuses_model = new Statuses();
@@ -89,6 +90,7 @@ class DashboardController extends Controller
 			'_w_application_status_counter' => $_w,
 			'_w_product_chart' => $_p,
 			// '_w_prod_data' => $_p_prod,
+			'percentage' => $agents_percentage,
 
 		]);
 	}
@@ -134,4 +136,52 @@ class DashboardController extends Controller
 			'myattendance' => $myattendance,
 		]);
 	}
+
+	public function percentageDashboard(){
+
+
+        $agent_ids = [];
+        $team_name = '';
+        // For cl agents
+        // if(!empty(Session::get('_c'))){
+        //     if(!empty(Session::get('_c')[0]['team_ids'])){
+        //
+        //         $team_ids = Teams::whereIn('id',Session::get('_c')[0]['team_ids'])->get(['agent_ids']);
+        //         $agent_id = $team_ids->pluck('agent_ids')->toArray();
+        //
+        //         $agent_ids = [];
+        //
+        //         foreach($agent_id as $ids){
+        //             foreach($ids as $id){
+        //                 $agent_ids[] = $id;
+        //             }
+        //         }
+        //     }
+        // }else
+        // if tl get agents id
+        if(!empty(Session::get('_t'))) {
+
+            if(!empty(Session::get('_t')[0]['agent_ids'])){
+
+                $agent_ids = Session::get('_t')[0]['agent_ids'];
+                $team_name = Session::get('_t')[0]['team_name'];
+            }
+        }elseif(!empty(Session::get('_a'))){
+            // if agent get id
+            if(!empty(Session::get('_a')[0]['agent_ids'])){
+                $agent_ids = [Auth()->user()->id];
+                $team_name = Session::get('_a')[0]['team_name'];
+
+            }
+        }
+        // get date today
+        $date = Carbon::now();
+        // agent target, new, activated and percentage to target information
+        $agents_percentage = ['data_percentage' => computation($agent_ids,$date),
+        'team_name' => $team_name
+    ];
+
+    return $agents_percentage;
+
+    }
 }
