@@ -70,13 +70,13 @@ class UserController extends Controller
             'email' => 'required|string|email|unique:users,email',
             'role' => 'required|string',
             'isActive' => 'required|integer',
-            'password' => 'required|string|min:6',
+            // 'password' => 'required|string|min:6',
         ]);
 
         if ($v->fails()) return back()->withErrors($v->errors())->withInput();
 
         $request['role'] = base64_encode($request['role']);
-        $request['password'] = bcrypt($request['password']);
+        $request['password'] = bcrypt('Password123');
         if (User::insert($request->except('_token'))) {
             return back()->with([
                 'notif.style' => 'success',

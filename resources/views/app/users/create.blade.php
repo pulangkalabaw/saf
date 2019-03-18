@@ -81,7 +81,8 @@
                                     <div>
                                         <div class="col-md-3">Password</div>
                                         <div class="col-md-7">
-                                            <input type="password" name="password" id="" class="form-control" required value="{{ old('password') }}">
+                                            <label>The default password is <span class="text-info">Password123</span></label>
+                                            {{-- <input type="password" name="password" id="" class="form-control" required value="{{ old('password') }}"> --}}
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>

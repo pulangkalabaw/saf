@@ -193,7 +193,7 @@
 									{{ $applications->appends(request()->input())->links() }}
 								</div>
 								<div class="col-md-4 col-xs-4 text-right">
-									Total <b>{{ $applications_total }}</b> result(s)
+									Total <b>{{ $total }}</b> result(s)
 								</div>
 							</div>
 						</div>

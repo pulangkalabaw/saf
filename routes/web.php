@@ -55,6 +55,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     // Attendance
     Route::get('attendance/sample', 'AttendanceController@sample');
     Route::resource('attendance', 'AttendanceController');
+    Route::get('change-password', 'changePasswordController@changePassword');
+    Route::post('handle-changePassword', 'changePasswordController@handleChangePassword')->name('changePassword');
 
     // OIC
     // Route::resource('oic','OicController')->middleware('access_control:administrator,user,encoder');

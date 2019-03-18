@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('isActive')->default(1);
             $table->string('agent_code')->nullable();
             $table->string('target')->nullable();
+            $table->string('password_status')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

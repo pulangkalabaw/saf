@@ -8,6 +8,7 @@ use Validator;
 use App\Teams;
 use App\Clusters;
 use Illuminate\Http\Request;
+use App\User;
 
 class LoginController extends Controller
 {
@@ -45,7 +46,14 @@ class LoginController extends Controller
 			Session::put('_a', $_data['_a']);
 
 			// Authenticated
-			return redirect()->route('app.dashboard');
+			// return redirect()->route('app.dashboard');
+			$password = User::select('password_status')->where('id', Auth::user()->id)->value('password_status');
+			// Authenticated
+			if($password == 1){
+				return redirect()->route('app.dashboard');
+			}elseif($password == 0){
+				return view('auth.change-password');
+			}
 
 		}
 		else {
