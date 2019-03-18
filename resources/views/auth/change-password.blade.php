@@ -3,6 +3,15 @@
 @section ('content')
 <div class="login">
     <form class="login__form" action="{{ route('app.changePassword') }}" method="POST">
+        <div class="form-group">
+            <h3 class="text-center">Change password</h3>
+        </div>
+        @if (Session::has('message'))
+        <div class="alert alert-dismissable alert-danger">
+            {{-- <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a> --}}
+                {{ Session::get('message') }}
+        </div>
+        @endif
         @include('includes.notif')
         {{ csrf_field() }}
         <input name="password_status" type="hidden" value="1">

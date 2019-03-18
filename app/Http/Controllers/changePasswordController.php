@@ -27,7 +27,8 @@ class changePasswordController extends Controller
       ]);
 
         if($request->input('newpassword') != $request->input('password')){
-            return back();
+            Session::flash('message', "Passwords do not match");
+            return view('auth.change-password');
         }
 
         $current_password = \Auth::User()->password;
