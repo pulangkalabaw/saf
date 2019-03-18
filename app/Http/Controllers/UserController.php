@@ -258,6 +258,8 @@ class UserController extends Controller
     }
 
     public function importUsers(Request $request){
+        ini_set('max_execution_time', 300); // IF THE DATA IS TOO MANY
+
         // return $request->all();
         // dd($request->hasFile('file'));
         if($request->hasFile('file')) {
@@ -267,77 +269,126 @@ class UserController extends Controller
                 $data = Excel::load($path, function($reader){})->get(); // GET THE CONTENT INSIDE THE FILE (THIS IS WHERE THE MAGIC HAPPENS)
                 $get_users = [];
                 $get_teams_clusters = [];
+                $get_agents_teams = [];
+                $last_name = "";
                 foreach($data as $index => $user){
-
-                    if(empty($data->email)){
-                        // get firtname acronym
-                        $tl_name = explode(',', trim($user->name));
-                        $words = explode(" ", trim($tl_name[1]));
-                        $acronym = "";
-                        foreach ($words as $w) {
-                            $acronym .= $w[0];
-                        }
-                        $user_email = strtolower($acronym . $tl_name[0]) . '@bizherd.com';
-                    } else {
-                        $user_email = strtolower($data->email);
-                    }
-
-                    // INSERT USERS ON USERS TABLE
-                    $get_users['fname'] = trim($tl_name[1]);
-                    $get_users['lname'] = trim($tl_name[0]);
-                    $get_users['email'] = $user_email;
-                    $get_users['password'] = bcrypt('Password123');
-                    $get_users['role'] = base64_encode('user');
-                    $get_users['target'] = trim($request->target);
-                    $get_users['created_at'] = Carbon::now();
-                    $get_users['updated_at'] = Carbon::now();
-
-                    // check if existing
-                    if(empty(user::where('email', $get_users['email'])->first())){
-                        $user_id = User::insertGetId($get_users);
-                    }
-
-                    // CREATE CLUSTERS IF USER IS CL
-                    if($user->position == 'cl'){
-                        // CHECK CLUSTER IF EXISTING
-                        $check_cluster = Clusters::where('cluster_name', $user->title)->first();
-                        if(empty($check_cluster)){
-                            Clusters::create([
-                                'cluster_name' => trim($user->title),
-                                'cl_ids' => [(string)$user_id],
-                            ]);
-                        }
-                    }
-
-                    // CREATE TEAMS IF USER IS TL
-                    if($user->position == 'tl'){
-                        Teams::create([
-                            'team_name' => trim($user->name),
-                            'tl_ids' => [(string)$user_id],
-                        ]);
-
-                        // CHECK TLS CLUSTER
-                        $check_position = Clusters::where('cluster_name', 'like', '%' . $user->title . '%')->first();
-                        if(!empty($check_position)){
-                            if(empty($check_position->team_ids)){
-                                $get_teams_clusters[] = (string)$user_id;
+                    if(!empty($user->name)){
+                        if(empty($user->email)){
+                            // get firtname acronym
+                            $tl_name = explode(',', trim($user->name));
+                            $tl_lname = explode(" ", trim($tl_name[0]));
+                            if(count($tl_lname) < 2){
+                                $last_name = $tl_lname;
                             } else {
-                                $get_teams_clusters = $check_position->team_ids;
-                                $get_teams_clusters[] = (string)$user_id;
+                                // return $tl_lname;
+                                foreach($tl_lname as $index => $lname){
+                                    // if($index == 0){
+                                    //     return $lname;
+                                    // }
+                                    $last_name = trim($lname);
+                                    // return $last_name;
+                                }
                             }
-                            Clusters::where('cluster_name', 'like', '%' . $user->title . '%')->update(['team_ids' => json_encode($get_teams_clusters)]);
+                            $words = explode(" ", trim($tl_name[1]));
+                            $acronym = "";
+                            foreach ($words as $w) {
+                                $acronym .= $w[0];
+                            }
+                            $user_email = strtolower($acronym . $tl_name[0]) . '@bizherd.com';
+                        } else {
+                            $tl_name = explode(',', trim($user->name));
+                            $user_email = strtolower($user->email);
                         }
-                    }
 
-                    if($user->position == 'ag'){
-                        return $tl_name = explode(',', trim($user->title));
-                        $check_user = User::where()->first();
-                        $check_position = Clusters::where('cluster_name', 'like', '%' . $user->title . '%')->first();
+                        // INSERT USERS ON USERS TABLE
+                        $get_users['fname'] = trim($tl_name[1]);
+                        $get_users['lname'] = trim($tl_name[0]);
+                        $get_users['email'] = $user_email;
+                        $get_users['password'] = bcrypt('Password123');
+                        $get_users['role'] = base64_encode('user');
+                        $get_users['target'] = (string) trim($user->target);
+                        $get_users['created_at'] = Carbon::now();
+                        $get_users['updated_at'] = Carbon::now();
 
+                        // check if existing
+                        $check_email = user::where('email', $get_users['email'])->first();
+                        if(empty($check_email)){
+                            $user_id = User::insertGetId($get_users);
+                        } else {
+                            $user_id = $check_email['id'];
+                        }
+
+                        // CREATE CLUSTERS IF USER IS CL
+                        if($user->position == 'cl'){
+                            // CHECK CLUSTER IF EXISTING
+                            $check_cluster = Clusters::where('cluster_name', $user->title)->first();
+                            if(empty($check_cluster)){
+                                Clusters::create([
+                                    'cluster_id' => rand(1111, 9999),
+                                    'cluster_name' => trim($user->title),
+                                    'cl_ids' => [(string)$user_id],
+                                ]);
+                            }
+                        }
+
+                        // CREATE TEAMS IF USER IS TL
+                        if($user->position == 'tl'){
+                            Teams::create([
+                                'team_id' =>rand(1111, 9999),
+                                'team_name' => trim($user->name),
+                                'tl_ids' => [(string)$user_id],
+                            ]);
+
+                            // CHECK TLS CLUSTER
+                            $check_position = Clusters::where('cluster_name', 'like', '%' . $user->title . '%')->first();
+                            if(!empty($check_position)){
+                                $team_ids;
+                                foreach(Teams::get() as $get_tls){
+                                    foreach($get_tls['tl_ids'] as $tls){
+                                        if($tls == $user_id){
+                                            $team_ids = $get_tls['id'];
+                                        }
+                                    }
+                                }
+
+                                if(empty($check_position->team_ids)){
+                                    $get_teams_clusters[] = (string)$team_ids;
+                                } else {
+                                    $get_teams_clusters = $check_position->team_ids;
+                                    $get_teams_clusters[] = (string)$team_ids;
+                                }
+                                Clusters::where('cluster_name', 'like', '%' . $user->title . '%')->update(['team_ids' => json_encode($get_teams_clusters)]);
+                            }
+                        }
+
+                        if($user->position == 'ag'){
+                            $tl = explode(',', trim($user->title));
+                            $check_user_id = User::where('fname', 'like', '%' . trim($tl['1']) . '%')->where('lname', 'like', '%' . trim($tl['0']) . '%')->value('id');
+                            $get_team_id;
+                            if(!empty($check_user_id)){
+                                $get_teams = Teams::get();
+                                foreach($get_teams as $teams){
+                                    foreach($teams['tl_ids'] as $tl_id){
+                                        if($check_user_id == $tl_id){
+                                            $get_team_id = $teams['id'];
+                                        }
+                                    }
+                                }
+                                $check_team = Teams::where('id', $get_team_id)->first();
+                                if(!empty($check_team)){
+                                    $get_agents_teams = $check_team['agent_ids'];
+                                    $get_agents_teams[] = (string)$user_id;
+                                } else {
+                                    $get_agents_teams[] = (string)$user_id;
+                                }
+                                // return $get_agents_teams;
+                                Teams::where('id', $get_team_id)->update(['agent_ids' => json_encode($get_agents_teams)]);
+                            }
+                        }
                     }
                 }
-                return $get_teams_clusters;
             }
         }
+        return back();
     }
 }
