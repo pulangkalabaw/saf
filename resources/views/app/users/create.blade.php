@@ -32,7 +32,7 @@
                         </div>
                     </div>
                     <div class="panel-body">
-                        <form action="{{ route('app.import-users') }}" method="POST" enctype="multipart/form-data">
+                        {{-- <form action="{{ route('app.import-users') }}" method="POST" enctype="multipart/form-data">
                             {{ csrf_field() }}
                             <label>Import Users</label>
                             <div class="row">
@@ -46,7 +46,7 @@
                                     <div class="clearfix"></div><br><br>
                                 </div>
                             </div>
-                        </form>
+                        </form> --}}
                         <form action="{{ route('app.users.store') }}" method="POST">
                             @include('includes.notif')
 
