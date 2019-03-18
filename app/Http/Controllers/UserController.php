@@ -269,22 +269,29 @@ class UserController extends Controller
                 $get_teams_clusters = [];
                 foreach($data as $index => $user){
 
-                    // get firtname acronym
-                    $tl_name = explode(',', trim($user->name));
-                    $words = explode(" ", trim($tl_name[1]));
-                    $acronym = "";
-                    foreach ($words as $w) {
-                        $acronym .= $w[0];
+                    if(empty($data->email)){
+                        // get firtname acronym
+                        $tl_name = explode(',', trim($user->name));
+                        $words = explode(" ", trim($tl_name[1]));
+                        $acronym = "";
+                        foreach ($words as $w) {
+                            $acronym .= $w[0];
+                        }
+                        $user_email = strtolower($acronym . $tl_name[0]) . '@bizherd.com';
+                    } else {
+                        $user_email = strtolower($data->email);
                     }
 
                     // INSERT USERS ON USERS TABLE
                     $get_users['fname'] = trim($tl_name[1]);
                     $get_users['lname'] = trim($tl_name[0]);
-                    $get_users['email'] = strtolower($acronym . $tl_name[0]) . '@bizherd.com';
+                    $get_users['email'] = $user_email;
                     $get_users['password'] = bcrypt('Password123');
                     $get_users['role'] = base64_encode('user');
+                    $get_users['target'] = trim($request->target);
                     $get_users['created_at'] = Carbon::now();
                     $get_users['updated_at'] = Carbon::now();
+
                     // check if existing
                     if(empty(user::where('email', $get_users['email'])->first())){
                         $user_id = User::insertGetId($get_users);
@@ -302,7 +309,7 @@ class UserController extends Controller
                         }
                     }
 
-                    // // CREATE TEAMS IF USER IS TL
+                    // CREATE TEAMS IF USER IS TL
                     if($user->position == 'tl'){
                         Teams::create([
                             'team_name' => trim($user->name),
@@ -310,7 +317,6 @@ class UserController extends Controller
                         ]);
 
                         // CHECK TLS CLUSTER
-                        // return $user->title;
                         $check_position = Clusters::where('cluster_name', 'like', '%' . $user->title . '%')->first();
                         if(!empty($check_position)){
                             if(empty($check_position->team_ids)){
@@ -320,13 +326,17 @@ class UserController extends Controller
                                 $get_teams_clusters[] = (string)$user_id;
                             }
                             Clusters::where('cluster_name', 'like', '%' . $user->title . '%')->update(['team_ids' => json_encode($get_teams_clusters)]);
-                        } else {
                         }
                     }
 
+                    if($user->position == 'ag'){
+                        return $tl_name = explode(',', trim($user->title));
+                        $check_user = User::where()->first();
+                        $check_position = Clusters::where('cluster_name', 'like', '%' . $user->title . '%')->first();
+
+                    }
                 }
-                    return $get_teams_clusters;
-                // return $get_users;
+                return $get_teams_clusters;
             }
         }
     }
