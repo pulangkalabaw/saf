@@ -425,7 +425,27 @@ class AttendanceController extends Controller
 	}
 
 	public function list(Request $request){
-		
+		// for jump to date, previous, and next
+		$date_original = $request->date == null ? Carbon::parse(date('Y-m-d')) : Carbon::parse($request->date);
+		$date_select = $date_original;
+
+		$date['selected'] = $date_select->toDateString(); // this will be the value of jump to date
+
+		$date['previous'] = $request->date == null ? Carbon::parse(date('Y-m-d'))->subDays(1)->toDateString() : Carbon::parse($request->date)->subDays(1)->toDateString();
+
+		if($date_select != Carbon::parse(date('Y-m-d'))){
+			$date['next'] = $request->date == null ? Carbon::parse(date('Y-m-d'))->addDays(1)->toDateString() : Carbon::parse($request->date)->addDays(1)->toDateString();
+		} else {
+			$date['next'] = null;
+		}
+
+		$data = getIds('all');
+
+		$attendance = Attendance::whereIn('user_id', $data['ids']['all'])->where('user_id', '!=', Auth::user()->id)->whereDate('created_at', $date_select)->orderBy('status', 'desc')->get();
+
+		$date_select = $request->date != null ? $request->date : date('Y-m-d H:i:s');
+
+		return view('app.attendance.list', compact('date', 'attendance'));
 	}
 
 	/**
