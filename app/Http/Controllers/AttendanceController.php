@@ -423,6 +423,11 @@ class AttendanceController extends Controller
 		// return $get_user_attendance;
 		return view('app.attendance.index', compact('attendance', 'teams', 'clusters', 'selected_cluster', 'get_user_attendance', 'date'));
 	}
+
+	public function list(Request $request){
+		
+	}
+
 	/**
 	* Show the form for creating a new resource.
 	*

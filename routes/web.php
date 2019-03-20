@@ -53,6 +53,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     Route::post('delete-post', 'MessageBoardController@delete')->name('delete-post');
 
     // Attendance
+    Route::get('attendance/list', 'AttendanceController@list')->name('attendance.list');
     Route::get('attendance/sample', 'AttendanceController@sample');
     Route::resource('attendance', 'AttendanceController');
     Route::get('change-password', 'changePasswordController@changePassword');

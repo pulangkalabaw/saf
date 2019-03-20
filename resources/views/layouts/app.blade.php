@@ -252,6 +252,12 @@
 	                                        <div class="nav-menu__text"><span>Users Attendance</span></div>
 	                                    </a>
 	                                </li>
+	                                {{-- <li>
+	                                    <a href="{{ route('app.attendance.list') }}">
+	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-file"></i></div>
+	                                        <div class="nav-menu__text"><span>List of Attendance</span></div>
+	                                    </a>
+	                                </li> --}}
 									@endif
 	                            </ul>
 	                        </div>
