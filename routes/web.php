@@ -58,6 +58,11 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     Route::resource('attendance', 'AttendanceController');
     Route::get('change-password', 'changePasswordController@changePassword');
     Route::post('handle-changePassword', 'changePasswordController@handleChangePassword')->name('changePassword');
+    // GALLERY
+    Route::get('gallery', 'AttendanceController@gallery')->name('gallery');
+    Route::delete('image/{id}', 'AttendanceController@destroy_image')->name('image.destroy');
+    Route::get('gallery/get/json', 'AttendanceController@getGallery')->name('gallery.json');
+    
 
     // OIC
     // Route::resource('oic','OicController')->middleware('access_control:administrator,user,encoder');

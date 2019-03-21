@@ -525,7 +525,7 @@ class AttendanceController extends Controller
 		// 	];
 		// }
 
-		if(!empty($request->input('empImg'))){
+		if(!empty($request->empImg)){
 			if($image = $request->input('empImg')){
 				// $this->validate($request, [
 				// 	'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -748,6 +748,19 @@ class AttendanceController extends Controller
 			// return $data_image;
 			Attendance_image::create($data_image);
 		}
+		return back();
+	}
+
+	public function gallery(Request $request){
+	 	$date = $request->date != null ? Carbon::parse($request->date)->toDateString() : date('Y-m-d');
+		$image = Attendance_image::orderBy('image', 'decs')->whereDate('created_at', $date)->paginate(12);
+		return view('app.attendance.gallery', compact('image', 'date'));
+	}
+
+	public function destroy_image($id){
+	    $image = Attendance_image::findOrFail($id);
+		$image->delete();
+		Session::flash('message', "Your photo has been deleted successfully");
 		return back();
 	}
 	/**
