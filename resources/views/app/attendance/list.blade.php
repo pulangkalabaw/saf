@@ -115,12 +115,14 @@
                                                     </thead>
                                                     <tbody>
                                                         @foreach($attendance as $att)
-                                                        <tr>
+                                                        <tr {!! $att['status'] == 1 ? 'title="Present"' : 'title="Absent"' !!}>
                                                             <td class="text-light">{{ $att['users']['fname'] . ' ' . $att['users']['lname'] }}</td>
                                                             <td class="text-light">{{ $att['activities'] }}</td>
                                                             <td class="text-light">{{ $att['location'] }}</td>
                                                             <td class="text-light">{{ $att['remarks'] }}</td>
-                                                            <td class="text-light">{{ $att['status'] == 1 ? 'Present' : 'Absent' }}</td>
+
+                                                            <td class="text-light">{!! $att['status'] == 1 ? '<span title="Present" class="fa fa-circle text-info"></span>' : '<span title="Absent" class="fa fa-circle text-danger"></span>' !!}</td>
+                                                            {{-- <td class="text-light">{{ $att['status'] == 1 ? 'Present' : 'Absent' }}</td> --}}
                                                             {{-- <td class="text-light text-center">{{ $att['team_name'] }}</td> --}}
                                                         </tr>
                                                         @endforeach

@@ -248,8 +248,8 @@
 									@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
 	                                <li>
 	                                    <a href="{{ route('app.attendance.index') }}">
-	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-user-o"></i></div>
-	                                        <div class="nav-menu__text"><span>Users Attendance</span></div>
+	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-clock-o"></i></div>
+	                                        <div class="nav-menu__text"><span>Attendance</span></div>
 	                                    </a>
 	                                </li>
 	                                <li>

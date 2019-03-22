@@ -89,269 +89,203 @@
                                     </div>
                                 </div>
                                 <div class="panel-body" id="hidepanel">
-                                    <ul class="nav nav-tabs" role="tablist">
-                                        <li class="active" role="presentation"><a href="#unpresent" aria-controls="unpresent" role="tab" data-toggle="tab">Roll call <span class="label">{{ count($attendance['unpresent']) }}</span> </a></li>
-                                        <li role="presentation"><a href="#present" aria-controls="present" role="tab" data-toggle="tab">Present <span class="label">{{ count($attendance['present']) }}</span></a></li>
-                                        <li role="presentation"><a href="#absent" aria-controls="absent" role="tab" data-toggle="tab">Absents <span class="label">{{ count($attendance['absent']) }}</span></a></li>
-                                    </ul>
-                                    <div class="tab-content" >
-                                        {{-- {{ dd(Carbon\Carbon::parse(request()->date)->format('F d, Y')) }} --}}
-                                        @if(!empty(request()->date))
-                                            <div class="panel-body">
-                                                <div class="form-group text-center">
-                                                    @php
-                                                    $fucking_date = Carbon\Carbon::parse(request()->date)->diffInDays(Carbon\Carbon::parse(date('Y-m-d')), false);
-                                                    $fucking_message = '';
-                                                    if($fucking_date == 1){
-                                                        $fucking_message = ' (Yesterday)';
-                                                    } else if($fucking_date == 0) {
-                                                        $fucking_message = ' (Now)';
-                                                    }
-                                                    @endphp
-                                                    <label><h2><i class="fa fa-calendar text-success"></i> {{ Carbon\Carbon::parse(request()->date)->format('F d, Y')  . $fucking_message}}</h2></label>
-                                                </div>
-                                            </div>
+                                    @if(!empty(request()->date))
+                                    <div class="panel-body">
+                                        <div class="form-group text-center">
+                                            @php
+                                            $fucking_date = Carbon\Carbon::parse(request()->date)->diffInDays(Carbon\Carbon::parse(date('Y-m-d')), false);
+                                            $fucking_message = '';
+                                            if($fucking_date == 1){
+                                                $fucking_message = ' (Yesterday)';
+                                            } else if($fucking_date == 0) {
+                                                $fucking_message = ' (Now)';
+                                            }
+                                            @endphp
+                                            <label><h2><i class="fa fa-calendar text-success"></i> {{ Carbon\Carbon::parse(request()->date)->format('F d, Y')  . $fucking_message}}</h2></label>
+                                        </div>
+                                    </div>
+                                    @endif
+                                    @if(count($attendance['unpresent']) == 0)
+                                        <div class="form-group text-center">
+                                            <label><h4><i class="fa fa-info-circle text-info"></i> All agents have been checked</h4></label>
+                                        </div>
+                                        <div class="form-group text-center">
+                                            <label>If you have any concerns or corrections, please contact your cluster lead</label>
+                                        </div>
+                                    @else
+        								@include('includes.notif')
+                                        @if (Session::has('message'))
+                                        <div class="alert alert-dismissable alert-danger">
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                                {{ Session::get('message') }}
+                                        </div>
                                         @endif
-                                        <div class="tab-pane active" id="unpresent" role="tabpanel">
-                                            {{-- {{ count($attendance['unpresent']) }} --}}
-                                            @if(count($attendance['unpresent']) == 0)
-                                            <div class="form-group text-center">
-                                                <label><h4><i class="fa fa-info-circle text-info"></i> All agents have been checked</h4></label>
+                                        @if (Session::has('success'))
+                                           <!-- <div class="alert alert-success">{{ Session::get('success') }}</div> -->
+                                           <div class="alert alert-dismissable alert-success">
+                                               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                   <span aria-hidden="true">&times;</span>
+                                               </button>
+                                                   {{ Session::get('success') }}
+                                           </div>
+                                        @endif
+                                        <form enctype="multipart/form-data" action="{{ route('app.attendance.store') }}" method="POST">
+                                            {{ csrf_field() }}
+                                            {{-- <input type="hidden" name="cl_id" value="{{  }}"> --}}
+                                            <div class="panel-body">
+                                                <input name="selected_date" type="hidden" value="{{ $date['selected'] }}">
+                                                <button class="btn btn-primary pull-right" id="buttonTop">Submit</button>
                                             </div>
-                                            <div class="form-group text-center">
-                                                <label>If you have any concerns or corrections, please contact your cluster lead</label>
-                                            </div>
-                                            @else
-            								@include('includes.notif')
-                                            @if (Session::has('message'))
-                                            <div class="alert alert-dismissable alert-danger">
-                                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                                    {{ Session::get('message') }}
-                                            </div>
-                                            @endif
-                                            @if (Session::has('success'))
-                                               <!-- <div class="alert alert-success">{{ Session::get('success') }}</div> -->
-                                               <div class="alert alert-dismissable alert-success">
-                                                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                       <span aria-hidden="true">&times;</span>
-                                                   </button>
-                                                       {{ Session::get('success') }}
-                                               </div>
-                                            @endif
-                                            <form enctype="multipart/form-data" action="{{route('app.attendance.store')}}" method="POST">
-                                                {{ csrf_field() }}
-                                                {{-- <input type="hidden" name="cl_id" value="{{  }}"> --}}
-                                                <div class="panel-body">
-                                                    <input name="selected_date" type="hidden" value="{{ $date['selected'] }}">
-                                                    <button class="btn btn-primary pull-right" id="buttonTop">Submit</button>
-                                                    {{-- <button type="button" class="btn btn-danger pull-right" id="buttonTop">toggle</button> --}}
-                                                </div>
-                                                <div class="panel-body">
-                                                    @if(base64_decode(auth()->user()->role) != 'administrator' && count(session()->get('_c')) == 0)
+                                            <div class="panel-body">
+                                                @if(base64_decode(auth()->user()->role) != 'administrator' && count(session()->get('_c')) == 0)
+                                                    @if(Carbon\Carbon::now()->setTimeZone('Asia/Manila')->toTimeString() >= Carbon\Carbon::parse('10:3-0:00')->toTimeString())
                                                         <label class="text-danger">You can't use attendance because it's passed 10:30am</label>
                                                     @endif
-                                                    <div class="table-responsive">
-                                                        <table class="table table-hovered table-striped">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th class="text-center">Status</th>
-                                                                    <th>Name</th>
-                                                                    <th>Activities</th>
-                                                                    <th>Location</th>
-                                                                    <th>Remarks</th>
-                                                                    <th class="text-center">Team</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach($attendance['unpresent'] as $index => $value)
-                                                                    <tr id="tr-container-{{ $index }}" class="">
-                                                                        <td class="text-center">
-                                                                            <input type="hidden" hidden name="user[{{ $index }}][status]" class="setStatus" id="status_{{ $index }}"
-                                                                            @if(!empty($value['value_btn']))
-                                                                                @if($value['value_btn']['class'] == 'btn-info')
-                                                                                    value="1"
-                                                                                @elseif($value['value_btn']['class'] == 'btn-danger')
-                                                                                    value="0"
-                                                                                @endif
+                                                @endif
+                                                <div class="table-responsive">
+                                                    <table class="table table-hovered table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-center">Status</th>
+                                                                <th>Name</th>
+                                                                <th>Activities</th>
+                                                                <th>Location</th>
+                                                                <th>Remarks</th>
+                                                                <th class="text-center">Team</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($attendance['unpresent'] as $index => $value)
+                                                                <tr id="tr-container-{{ $index }}" class="">
+                                                                    <td class="text-center">
+                                                                        <input type="hidden" hidden name="user[{{ $index }}][status]" class="setStatus" id="status_{{ $index }}"
+                                                                        @if(!empty($value['value_btn']))
+                                                                            @if($value['value_btn']['class'] == 'btn-info')
+                                                                                value="1"
+                                                                            @elseif($value['value_btn']['class'] == 'btn-danger')
+                                                                                value="0"
                                                                             @endif
+                                                                        @endif
 
-                                                                            >
-                                                                            <button type="button" name="changeStatus" id="changeStatus_{{ $value['id'] }}" onclick="changeButtonStatus('desktop', 'changeStatus_{{ $value['id'] }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]');
-                                                                            @if(!empty($value['value_btn']))
-                                                                                showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}');
+                                                                        >
+                                                                        <button type="button" name="changeStatus" id="changeStatus_{{ $value['id'] }}" onclick="changeButtonStatus('desktop', 'changeStatus_{{ $value['id'] }}', 'status_{{ $index }}' , 'user[{{ $index }}][activities]', 'user[{{ $index }}][location]', 'user[{{ $index }}][remarks]');
+                                                                        @if(!empty($value['value_btn']))
+                                                                            showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}');
+                                                                        @endif
+                                                                        @if(!empty(request()->date))
+                                                                            @if(request()->date != Carbon\Carbon::now()->toDateString())
+                                                                                showRemark('{{ $value['id'] }}');
                                                                             @endif
-                                                                            @if(!empty(request()->date))
-                                                                                @if(request()->date != Carbon\Carbon::now()->toDateString())
-                                                                                    showRemark('{{ $value['id'] }}');
-                                                                                @endif
-                                                                            @endif
-                                                                            "
-                                                                            class="btn
-                                                                            @if(!empty($value['value_btn']))
-                                                                                {{ $value['value_btn']['class'] }}
+                                                                        @endif
+                                                                        "
+                                                                        class="btn
+                                                                        @if(!empty($value['value_btn']))
+                                                                            {{ $value['value_btn']['class'] }}
+                                                                        @else
+                                                                            btn-default
+                                                                        @endif attendance
+                                                                        "
+                                                                        >@php
+                                                                        if(!empty($value['value_btn'])){
+                                                                            echo $value['value_btn']['label'];
+                                                                        }else{
+                                                                            echo 'Undecided';
+                                                                        }
+                                                                        @endphp</button>
+                                                                    </td>
+                                                                    <td class="text-light"><span class="margin-vertical {{ !empty($value['tl']) ? 'text-info' : '' }}">{{ $value['fname'] . ' ' . $value['lname']}}</span></td>
+                                                                    {{-- <td>{{  }}</td> --}}
+                                                                    <td>
+                                                                        <input name="user[{{ $index }}][user_id]" class="form-control" type="hidden" value={{ $value['id'] }}>
+                                                                        <select class="form-control input-gray" name="user[{{ $index }}][activities]" id="user_activity_{{ $value['id'] }}"
+                                                                            @if(empty($value['value_activity']))
+                                                                                disabled
                                                                             @else
-                                                                                btn-default
-                                                                            @endif attendance
-                                                                            "
-                                                                            >@php
-                                                                            if(!empty($value['value_btn'])){
-                                                                                echo $value['value_btn']['label'];
-                                                                            }else{
-                                                                                echo 'Undecided';
-                                                                            }
-                                                                            @endphp</button>
-                                                                        </td>
-                                                                        <td class="text-light"><span class="margin-vertical {{ !empty($value['tl']) ? 'text-info' : '' }}">{{ $value['fname'] . ' ' . $value['lname']}}</span></td>
-                                                                        {{-- <td>{{  }}</td> --}}
-                                                                        <td>
-                                                                            <input name="user[{{ $index }}][user_id]" class="form-control" type="hidden" value={{ $value['id'] }}>
-                                                                            <select class="form-control input-gray" name="user[{{ $index }}][activities]" id="user_activity_{{ $value['id'] }}"
-                                                                                @if(empty($value['value_activity']))
-                                                                                    disabled
-                                                                                @else
-                                                                                    onchange="showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
+                                                                                onchange="showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
+                                                                            @endif
+                                                                        >
+                                                                            <option
+                                                                            @if(!empty($value['value_activity']))
+                                                                                @if($value['value_activity'] == 'Blitz')
+                                                                                    selected
                                                                                 @endif
-                                                                            >
-                                                                                <option
-                                                                                @if(!empty($value['value_activity']))
-                                                                                    @if($value['value_activity'] == 'Blitz')
-                                                                                        selected
-                                                                                    @endif
+                                                                            @endif
+                                                                            >Blitz</option>
+                                                                            <option
+                                                                            @if(!empty($value['value_activity']))
+                                                                                @if($value['value_activity'] == 'Saturation')
+                                                                                    selected
                                                                                 @endif
-                                                                                >Blitz</option>
-                                                                                <option
-                                                                                @if(!empty($value['value_activity']))
-                                                                                    @if($value['value_activity'] == 'Saturation')
-                                                                                        selected
-                                                                                    @endif
-                                                                                @endif
-                                                                                >Saturation</option>
-                                                                            </select>
-                                                                        </td>
-                                                                        <td>
-                                                                            <div class="form-group">
-                                                                                <input name="user[{{ $index }}][location]" id="user_location_{{ $value['id'] }}" class="form-control input-gray" required type="text"
-                                                                                @if(!empty($value['value_location']))
-                                                                                    value="{{ $value['value_location'] }}"
-                                                                                    oninput="showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
-                                                                                @else
-                                                                                    disabled
-                                                                                @endif
-                                                                                >
-                                                                            </div>
-                                                                        </td>
-                                                                        <td>
-                                                                            <input name="user[{{ $index }}][remarks]" id="user_remarks_{{ $value['id'] }}" class="form-control input-gray"  required type="text"
-                                                                            @if(!empty($value['value_remarks']))
-                                                                                value="{{ $value['value_remarks'] }}"
+                                                                            @endif
+                                                                            >Saturation</option>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="form-group">
+                                                                            <input name="user[{{ $index }}][location]" id="user_location_{{ $value['id'] }}" class="form-control input-gray" required type="text"
+                                                                            @if(!empty($value['value_location']))
+                                                                                value="{{ $value['value_location'] }}"
                                                                                 oninput="showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
                                                                             @else
                                                                                 disabled
                                                                             @endif
                                                                             >
-                                                                        </td>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <input name="user[{{ $index }}][remarks]" id="user_remarks_{{ $value['id'] }}" class="form-control input-gray"  required type="text"
+                                                                        @if(!empty($value['value_remarks']))
+                                                                            value="{{ $value['value_remarks'] }}"
+                                                                            oninput="showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
+                                                                        @else
+                                                                            disabled
+                                                                        @endif
+                                                                        >
+                                                                    </td>
 
-                                                                        <td class="text-light text-center">{{ $value['team_name'] }}</td>
-                                                                    </tr>
-                                                                    <tr class="bg-gray tr-accordion" id="tr-accordion-{{ $value['id'] }}">
-                                                                        <td></td>
-                                                                        <td colspan="5">
-                                                                            <div class="collapse" id="accordion-container-{{ $value['id'] }}">
-                                                                                <div class="row vertical-align">
-                                                                                    <div class="col-md-2">
-                                                                                        <label class="pull-right">Remarks:</label>
-                                                                                    </div>
-                                                                                    <div class="col-md-10">
-                                                                                        {{-- {{ dd($date['selected']) }} --}}
-                                                                                        @if(!empty($value['value_location']) || $date['selected'] != Carbon\Carbon::now()->toDateString())
-                                                                                            <input type="hidden" name="date" value="{{ $date['selected'] }}">
-                                                                                            <input type="hidden" name="user[{{ $index }}][modified_status]" value="1">
-                                                                                        @endif
-                                                                                        {{-- @if(request()->date != Carbon\Carbon::now()->toDateString())
-                                                                                            <input type="text" name="user[{{ $index }}][modified_status]" value="1">
-                                                                                        @endif --}}
-                                                                                        <input name="user[{{ $index }}][modified_remarks]" id="user_modified_remarks_{{ $value['id'] }}" class="form-control text-light" required disabled type="text">
-                                                                                    </div>
+                                                                    <td class="text-light text-center">{{ $value['team_name'] }}</td>
+                                                                </tr>
+                                                                <tr class="bg-gray tr-accordion" id="tr-accordion-{{ $value['id'] }}">
+                                                                    <td></td>
+                                                                    <td colspan="5">
+                                                                        <div class="collapse" id="accordion-container-{{ $value['id'] }}">
+                                                                            <div class="row vertical-align">
+                                                                                <div class="col-md-2">
+                                                                                    <label class="pull-right">Remarks:</label>
+                                                                                </div>
+                                                                                <div class="col-md-10">
+                                                                                    {{-- {{ dd($date['selected']) }} --}}
+                                                                                    @if(!empty($value['value_location']) || $date['selected'] != Carbon\Carbon::now()->toDateString())
+                                                                                        <input type="hidden" name="date" value="{{ $date['selected'] }}">
+                                                                                        <input type="hidden" name="user[{{ $index }}][modified_status]" value="1">
+                                                                                    @endif
+                                                                                    {{-- @if(request()->date != Carbon\Carbon::now()->toDateString())
+                                                                                        <input type="text" name="user[{{ $index }}][modified_status]" value="1">
+                                                                                    @endif --}}
+                                                                                    <input name="user[{{ $index }}][modified_remarks]" id="user_modified_remarks_{{ $value['id'] }}" class="form-control text-light" required disabled type="text">
                                                                                 </div>
                                                                             </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                                <div class="panel-body">
-                                                    <div class="form-group">
-                                                        <button class="btn btn-primary pull-right" id="buttonButtom">Submit</button>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <h4>Attach Image: </h4>
-                                                        <input type="file" name="empImg" id="browseImg">
-                                                    </div>
-                                                </div>
-                                            </form>
-                                            @endif
-                                        </div>
-                                        <div class="tab-pane" id="present" role="tabpanel">
-                                            <div class="panel-body">
-                                                <div class="table-responsive">
-                                                    <table class="table table-hovered table-striped">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Name</th>
-                                                                <th>Activities</th>
-                                                                <th>Location</th>
-                                                                <th>Remarks</th>
-                                                                <th class="text-center">Team</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach($attendance['present'] as $present)
-                                                            <tr>
-                                                                <td class="text-light">{{ $present['users']['fname'] . ' ' . $present['users']['lname'] }}</td>
-                                                                <td class="text-light">{{ $present['activities'] }}</td>
-                                                                <td class="text-light">{{ $present['location'] }}</td>
-                                                                <td class="text-light">{{ $present['remarks'] }}</td>
-                                                                <td class="text-light text-center">{{ $present['team_name'] }}</td>
-                                                            </tr>
-                                                            @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="tab-pane" id="absent" role="tabpanel">
-                                            <div class="panel-body">
-                                                <div class="table-responsive">
-                                                    <table class="table table-hovered table-striped">
-                                                        <thead>
-                                                            <tr>
-                                                                <th>Name</th>
-                                                                <th>Activities</th>
-                                                                <th>Location</th>
-                                                                <th>Remarks</th>
-                                                                <th class="text-center">Team</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            @foreach($attendance['absent'] as $absent)
-                                                                <tr>
-                                                                    <td class="text-light">{{ $absent['users']['fname'] . ' ' . $absent['users']['lname'] }}</td>
-                                                                    <td class="text-light">{{ $absent['activities'] }}</td>
-                                                                    <td class="text-light">{{ $absent['location'] }}</td>
-                                                                    <td class="text-light">{{ $absent['remarks'] }}</td>
-                                                                    <td class="text-light text-center">{{ $absent['team_name'] }}</td>
+                                                                        </div>
+                                                                    </td>
                                                                 </tr>
                                                             @endforeach
                                                         </tbody>
                                                     </table>
                                                 </div>
                                             </div>
-                                        </div>
-                                    </div>
+                                            <div class="panel-body">
+                                                <div class="form-group">
+                                                    <button class="btn btn-primary pull-right" id="buttonButtom">Submit</button>
+                                                </div>
+                                                <div class="form-group">
+                                                    <h4>Attach Image: </h4>
+                                                    <input type="file" name="empImg" id="browseImg">
+                                                </div>
+                                            </div>
+                                        </form>
+                                    @endif
                                 </div>
                                 @endif
                             </div>
@@ -421,7 +355,9 @@
                                     </div>
                                     <div class="form-group">
                                         @if(base64_decode(auth()->user()->role) != 'administrator' && count(session()->get('_c')) == 0)
-                                            <label class="text-danger">You can't use attendance because it's passed 10:30am</label>
+                                            @if(Carbon\Carbon::now()->setTimeZone('Asia/Manila')->toTimeString() >= Carbon\Carbon::parse('10:3-0:00')->toTimeString())
+                                                <label class="text-danger">You can't use attendance because it's passed 10:30am</label>
+                                            @endif
                                         @endif
                                     </div>
                                     <div class="form-group">
@@ -570,7 +506,7 @@ jQuery(document).ready(function () {
     });
 });
 @if(base64_decode(auth()->user()->role) != 'administrator' && count(session()->get('_c')) == 0)
-    if(time <= timein){
+    if(time >= timein){
         $('#buttonButtom').attr('disabled', true);
         $('#buttonTop').attr('disabled', true);
         $('.attendance').attr('disabled', true);
