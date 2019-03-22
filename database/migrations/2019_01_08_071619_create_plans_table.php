@@ -18,7 +18,7 @@ class CreatePlansTable extends Migration
             $table->string('plan_name');
             $table->tinyInteger('with_device');
             $table->string('product');
-            $table->text('description');
+            $table->text('description')->nullable();
             $table->double('msf');
             $table->timestamps();
         });

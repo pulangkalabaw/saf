@@ -72,7 +72,7 @@
                                     <div>
                                         <div class="col-md-3">MSF</div>
                                         <div class="col-md-7">
-                                            <input type="text" name="msf" id="" class="form-control" required value="{{ old('plan_name') }}">
+                                            <input type="text" name="msf" id="floatTextBox" class="form-control" required value="{{ old('msf') }}">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -102,4 +102,28 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+function setInputFilter(textbox, inputFilter) {
+        ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+        textbox.addEventListener(event, function() {
+          if (inputFilter(this.value)) {
+            this.oldValue = this.value;
+            this.oldSelectionStart = this.selectionStart;
+            this.oldSelectionEnd = this.selectionEnd;
+          } else if (this.hasOwnProperty("oldValue")) {
+            this.value = this.oldValue;
+            this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+          }
+        });
+    });
+}
+
+
+// Install input filters.
+setInputFilter(document.getElementById("floatTextBox"), function(value) {
+return /^-?\d*[.,]?\d*$/.test(value); });
+</script>
 @endsection

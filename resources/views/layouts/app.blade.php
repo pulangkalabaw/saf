@@ -98,7 +98,7 @@
 							@if(accessControl(['administrator', 'user']))
 								@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
 								{{-- @if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl") --}}
-									<div class="quickmenu__item {{ str_contains(url()->current(), ['attendance','attendancedashboard']) ? 'active' : '' }}">
+									<div class="quickmenu__item {{ str_contains(url()->current(), ['attendance','attendancedashboard', 'gallery']) ? 'active' : '' }}">
 										<div class="fa fa-clock-o"></div>
 									</div>
 								@endif
@@ -252,12 +252,18 @@
 	                                        <div class="nav-menu__text"><span>Users Attendance</span></div>
 	                                    </a>
 	                                </li>
-	                                {{-- <li>
+	                                <li>
 	                                    <a href="{{ route('app.attendance.list') }}">
 	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-file"></i></div>
 	                                        <div class="nav-menu__text"><span>List of Attendance</span></div>
 	                                    </a>
-	                                </li> --}}
+	                                </li>
+	                                <li>
+										<a href="{{ route('app.gallery') }}">
+											<div class="nav-menu__ico"><i class="fa fa-file-image-o fa-fw"></i></div>
+											<div class="nav-menu__text"><span>Gallery</span></div>
+										</a>
+									</li>
 									@endif
 	                            </ul>
 	                        </div>

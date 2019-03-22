@@ -20,6 +20,8 @@ class Plans extends Model
 
     public  function scopeSearch ($query, $value) {
         $val = trim($value);
-        return $query->where('plan_name', 'LIKE', "%".$val."%");
+        return $query->where('plan_name', 'LIKE', "%".$val."%")
+        ->orWhere('product','LIKE', "%".$val."%")
+        ->orWhere('msf','LIKE', "%".$val."%");
     }
 }

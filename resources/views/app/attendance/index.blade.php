@@ -570,7 +570,7 @@ jQuery(document).ready(function () {
     });
 });
 @if(base64_decode(auth()->user()->role) != 'administrator' && count(session()->get('_c')) == 0)
-    if(time >= timein){
+    if(time <= timein){
         $('#buttonButtom').attr('disabled', true);
         $('#buttonTop').attr('disabled', true);
         $('.attendance').attr('disabled', true);

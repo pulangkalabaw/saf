@@ -57,7 +57,9 @@ class PlansController extends Controller
         }
         // Validate inputs
         $validate = Validator::make($request->all(), [
-            'plan_name' => 'required|string|max:255'
+            'plan_name' => 'required|string|max:255',
+            'product' => 'required',
+            'msf' => 'required',
         ]);
 
         if($validate->fails()) return back()->withErrors($validate->errors())->withInput();
@@ -118,6 +120,8 @@ class PlansController extends Controller
 
         $request->validate([
             'plan_name' => 'required|string|max:255',
+            'product' => 'required',
+            'msf' => 'required',
         ]);
 
         // Once validated

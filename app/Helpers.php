@@ -965,4 +965,43 @@ function getHeirarchy2($date = null,$dateto = null){
 
 }
 
+// function to get all the ids of clusters, teams, and agents
+
+function getIds($getWhat = 'all'){
+	if($getWhat == 'all'){
+		$clusters = new App\Clusters;
+		$teams = new App\Teams;
+		$get_c = Session::get('_c');
+		$get_t = Session::get('_t');
+		$data['all'] = [];
+		$data['clusters'] = [];
+		$data['teams'] = [];
+		$data['agents'] = [];
+
+		if(count($get_c) != 0){
+
+		} else if(count($get_t) != 0) {
+			$status = true;
+			$message = "Collected all ids";
+
+			foreach($get_t as $teams){
+				foreach($teams['tl_ids'] as $tl_ids){
+					$data['all'][] = (string)$tl_ids;
+					$data['teams'][] = (string)$tl_ids;
+				}
+				foreach($teams['agent_ids'] as $agent_ids){
+					$data['all'][] = (string)$agent_ids;
+					$data['agents'][] = (string)$agent_ids;
+				}
+			}
+		} else {
+		}
+
+		$return['status'] = $status;
+		$return['ids'] = $data;
+		$return['message'] = $message;
+		return $return;
+	}
+}
+
 ?>
