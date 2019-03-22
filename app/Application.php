@@ -105,7 +105,13 @@ class Application extends Model
 
 		}
 		else {
-			$applications = $applications;
+			if(!empty($status_filter)){
+				$col = $status_filter['col'];
+				$value = $status_filter['value'];
+				$applications = $applications->where($col, $value);
+			}else{
+				$applications = $applications;
+			}
 		}
 
 		return $applications;
