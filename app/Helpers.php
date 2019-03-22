@@ -581,13 +581,13 @@ function searchTeamAndCluster ($auth) {
 
 function getHeirarchy2($date = null,$dateto = null){
 	// $date = '28-03-2018';
-	$isSearching = 0;
+	$isSearching = 1;
 	if($date != null && $dateto != null){
 		$isSearching = 1;
 	}
-	$date = ($date !== null) ? Carbon::parse($date) : Carbon::now()->today();
-	$dateto = ($dateto !== null) ? Carbon::parse($dateto) : Carbon::now()->today();
-	// dd($isSearching);
+	$date = ($date !== null) ? Carbon::parse($date) : Carbon::now()->startOfMonth();
+	$dateto = ($dateto !== null) ? Carbon::parse($dateto)->endOfDay() : Carbon::now()->endOfMonth();
+	// dd($dateto);
 
 	$teams_model = new Teams();
 	$clusters_model = new Clusters();
@@ -611,6 +611,7 @@ function getHeirarchy2($date = null,$dateto = null){
 				'paid' => 0,
 				'target' => 0,
 			];
+			$res['date'] = ($dateto == null) ? ($date->format('F d Y')) : ($date->format('F d Y').' - '.$dateto->format('F d Y'));
 			$res['teams'] = $teams_model->whereIn('id', collect($res['team_ids'])->toArray())->get()->map(function($res) use ($teams_model, $user_model,$attendance_model,$application_model,&$count_applications,$date,$dateto,$isSearching){
 
 				// calcualting applications and saf
@@ -692,16 +693,17 @@ function getHeirarchy2($date = null,$dateto = null){
 				// for percentage of this cutoff
 				// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
 				$res['total_target'] = $res['getallsafthiscutoff']['target']; // total current selled
-        		$total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
-        		if ($total_based_target == 0) {
+        		$res['total_based_target'] = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
+        		if ($res['total_based_target'] == 0) {
 			  		$res['pat'] = 0;
 				}
 				else {
-					$pat = ($res['total_target'] / $total_based_target) * 100;
+					$pat = ($res['total_target'] / $res['total_based_target']) * 100;
 					$res['pat'] = $pat;
 				}
 
 				return $res;
+
 			});
 			return $res;
 		});
@@ -719,6 +721,7 @@ function getHeirarchy2($date = null,$dateto = null){
 					'paid' => 0,
 					'target' => 0,
 				];
+				$res['date'] = ($dateto == null) ? ($date->format('F d Y')) : ($date->format('F d Y').' - '.$dateto->format('F d Y'));
 				$res['teams'] = $teams_model->whereIn('id',collect(Session::get('_c')[0]['team_ids'])->toArray())->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,&$count_applications,$date,$dateto,$isSearching){
 
 					// calcualting applications and saf
@@ -799,12 +802,12 @@ function getHeirarchy2($date = null,$dateto = null){
 					// for percentage of this cutoff
 					// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
 					$res['total_target'] = $res['getallsafthiscutoff']['target']; // total current selled
-	        		$total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
-	        		if ($total_based_target == 0) {
+	        		$res['total_based_target'] = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
+	        		if ($res['total_based_target'] == 0) {
 				  		$res['pat'] = 0;
 					}
 					else {
-						$pat = ($res['total_target'] / $total_based_target) * 100;
+						$pat = ($res['total_target'] / $res['total_based_target']) * 100;
 						$res['pat'] = $pat;
 					}
 
@@ -827,6 +830,7 @@ function getHeirarchy2($date = null,$dateto = null){
 				if( array_intersect(collect(Session::get('_t'))->pluck('id')->toArray(),collect($res['team_ids'])->toArray()) ){
 
 					// dd(Session::get('_t'));
+					$res['date'] = ($dateto == null) ? ($date->format('F d Y')) : ($date->format('F d Y').' - '.$dateto->format('F d Y'));
 					$team_ids = $res['team_ids'];
 					$res['teams'] = $teams_model->whereIn('id', collect($res['team_ids'])->toArray())->get()->map(function($res) use ($teams_model,$user_model,$application_model,$attendance_model,$team_ids,&$count_applications,$date,$dateto,$isSearching){
 						if( in_array($res['id'],collect(Session::get('_t'))->pluck('id')->toArray()) ){
@@ -904,15 +908,14 @@ function getHeirarchy2($date = null,$dateto = null){
 							// for percentage of this cutoff
 							// $res['pat'] = (int)round(($res['getallsafthiscutoff']['target']/($res['attendance']['totaltarget'] !== 0) ? $res['attendance']['totaltarget'] : 0) * 100); // ADD THIS
 							$res['total_target'] = $res['getallsafthiscutoff']['target']; // total current selled
-			        		$total_based_target = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
-			        		if ($total_based_target == 0) {
+			        		$res['total_based_target'] = $res['attendance']['totaltarget'] != 0 ? $res['attendance']['totaltarget'] : 0; // based_target
+			        		if ($res['total_based_target'] == 0) {
 						  		$res['pat'] = 0;
 							}
 							else {
-								$pat = ($res['total_target'] / $total_based_target) * 100;
+								$pat = ($res['total_target'] / $res['total_based_target']) * 100;
 								$res['pat'] = $pat;
 							}
-
 
 							return $res;
 						}

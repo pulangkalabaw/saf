@@ -16,8 +16,10 @@
 	<div class="container-fluid half-padding">
 		<div class="template template__blank">
 			{{-- Product chart --}}
-			@if (count($_w_product_chart) != 0)
-				@if ($_w_product_chart[0]['count'] != 0)
+
+			@if (count($_w_prod_data['prod']) != 0)
+				@if ($_w_prod_data['count'] != 0)
+
 					<div class="panel panel-info">
 						<div class="panel-heading">
 							<h3 class="panel-title">
@@ -106,23 +108,10 @@
 									@if(count(checkPosition(auth()->user(), ['tl','cl'], true)) || accessControl(['administrator']))
 										<div class="row">
 											<form action="{{ route('app.dashboard') }}" method="get">
-												<div class="col-md-2 col-xs-5">From<input type="date" name="from" value="{{ request()->get('from') }}" class="form-control input-sm"></div>
-												<div class="col-md-2 col-xs-5">To<input type="date" name="to" value="{{ request()->get('to') }}" class="form-control input-sm"></div>
+												<div class="col-md-2 col-xs-5">From<input type="date" name="from" value="{{ request()->get('from') }}" class="form-control input-sm" required></div>
+												<div class="col-md-2 col-xs-5">To<input type="date" name="to" value="{{ request()->get('to') }}" class="form-control input-sm" required></div>
 												<div class="col-md-2 col-xs-2"><br><button class="btn btn-primary btn-sm"><i class="fa fa-search"></i></button></div>
 											</form>
-										</div>
-
-										<div class="row">
-											<div class="col-md-12">
-												<br>
-												@if( (app('request')->input('to') != null) && (app('request')->input('from') != null) )
-													<b>From {{ Carbon\Carbon::parse(app('request')->input('from'))->format('M d Y') }} to {{ (app('request')->input('to') == null) ? '--': (Carbon\Carbon::parse(app('request')->input('to'))->format('M d Y')) }}</b>
-												@elseif( (app('request')->input('to') == null) && (app('request')->input('from') != null) )
-													<b>Data from {{ Carbon\Carbon::parse(app('request')->input('from'))->format('M d Y') }}</b>
-												@elseif((app('request')->input('to') != null) && (app('request')->input('from') == null))
-													<b>From {{ Carbon\Carbon::parse(app('request')->input('from'))->format('M d Y') }} to {{ Carbon\Carbon::parse(app('request')->input('to'))->format('M d Y') }}</b>
-												@endif
-											</div>
 										</div>
 									@endif
 								@endif
@@ -133,6 +122,7 @@
 											<!-- <div class="col-md-4" style="float:none;margin: 0 auto;"> -->
 											<div class="col-md-12">
 												<h4 class="alert alert-primary text-center">{{ $clus->cluster_name }}</h4>
+												<h5 class="text-center">As of {{ $clus->date }}</h5>
 											</div>
 											<!-- PUT FOREACH TEAM  -->
 											@foreach($clus->teams as $team)
@@ -143,7 +133,8 @@
 															<p>New Applications: <b>{{ (float)$team->getallsafthiscutoff['new'] }}</b></p>
 															<p>Activated Applications: <b class="text-info">{{ (float)$team->getallsafthiscutoff['activated'] }}</b></p>
 															<p>Paid Applications: <b class="text-primary">{{ (float)$team->getallsafthiscutoff['paid'] }}</b></p>
-															<p>Total Target: <b class="text-success">{{ $team->total_target }}</b> <small class="text-muted">({{ (float)number_format($team->pat, 2) }}%)</small></p>
+															<p>Total Target: <b class="text-success">{{ $team->total_based_target }}</b></p>
+															<p>PAT: <small class="text-muted">({{ (float)number_format($team->pat, 2) }}%)</small></p>
 														</div>
 													</div>
 												@endif
@@ -157,6 +148,7 @@
 						</div>
 					</div>
 				</div>
+				{!! json_encode($_w_prod_data['prod']) !!}
 			@endif
 			<!-- PAT WIDGET -->
 		</div>
@@ -175,6 +167,7 @@
 	Application Status
 	***
 	--}}
+	$(document).ready(function(){
 
 	var aps_ctx = document.getElementById("application_status").getContext('2d');
 
@@ -277,6 +270,7 @@
 					responsive: true,
 				},
 			});
+		});
 
 			</script>
 
