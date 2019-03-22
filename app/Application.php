@@ -85,23 +85,30 @@ class Application extends Model
 				$col = $status_filter['col'];
 				$value = $status_filter['value'];
 				$applications = $applications->where($col, $value);
+
+				// Agent
+				if (in_array('agent', checkPosition($auth, ['agent']))) {
+					$applications = $applications->where('agent_id', $auth->id);
+				}
+
+				// TL and CL
+				else {
+
+					// $applications = $applications->whereIn('team_id', collect(Session::get('_t'))->map(function($r){
+					// 	return $r['id'];
+					// }))
+					// ->orWhereIn('cluster_id', collect(Session::get('_c'))->map(function($r){
+					// 	return $r['cluster_id'];
+					// }));
+					$applications = $applications->orWhereIn('agent_id', collect(Session::get('_t'))->pluck('agent_ids')->values())
+					->orWhereIn('cluster_id', collect(Session::get('_c'))->pluck('cl_ids')->values())
+					->where($col, $value);
+
+					// dd(collect(Session::get('_t'))->pluck('agent_ids')->values());
+					// dd($applications->get());
+				}
 			}
 
-			// Agent
-			if (in_array('agent', checkPosition($auth, ['agent']))) {
-				$applications = $applications->where('agent_id', $auth->id);
-			}
-
-			// TL and CL
-			else {
-
-				$applications = $applications->whereIn('team_id', collect(Session::get('_t'))->map(function($r){
-					return $r['id'];
-				}))
-				->orWhereIn('cluster_id', collect(Session::get('_c'))->map(function($r){
-					return $r['cluster_id'];
-				}));
-			}
 
 		}
 		else {
@@ -111,6 +118,7 @@ class Application extends Model
 				$applications = $applications->where($col, $value);
 			}else{
 				$applications = $applications;
+
 			}
 		}
 

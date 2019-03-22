@@ -122,7 +122,7 @@
 								</li>
 							</ul>
 
-							@if(!empty(checkUserAgents(auth()->user())) || accessControl(['administrator']))
+							@if(!empty(checkUserAgents(auth()->user())) || accessControl(['administrator', 'encoder']))
 							<div class="sidebar__title">Applications</div>
 							<ul class="nav nav-menu">
 								<li>
