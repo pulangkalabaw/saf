@@ -100,12 +100,23 @@ class Application extends Model
 					// ->orWhereIn('cluster_id', collect(Session::get('_c'))->map(function($r){
 					// 	return $r['cluster_id'];
 					// }));
-					$applications = $applications->orWhereIn('agent_id', collect(Session::get('_t'))->pluck('agent_ids')->values())
-					->orWhereIn('cluster_id', collect(Session::get('_c'))->pluck('cl_ids')->values())
-					->where($col, $value);
 
-					// dd(collect(Session::get('_t'))->pluck('agent_ids')->values());
-					// dd($applications->get());
+					if(!empty(Session::get('_c'))){
+						// if you are cl
+						$applications = $applications->whereIn('cluster_id', collect(Session::get('_c'))->pluck('cl_ids')->values())->where($col, $value);
+					}else{
+						$applications = $applications->whereIn('agent_id', collect(collect(Session::get('_t'))->pluck('agent_ids')->values()[0])->map(function($res){
+							return (int)$res;
+						}))->where($col, $value);
+						// dd(collect(collect(Session::get('_t'))->pluck('agent_ids')->values()[0])->map(function($res){
+						// 	return (int)$res;
+						// }));
+					}
+
+					// $applications = $applications->orWhereIn('agent_id', collect(Session::get('_t'))->pluck('agent_ids')->values())
+					// ->orWhereIn('cluster_id', collect(Session::get('_c'))->pluck('cl_ids')->values())
+					// ->where($col, $value);
+
 				}
 			}
 
