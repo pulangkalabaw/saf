@@ -225,7 +225,7 @@
 
 		var acbc_labels = {!! collect(array_filter(collect($_w_product_chart)->filter(function ($r) {
 			if ($r['count'] != 0) {
-				return $r['product'];
+				return productNameConvert($r['product'])."llll";
 			}
 		})->pluck('product')->toArray())) !!};
 
