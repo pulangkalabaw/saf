@@ -148,7 +148,6 @@
 						</div>
 					</div>
 				</div>
-				{!! json_encode($_w_prod_data['prod']) !!}
 			@endif
 			<!-- PAT WIDGET -->
 		</div>
