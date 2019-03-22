@@ -982,7 +982,35 @@ function getIds($getWhat = 'all'){
 		$data['agents'] = [];
 		if(Auth::user()->role != base64_encode('administrator')){
 			if(count($get_c) != 0){
-
+				$status = true;
+				$message = "Collected all ids";
+				foreach($get_c as $cluster){
+					foreach($cluster['cl_ids'] as $cl_id){
+						$data['all'][] = $cl_id;
+						$data['clusters'][] = $cl_id;
+					}
+					foreach($cluster['team_ids'] as $team_id){
+						$check_teams = Teams::where('id', $team_id)->first();
+						if(!empty($check_teams)){
+							foreach($check_teams['tl_ids'] as $tl_id){
+								if(!in_array($tl_id, $data['all'])){
+									$data['all'][] = (string)$tl_id;
+								}
+								if(!in_array($tl_id, $data['teams'])){
+									$data['teams'][] = (string)$tl_id;
+								}
+							}
+							foreach($check_teams['agent_ids'] as $agent_id){
+								if(!in_array($agent_id, $data['all'])){
+									$data['all'][] = (string)$agent_id;
+								}
+								if(!in_array($agent_id, $data['agents'])){
+									$data['agents'][] = (string)$agent_id;
+								}
+							}
+						}
+					}
+				}
 			} else if(count($get_t) != 0) {
 				$status = true;
 				$message = "Collected all ids";
