@@ -980,24 +980,55 @@ function getIds($getWhat = 'all'){
 		$data['clusters'] = [];
 		$data['teams'] = [];
 		$data['agents'] = [];
+		if(Auth::user()->role != base64_encode('administrator')){
+			if(count($get_c) != 0){
 
-		if(count($get_c) != 0){
+			} else if(count($get_t) != 0) {
+				$status = true;
+				$message = "Collected all ids";
 
-		} else if(count($get_t) != 0) {
-			$status = true;
-			$message = "Collected all ids";
-
-			foreach($get_t as $teams){
-				foreach($teams['tl_ids'] as $tl_ids){
-					$data['all'][] = (string)$tl_ids;
-					$data['teams'][] = (string)$tl_ids;
+				foreach($get_t as $teams){
+					foreach($teams['tl_ids'] as $tl_ids){
+						$data['all'][] = (string)$tl_ids;
+						$data['teams'][] = (string)$tl_ids;
+					}
+					foreach($teams['agent_ids'] as $agent_ids){
+						$data['all'][] = (string)$agent_ids;
+						$data['agents'][] = (string)$agent_ids;
+					}
 				}
-				foreach($teams['agent_ids'] as $agent_ids){
-					$data['all'][] = (string)$agent_ids;
-					$data['agents'][] = (string)$agent_ids;
-				}
+			} else {
 			}
 		} else {
+			$status = true;
+			$message = "Collected all ids";
+			foreach($clusters->get() as $cluster){
+				foreach($cluster['cl_ids'] as $cl_id){
+					$data['all'][] = $cl_id;
+					$data['clusters'][] = $cl_id;
+				}
+				foreach($cluster['team_ids'] as $team_id){
+					$check_teams = Teams::where('id', $team_id)->first();
+					if(!empty($check_teams)){
+						foreach($check_teams['tl_ids'] as $tl_id){
+							if(!in_array($tl_id, $data['all'])){
+								$data['all'][] = (string)$tl_id;
+							}
+							if(!in_array($tl_id, $data['teams'])){
+								$data['teams'][] = (string)$tl_id;
+							}
+						}
+						foreach($check_teams['agent_ids'] as $agent_id){
+							if(!in_array($agent_id, $data['all'])){
+								$data['all'][] = (string)$agent_id;
+							}
+							if(!in_array($agent_id, $data['agents'])){
+								$data['agents'][] = (string)$agent_id;
+							}
+						}
+					}
+				}
+			}
 		}
 
 		$return['status'] = $status;

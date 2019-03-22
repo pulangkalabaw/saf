@@ -238,7 +238,8 @@ class ApplicationController extends Controller
 
 		return view('app.applications.show', [
 			'application' => $application,
-			'application_model' => $application_model, 'application_status' => $application_status
+			'application_model' => $application_model,
+			'application_status' => $application_status
 		]);
 	}
 

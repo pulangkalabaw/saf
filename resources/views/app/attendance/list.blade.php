@@ -11,8 +11,10 @@
         <div class="template template__blank">
             <div class="row">
                 <div class="col-md-12">
-                    @if(!empty($dont_have_cl))
                     {{-- {{ dd(!empty($dont_have_cl)) }} --}}
+                    {{-- {{ dd(auth()->user()->role . ' = ' . base64_encode('administrator')) }} --}}
+                    @if(!empty($dont_have_cl) && (auth()->user()->role != base64_encode('administrator')))
+                        {{-- @if() --}}
                         <div class="panel panel-danger">
                             <div class="panel-heading">
                                 <div class="row">
@@ -32,6 +34,7 @@
                                 </div>
                             </div>
                         </div>
+                        {{-- @endif --}}
                     @else
                         <div id="desktop-view">
                             <div class="panel panel-danger">
@@ -44,7 +47,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                @if(count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0)
+                                @if((count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0) && (auth()->user()->role != base64_encode('administrator')))
                                     <div class="panel-body">
                                         <div class="form-group text-center">
                                             <label><h2><i class="fa fa-close text-danger"></i> Sorry you are not permitted to access this!</h2></label>
@@ -100,34 +103,85 @@
                                                 <label><h2><i class="fa fa-calendar text-success"></i> {{ Carbon\Carbon::parse(request()->date)->format('F d, Y')  . $fucking_message}}</h2></label>
                                             </div>
                                         </div>
-                                        <div class="panel-body">
-                                            <div class="table-responsive">
-                                                <table class="table table-hovered table-striped">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Name</th>
-                                                            <th>Activities</th>
-                                                            <th>Location</th>
-                                                            <th>Remarks</th>
-                                                            <th>Status</th>
-                                                            {{-- <th class="text-center">Team</th> --}}
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($attendance as $att)
-                                                        <tr {!! $att['status'] == 1 ? 'title="Present"' : 'title="Absent"' !!}>
-                                                            <td class="text-light">{{ $att['users']['fname'] . ' ' . $att['users']['lname'] }}</td>
-                                                            <td class="text-light">{{ $att['activities'] }}</td>
-                                                            <td class="text-light">{{ $att['location'] }}</td>
-                                                            <td class="text-light">{{ $att['remarks'] }}</td>
+                                        <div class="row">
 
-                                                            <td class="text-light">{!! $att['status'] == 1 ? '<span title="Present" class="fa fa-circle text-info"></span>' : '<span title="Absent" class="fa fa-circle text-danger"></span>' !!}</td>
-                                                            {{-- <td class="text-light">{{ $att['status'] == 1 ? 'Present' : 'Absent' }}</td> --}}
-                                                            {{-- <td class="text-light text-center">{{ $att['team_name'] }}</td> --}}
-                                                        </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
+            								@include('includes.filter')
+
+                                            <div class="col-md-4 col-xs-4">
+                                                <div class="form-inline">
+                                                    <div class="form-group">
+                                                        <label>Number of rows: </label>
+                                                        <select name="" id="" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value)" class="form-control">
+                                                            <option {{ !empty(request()->get('show') && request()->get('show') == 10) ? 'selected' : ''  }}
+                                                                value="{{ request()->fullUrlWithQuery(['show' => '10']) }}">10
+                                                            </option>
+                                                            <option {{ !empty(request()->get('show') && request()->get('show') == 25) ? 'selected' : ''  }}
+                                                                value="{{ request()->fullUrlWithQuery(['show' => '25']) }}">25
+                                                            </option>
+                                                            <option {{ !empty(request()->get('show') && request()->get('show') == 50) ? 'selected' : ''  }}
+                                                                value="{{ request()->fullUrlWithQuery(['show' => '50']) }}">50
+                                                            </option>
+                                                            <option {{ !empty(request()->get('show') && request()->get('show') == 100) ? 'selected' : ''  }}
+                                                                value="{{ request()->fullUrlWithQuery(['show' => '100']) }}">100
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3"></div>
+            								<div class="col-md-5 col-xs-5">
+            									<form action="{{ request()->fullUrl() }}" method="GET">
+            										<div class="input-group">
+            											<input autofocus type="search" name="search_string" id="" value="{{ !empty(request()->get('search_string')) ? request()->get('search_string') : '' }}" class="form-control"
+            											placeholder="Search for first name, last name, email and role">
+            											<span class="input-group-btn">
+            												<button class="btn btn-primary"><span class='fa fa-search'></span> </button>
+            											</span>
+            										</div>
+            									</form>
+            								</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="panel-body">
+                                                <div class="table-responsive">
+                                                    <table class="table table-hovered table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>First Name</th>
+                                                                <th>Last Name</th>
+                                                                <th>Activities</th>
+                                                                <th>Location</th>
+                                                                <th>Remarks</th>
+                                                                <th class="text-center">Status</th>
+                                                                {{-- <th class="text-center">Team</th> --}}
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            @foreach($attendance as $att)
+                                                                <tr {!! $att['status'] == 1 ? 'title="Present"' : 'title="Absent"' !!}>
+                                                                    <td class="text-light">{{ $att['users']['fname'] }}</td>
+                                                                    <td class="text-light">{{ $att['users']['lname'] }}</td>
+                                                                    <td class="text-light">{{ $att['activities'] }}</td>
+                                                                    <td class="text-light">{{ $att['location'] }}</td>
+                                                                    <td class="text-light">{{ $att['remarks'] }}</td>
+
+                                                                    <td class="text-light text-center">{!! $att['status'] == 1 ? '<span title="Present" class="fa fa-circle text-info"></span>' : '<span title="Absent" class="fa fa-circle text-danger"></span>' !!}</td>
+                                                                    {{-- <td class="text-light">{{ $att['status'] == 1 ? 'Present' : 'Absent' }}</td> --}}
+                                                                    {{-- <td class="text-light text-center">{{ $att['team_name'] }}</td> --}}
+                                                                </tr>
+                                                            @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <br>
+                                                <div class="row">
+                                                    <div class="col-md-8 col-xs-8">
+                                                        {{ $attendance->appends(request()->input())->links() }}
+                                                    </div>
+                                                    <div class="col-md-4 col-xs-4 text-right">
+                                                        Total <b>{{ $attendance_total }}</b> result(s)
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

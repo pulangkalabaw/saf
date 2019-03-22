@@ -96,12 +96,10 @@
 							@endif
 
 							@if(accessControl(['administrator', 'user']))
-								@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
 								{{-- @if (Auth::user()->role == base64_encode("administrator") || Auth::user()->role == base64_encode("cl") || "tl") --}}
-									<div class="quickmenu__item {{ str_contains(url()->current(), ['attendance','attendancedashboard', 'gallery']) ? 'active' : '' }}">
-										<div class="fa fa-clock-o"></div>
-									</div>
-								@endif
+								<div class="quickmenu__item {{ str_contains(url()->current(), ['attendance','attendancedashboard', 'gallery']) ? 'active' : '' }}">
+									<div class="fa fa-clock-o"></div>
+								</div>
 							@endif
 							{{-- dissable for presentation --}}
 							{{-- <div class="quickmenu__item {{ str_contains(url()->current(), ['messages']) ? 'active' : '' }}">
@@ -245,7 +243,7 @@
 	                                        <div class="nav-menu__text"><span>Dashboard</span></div>
 	                                    </a>
 	                                </li>
-									@if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0)
+									{{-- @if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0) --}}
 	                                <li>
 	                                    <a href="{{ route('app.attendance.index') }}">
 	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-clock-o"></i></div>
@@ -264,7 +262,7 @@
 											<div class="nav-menu__text"><span>Gallery</span></div>
 										</a>
 									</li>
-									@endif
+									{{-- @endif --}}
 	                            </ul>
 	                        </div>
 

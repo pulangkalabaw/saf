@@ -440,12 +440,26 @@ class AttendanceController extends Controller
 		}
 
 		$data = getIds('all');
+        $attendance = Attendance::whereIn('user_id', $data['ids']['all'])->where('user_id', '!=', Auth::user()->id)->whereDate('created_at', $date_select)->orderBy('status', 'desc');
 
-		$attendance = Attendance::whereIn('user_id', $data['ids']['all'])->where('user_id', '!=', Auth::user()->id)->whereDate('created_at', $date_select)->orderBy('status', 'desc')->get();
+        if (!empty($request->get('search_string'))) $attendance = $attendance->search($request->get('search_string'));
+
+        // Count all before paginate
+        $total = $attendance->count();
+
+        // Count all attendance
+        $total_attendance = User::count();
 
 		$date_select = $request->date != null ? $request->date : date('Y-m-d H:i:s');
 
-		return view('app.attendance.list', compact('date', 'attendance'));
+        // Insert pagination
+        $attendance = $attendance->paginate((!empty($request->show) ? $request->show : 10));
+		return view('app.attendance.list', [
+			'date' => $date,
+			'attendance' => $attendance,
+            'attendance_total' => $total_attendance,
+            'total' => $total,
+		]);
 	}
 
 	/**
