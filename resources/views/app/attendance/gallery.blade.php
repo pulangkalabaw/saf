@@ -34,21 +34,28 @@
 								</div>
 							</div>
 						</div>
-						<div class="form-group" style="padding-top:10px;">
-							<form method="GET"  action="{{ route('app.gallery') }}">
-								<div class="row" style="margin-left:8px; margin-right:8px;">
-									<div class="col-lg-3 col-md-4 col-sm-4">
-										<div class="input-group date">
-											<input class="form-control text-light" name="gal_date" type="text" id="jump_to_date" value="{{ $date }}"
-											max="{{ \Carbon\Carbon::today()->toDateString() }}" readonly>
-											<div class="input-group-addon" title="Jump to certain date" id="icon-container">
-												<div class="fa fa-calendar" title="Jump to certain date"></div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</form>
-						</div>
+						<div class="panel-body">
+                            <div class="form-group" style="padding-top:10px;">
+                                <div class="row" style="margin-left:8px; margin-right:8px;">
+                                   <div class="col-lg-1 col-md-2 col-sm-2">
+                                        <button onclick="window.location  = '{{ url('app/gallery') . '?date=' . $previous }}'" class="btn btn-md btn-warning">Previous</button>
+                                        {{-- {{ dd($previous) }} --}}
+                                    </div>
+                                    <div class="col-lg-3 col-md-4 col-sm-4">
+                                        <div class="input-group date">
+                                            <input class="form-control text-light" name="date" type="text" id="jump_to_date" value="{{ $date }}"
+                                            max="{{ \Carbon\Carbon::today()->toDateString() }}" readonly>
+                                            <div class="input-group-addon" title="Jump to certain date" id="icon-container">
+                                                <div class="fa fa-calendar" title="Jump to certain date"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                  <div class="col-lg-1 col-md-2 col-sm-2">
+                                    <button onclick="window.location  = '{{ url('app/gallery') . '?date=' . $next }}'" {{ $next == null ? 'disabled' : '' }} class="btn btn-md btn-warning">Next</button>
+                                  </div>
+                                </div>
+                            </div>
+                        </div>
 						{{-- Body start --}}
 						<div class="panel-body" style="margin-left:1%;">
                             <div class="row">

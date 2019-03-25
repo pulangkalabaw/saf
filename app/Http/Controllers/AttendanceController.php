@@ -767,8 +767,17 @@ class AttendanceController extends Controller
 
 	public function gallery(Request $request){
 	 	$date = $request->date != null ? Carbon::parse($request->date)->toDateString() : date('Y-m-d');
+	 	$date_select = $date;
 		$image = Attendance_image::orderBy('image', 'decs')->whereDate('created_at', $date)->paginate(12);
-		return view('app.attendance.gallery', compact('image', 'date'));
+
+	 	$date_selected = $date_select;
+	 	$previous = $request->date == null ? Carbon::parse(date('Y-m-d'))->subDays(1)->toDateString() : Carbon::parse($request->date)->subDays(1)->toDateString();
+		if($date != Carbon::parse(date('Y-m-d'))->toDateString()){
+			$next = $request->date == null ? Carbon::parse(date('Y-m-d'))->addDays(1)->toDateString() : Carbon::parse($request->date)->addDays(1)->toDateString();
+		} else {
+			$next = null;
+		}
+		return view('app.attendance.gallery', compact('image', 'date', 'previous', 'next'));
 	}
 
 	public function destroy_image($id){
