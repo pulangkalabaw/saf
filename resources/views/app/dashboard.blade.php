@@ -15,39 +15,43 @@
 	<!-- {{ base64_encode('administrator') }} -->
 	<div class="container-fluid half-padding">
 		<div class="template template__blank">
-			{{-- Product chart --}}
+
+			<!-- Product Chart and Application Chart -->
+			<div class="row">
 
 			@if (count($_w_prod_data['prod']) != 0)
 				@if ($_w_prod_data['count'] != 0)
-
-					<div class="panel panel-info">
-						<div class="panel-heading">
-							<h3 class="panel-title">
-								Product Chart
-							</h3>
-						</div>
-						<div class="panel-body">
-							<div class="row">
-								<div class="col-md-8">
-									<canvas id="product_chart"></canvas>
-								</div>
-								<div class="col-md-4">
-									<h2>Product chart</h2>
-									<ul>
-										@foreach ($_w_product_chart as $key => $pc)
-											@if ($pc['count'] != 0)
-												<li>
-													{{ productNameConvert($pc['product']) }}:
-													{{ $pc['count'] }}
-												</li>
-											@endif
-										@endforeach
-									</ul>
+					<div class="col-md-6">
+						<div class="panel panel-info">
+							<div class="panel-heading">
+								<h3 class="panel-title">
+									Product Chart
+								</h3>
+							</div>
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-md-8">
+										<canvas id="product_chart"></canvas>
+									</div>
+									<div class="col-md-4">
+										<h4>Product chart</h4>
+										<ul>
+											@foreach ($_w_product_chart as $key => $pc)
+												@if ($pc['count'] != 0)
+													<li>
+														{{ productNameConvert($pc['product']) }}:
+														{{ $pc['count'] }}
+													</li>
+												@endif
+											@endforeach
+										</ul>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="clearfix"></div><Br />
+
+					<!-- <div class="clearfix"></div><Br /> -->
 				@endif
 			@endif
 
@@ -55,37 +59,42 @@
 			{{-- Appplication Status --}}
 			@if (count($_w_application_status_counter['application_status_c']) != 0)
 				@if ($_w_application_status_counter['application_status_c'][0]['count'] != 0)
-
-					<div class="panel panel-info">
-						<div class="panel-heading">
-							<h3 class="panel-title">
-								Application Status
-							</h3>
-						</div>
-						<div class="panel-body">
-							<div class="row">
-								<div class="col-md-8">
-									<canvas id="application_status"></canvas>
-								</div>
-								<div class="col-md-4">
-									<h2>Application statuses</h2>
-									<ul>
-										@foreach ($_w_application_status_counter['application_status_c'] as $key => $asc)
-											@if ($asc['count'] != 0)
-												<li>
-													{{ ucfirst($asc['status']) }}:
-													{{ $asc['count'] }}
-												</li>
-											@endif
-										@endforeach
-									</ul>
+					<div class="col-md-6">
+						<div class="panel panel-info">
+							<div class="panel-heading">
+								<h3 class="panel-title">
+									Application Status
+								</h3>
+							</div>
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-md-8">
+										<canvas id="application_status"></canvas>
+									</div>
+									<div class="col-md-4">
+										<h4>Application statuses</h4>
+										<ul>
+											@foreach ($_w_application_status_counter['application_status_c'] as $key => $asc)
+												@if ($asc['count'] != 0)
+													<li>
+														{{ ucfirst($asc['status']) }}:
+														{{ $asc['count'] }}
+													</li>
+												@endif
+											@endforeach
+										</ul>
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="clearfix"></div><Br />
+
+					<!-- <div class="clearfix"></div><Br /> -->
 				@endif
 			@endif
+			</div>
+			<!-- End of Product Chart and Application Chart -->
+
 
 			<!-- PAT WIDGET  -->
 			@if( (!empty(checkPosition(auth()->user(), ['tl','cl'])) || accessControl(['administrator','user'])) && isset($heirarchy) )
@@ -130,11 +139,11 @@
 													<div class="col-md-3">
 														<div class="breadcrumb">
 															<h5><b>{{ $team->team_name }}</b></h5>
-															<p>New Applications: <b>{{ (float)$team->getallsafthiscutoff['new'] }}</b></p>
-															<p>Activated Applications: <b class="text-info">{{ (float)$team->getallsafthiscutoff['activated'] }}</b></p>
-															<p>Paid Applications: <b class="text-primary">{{ (float)$team->getallsafthiscutoff['paid'] }}</b></p>
-															<p>Total Target: <b class="text-success">{{ $team->total_based_target }}</b></p>
-															<p>PAT: <small class="text-muted">({{ (float)number_format($team->pat, 2) }}%)</small></p>
+															<p>New Applications: <b>₱ {{ number_format((float)$team->getallsafthiscutoff['new'],2) }}</b></p>
+															<p>Activated Applications: <b class="text-info">₱ {{ number_format((float)$team->getallsafthiscutoff['activated'],2) }}</b></p>
+															<p>Paid Applications: <b class="text-primary">₱ {{ number_format((float)$team->getallsafthiscutoff['paid'],2) }}</b></p>
+															<p>Total Target: <b class="text-secondary">₱ {{ number_format($team->total_based_target,2) }}</b></p>
+															<p>Accumulated Target: <b class="text-success">₱ {{ number_format((float)$team->total_target,2) }}</b> <small class="text-muted">({{ (float)number_format($team->pat, 2) }}%)</small></p>
 														</div>
 													</div>
 												@endif
@@ -150,6 +159,48 @@
 				</div>
 			@endif
 			<!-- PAT WIDGET -->
+
+			<!-- ATTENDANCE TODAY WIDGET  -->
+			<div class="row">
+				<div class="col-md-12">
+
+				  <div class="panel panel-info">
+					  <div class="panel-heading">
+						  <h3 class="panel-title">Today's Team Attendance</h3>
+					  </div>
+					  <div class="panel-body">
+						  @if(!empty($heirarchy))
+	  					  @foreach($heirarchy['clusters'] as $clus)
+	  						  @if(!empty($clus))
+	  							  <div class="col-md-12">
+	  								<h4>{{ $clus->cluster_name }} <!--<small>Total Agents: 100</small>--></h4>
+	  							  </div>
+	  							  <!-- TEAMS  -->
+	  							  @if(!empty($clus->teams))
+	  								@foreach($clus->teams as $team)
+	  									@if(!empty($team))
+	  										<div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-3' : 'col-md-4'  }}">
+	  										  <div class="breadcrumb">
+	  											<h5>{{ $team->team_name }} <br><small>Total Agents: {{ $team->total_agents }}</small></h5>
+	  											<!-- <p>TL Present: <b class="{{ ($team->tlattendance > 0) ? 'text-success' : 'text-danger' }}">{{ $team->tlattendance }}<span class="text-muted">/{{ $team->totaltl }}</span></b></p> -->
+	  											<p>Present: <b class="text-success">{{ $team->attendance['present'] }}</b></p>
+	  											<p>Absent: <b class="text-danger">{{ $team->attendance['absent'] }}</b></p>
+	  											<p>Unkown: <b class="text-warning">{{ $team->attendance['unkown'] }}</b></p>
+	  										  </div>
+	  										</div>
+	  									@endif
+	  								@endforeach
+	  							  @endif
+	  							  <!-- TEAMS -->
+	  						  @endif
+	  					  @endforeach
+	  				  @endif
+					  </div>
+				  </div>
+
+				</div>
+			</div>
+			<!-- END ATTENDANCE TODAY WIDGET  -->
 		</div>
 	</div>
 @endsection
@@ -171,7 +222,8 @@
 	var aps_ctx = document.getElementById("application_status").getContext('2d');
 
 	var aps_labels = {!! collect($_w_application_status_counter['application_status_c'])->map(function ($r) {
-		return '('.$r['count'].') '. ucfirst($r['status']);
+		// return '('.$r['count'].') '. ucfirst($r['status']);
+		return ucfirst($r['status']);
 	}) !!};
 
 	var aps_data = {!! collect($_w_application_status_counter['application_status_c'])->map(function ($r) {

@@ -1011,6 +1011,16 @@ function getIds($getWhat = 'all'){
 						}
 					}
 				}
+				// GET ALL TEAM HEIRARCHY
+				foreach($get_c as $index => $c){
+					$data['team_heirarchy'] = Teams::whereIn('id', $c['team_ids'])->select('id', 'team_name', 'tl_ids', 'agent_ids')->get();
+				}
+
+				// GET ALL HEIRARCHY
+				$data['all_heirarchy'] = collect($get_c)->map(function($c) use ($teams){
+					$c['team'] = $teams->whereIn('id', $c['team_ids'])->select('id', 'team_name', 'tl_ids', 'agent_ids')->get();
+					return $c;
+				});
 			} else if(count($get_t) != 0) {
 				$status = true;
 				$message = "Collected all ids";
@@ -1031,8 +1041,9 @@ function getIds($getWhat = 'all'){
 			$status = true;
 			$message = "Collected all ids";
 			foreach($clusters->get() as $cluster){
-				foreach($cluster['cl_ids'] as $cl_id){
+				foreach($cluster['cl_ids'] as $index => $cl_id){
 					$data['all'][] = $cl_id;
+					$data['clusters'][] = $cl_id;
 					$data['clusters'][] = $cl_id;
 				}
 				foreach($cluster['team_ids'] as $team_id){
@@ -1057,6 +1068,14 @@ function getIds($getWhat = 'all'){
 					}
 				}
 			}
+			// GET ALL TEAM HEIRARCHY
+			$data['team_heirarchy'] = $teams->select('id', 'team_name', 'tl_ids', 'agent_ids')->get();
+
+			// GET ALL HEIRARCHY
+			$data['all_heirarchy'] = collect($clusters->select('id', 'cluster_name', 'cl_ids', 'team_ids')->get())->map(function($c) use ($teams){
+				$c['team'] = $teams->whereIn('id', $c['team_ids'])->select('id', 'team_name', 'tl_ids', 'agent_ids')->get();
+				return $c;
+			});
 		}
 
 		$return['status'] = $status;

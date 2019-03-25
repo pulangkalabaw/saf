@@ -91,7 +91,12 @@
 													<span class='fa fa-sort'></span>
 												</a>
 											</th>
-											<th>Product</th>
+											<th>
+												Product
+												<a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'product', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
+													<span class='fa fa-sort'></span>
+												</a>
+											</th>
 											<th>Plan</th>
 											<th>Team</th>
 											<th>
@@ -113,7 +118,12 @@
 													<span class='fa fa-sort'></span>
 												</a>
 											</th>
-											<th>Status</th>
+											<th>
+												Status
+												<a data-toggle="tooltip" title="Sort" href="{{ request()->fullUrlWithQuery(['sort_in' => 'status', 'sort_by' => (Request::get('sort_by') == "asc") ? 'desc' : 'asc']) }}">
+													<span class='fa fa-sort'></span>
+												</a>
+											</th>
 										</tr>
 									</thead>
 									<tbody>

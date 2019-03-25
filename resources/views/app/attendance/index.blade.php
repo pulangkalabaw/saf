@@ -12,7 +12,6 @@
             <div class="row">
                 <div class="col-md-12">
                     @if(!empty($dont_have_cl))
-                    {{-- {{ dd(!empty($dont_have_cl)) }} --}}
                         <div class="panel panel-danger">
                             <div class="panel-heading">
                                 <div class="row">
@@ -47,8 +46,7 @@
                                 {{-- {{dd(empty($attendance['unpresent']))}} --}}
                                 {{-- {{ dd(count(session()->get('_t'))) }} --}}
                                 {{-- {{ dd(count(session()->get('_c')) == 0 && count(session()->get('_t'))) }} --}}
-
-                                @if(count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0)
+                                @if((count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0) && (base64_decode(auth()->user()->role) != 'administrator'))
                                     <div class="panel-body">
                                         <div class="form-group text-center">
                                             <label><h2><i class="fa fa-close text-danger"></i> Sorry you are not permitted to access this!</h2></label>
@@ -145,6 +143,7 @@
                                                     @endif
                                                 @endif
                                                 <div class="table-responsive">
+                                                    {{-- {{ count($attendance['unpresent']) }} --}}
                                                     <table class="table table-hovered table-striped">
                                                         <thead>
                                                             <tr>
@@ -199,7 +198,7 @@
                                                                     {{-- <td>{{  }}</td> --}}
                                                                     <td>
                                                                         <input name="user[{{ $index }}][user_id]" class="form-control" type="hidden" value={{ $value['id'] }}>
-                                                                        <select class="form-control input-gray" name="user[{{ $index }}][activities]" id="user_activity_{{ $value['id'] }}"
+                                                                        <select class="form-control" name="user[{{ $index }}][activities]" id="user_activity_{{ $value['id'] }}"
                                                                             @if(empty($value['value_activity']))
                                                                                 disabled
                                                                             @else
@@ -224,7 +223,7 @@
                                                                     </td>
                                                                     <td>
                                                                         <div class="form-group">
-                                                                            <input name="user[{{ $index }}][location]" id="user_location_{{ $value['id'] }}" class="form-control input-gray" required type="text"
+                                                                            <input name="user[{{ $index }}][location]" id="user_location_{{ $value['id'] }}" class="form-control" required type="text"
                                                                             @if(!empty($value['value_location']))
                                                                                 value="{{ $value['value_location'] }}"
                                                                                 oninput="showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
@@ -235,7 +234,7 @@
                                                                         </div>
                                                                     </td>
                                                                     <td>
-                                                                        <input name="user[{{ $index }}][remarks]" id="user_remarks_{{ $value['id'] }}" class="form-control input-gray"  required type="text"
+                                                                        <input name="user[{{ $index }}][remarks]" id="user_remarks_{{ $value['id'] }}" class="form-control"  required type="text"
                                                                         @if(!empty($value['value_remarks']))
                                                                             value="{{ $value['value_remarks'] }}"
                                                                             oninput="showClRemark('{{ $value['id'] }}', '{{ $value['value_location'] }}', '{{ $value['value_remarks'] }}', '{{ $value['value_activity'] }}', '{{ $value['value_btn']['label'] }}')"
@@ -291,7 +290,7 @@
                             </div>
                         </div>
                         <div id="mobile-view">
-                            @if(count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0)
+                            @if((count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0) && (base64_decode(auth()->user()->role) != 'administrator'))
                             <div class="panel-body">
                                 <div class="form-group text-center">
                                     <label><h3><i class="fa fa-close text-danger"></i> Sorry you are not permitted to access this!</h3></label>
@@ -340,7 +339,7 @@
                                 <div class="form-group">
                                     @if(!empty($clusters))
                                         @foreach(array_reverse($clusters) as $cluster)
-                                            <button type="button" onclick="window.location='{{ url('attendance') . '?cl_id=' . $cluster['id'] }}'" class="btn btn-primary" id="mutliplebtn" {{ $selected_cluster == $cluster['id'] ? 'disabled' : '' }}>{{ $cluster['name'] }}</button>
+                                            {{-- <button type="button" onclick="window.location='{{ url('attendance') . '?cl_id=' . $cluster['id'] }}'" class="btn btn-primary" id="mutliplebtn" {{ $selected_cluster == $cluster['id'] ? 'disabled' : '' }}>{{ $cluster['name'] }}</button> --}}
                                         @endforeach
                                     @endif
                                 </div>
@@ -506,7 +505,7 @@ jQuery(document).ready(function () {
     });
 });
 @if(base64_decode(auth()->user()->role) != 'administrator' && count(session()->get('_c')) == 0)
-    if(time <= timein){
+    if(time >= timein){
         $('#buttonButtom').attr('disabled', true);
         $('#buttonTop').attr('disabled', true);
         $('.attendance').attr('disabled', true);

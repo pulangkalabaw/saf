@@ -32,10 +32,11 @@ class AttendanceController extends Controller
 	}
 	public function index(Request $request)
 	{
+		// return getIds('all');
 		// return count(checkPosition(Auth::user(), ['cl', 'tl'], true));
 		$get_session;
         // return count(session()->get('_t'));
-        if(count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0){
+        if((count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0) && (base64_decode(auth()->user()->role) != 'administrator')){
     		return view('app.attendance.index');
         }
 		// dd()
@@ -52,7 +53,35 @@ class AttendanceController extends Controller
 		// return $date;
 		$date_select = $request->date != null ? $request->date : date('Y-m-d H:i:s');
 		$get_user_attendance = [];
-		if(count(session()->get('_c')) >= 1){
+		// return $date_select;
+		if(Auth::user()->role == base64_encode('administrator')){
+			$getIds = getIds('all');
+			$selected_unpresent_users = [];
+
+			// REMOVE CLUSTER ID TO THE LIST
+			foreach(Clusters::pluck('cl_ids') as $clus){
+				foreach($clus as $cl){
+					$get_cluster_id = array_search($cl, $getIds['ids']['all']);
+					unset($getIds['ids']['all'][$get_cluster_id]);
+				}
+			}
+			// return $getIds['ids']['all'];
+			// return $getIds;
+			$teams = $getIds['ids']['team_heirarchy'];
+			$agent_ids = $getIds['ids']['agents'];
+			// return $clusters = $getIds['ids']['all'];
+			foreach($getIds['ids']['all'] as $ids){
+				// return $ids;
+				// return Carbon::parse($date_select)->toDateString();
+				$getAttendance = Attendance::where('user_id', $ids)->whereDate('created_at', Carbon::parse($date_select)->toDateString())->first();
+				if(empty($getAttendance)){
+					// return $ids;
+					$selected_unpresent_users[] = $ids;
+				}
+			}
+			// return $selected_unpresent_users;
+		}
+		else if(count(session()->get('_c')) >= 1){
 			$get_session = session()->get('_c');
 			$user_ids = session()->get('_c')[0];
 			$get_user_ids = [];
@@ -394,29 +423,29 @@ class AttendanceController extends Controller
 		// GET PRESENT AGENTS
 		// return $get_user_ids;
 		// return $get_user_ids['user_ids'];
-		$attendance['present'] = Attendance::whereIn('user_id', $get_user_ids['user_ids'])->whereDate('created_at', $date_original)->where('status', 1)->with(['Users'])->orderBy('id', 'desc')->get();
-        collect($attendance['present'])->map(function($r) use ($get_user_ids){
-			foreach($get_user_ids['user_info'] as $user){
-				// return $r['users']->id;
-				// return $user;
-				if($r['users']->id == $user['user_id']){
-					$r['team_name'] = $user['team_name'];  // INSERT TEAM NAME ON PRESENT USERS
-				}
-			}
-            return $r;
-        });
-		// GET ABSENT AGENTS
-		$attendance['absent'] = Attendance::whereIn('user_id', $get_user_ids['user_ids'])->whereDate('created_at', $date_original)->where('status', 0)->with(['Users'])->orderBy('id', 'desc')->get();
-        collect($attendance['absent'])->map(function($r) use ($get_user_ids){
-			// return $get_user_ids;
-			foreach($get_user_ids['user_info'] as $user){
-				// return $user;
-				if($r['users']->id == $user['user_id']){
-					$r['team_name'] = $user['team_name'];  // INSERT TEAM NAME ON PRESENT USERS
-				}
-			}
-            return $r;
-        });
+		// $attendance['present'] = Attendance::whereIn('user_id', $get_user_ids['user_ids'])->whereDate('created_at', $date_original)->where('status', 1)->with(['Users'])->orderBy('id', 'desc')->get();
+        // collect($attendance['present'])->map(function($r) use ($get_user_ids){
+		// 	foreach($get_user_ids['user_info'] as $user){
+		// 		// return $r['users']->id;
+		// 		// return $user;
+		// 		if($r['users']->id == $user['user_id']){
+		// 			$r['team_name'] = $user['team_name'];  // INSERT TEAM NAME ON PRESENT USERS
+		// 		}
+		// 	}
+        //     return $r;
+        // });
+		// // GET ABSENT AGENTS
+		// $attendance['absent'] = Attendance::whereIn('user_id', $get_user_ids['user_ids'])->whereDate('created_at', $date_original)->where('status', 0)->with(['Users'])->orderBy('id', 'desc')->get();
+        // collect($attendance['absent'])->map(function($r) use ($get_user_ids){
+		// 	// return $get_user_ids;
+		// 	foreach($get_user_ids['user_info'] as $user){
+		// 		// return $user;
+		// 		if($r['users']->id == $user['user_id']){
+		// 			$r['team_name'] = $user['team_name'];  // INSERT TEAM NAME ON PRESENT USERS
+		// 		}
+		// 	}
+        //     return $r;
+        // });
 		// return $attendance['unpresent'];
 		// return $attendance['present'];
 		// return $attendance['absent'];

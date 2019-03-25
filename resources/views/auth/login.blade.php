@@ -15,6 +15,7 @@
             <div class="login__submit">
                 <button class="btn btn-default" type="submit">Sign in</button>
             </div>
+            <a href="{{ route('forgot') }}">Forgot password</a>
         </div>
     </form>
 </div>

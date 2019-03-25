@@ -120,7 +120,7 @@
         <div class="{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? 'col-md-4' : 'col-md-12'  }}">
           <div class="panel panel-info">
               <div class="panel-heading">
-                  <h3 class="panel-title">Attendance</h3>
+                  <h3 class="panel-title">{{ (  count(checkPosition(auth()->user(), ['tl','agent'], true))  ) ? ('Team Attendance') : ("Today's Team Attendance")  }}</h3>
               </div>
               <div class="panel-body">
                 <!-- CLUSTER -->

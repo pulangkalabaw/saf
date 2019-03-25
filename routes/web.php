@@ -18,6 +18,18 @@ Route::get('/login', 'LoginController@login')->name('login');
 Route::post('/login', 'LoginController@postLogin')->name('login');
 Route::get('/logout', 'LoginController@logout')->name('logout');
 
+//FORGOT PASSWORD
+Route::get('/forgot-password', 'changePasswordController@forgotPassword')->name('forgot');
+Route::post('/password-reset', 'changePasswordController@passwordReset')->name('password_reset');
+//RESET PASSWORD LINK TO EMAIL
+Route::get('/reset-password-link', 'changePasswordController@reset')->name('reset-password-link');
+//RESET PASSWORD && SET NEW PASSWORD
+Route::post('/get-new-password/{token}', 'changePasswordController@getnewPassword')->name('get-new-password');
+Route::get('/get-new-password/{token}', 'changePasswordController@getnewPassword')->name('get-new-password');
+Route::post('/set-new-password/{token}', 'changePasswordController@setnewPassword')->name('set-new-password');
+
+
+
 
 
 // App Routes
@@ -62,7 +74,7 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     Route::get('gallery', 'AttendanceController@gallery')->name('gallery');
     Route::delete('image/{id}', 'AttendanceController@destroy_image')->name('image.destroy');
     Route::get('gallery/get/json', 'AttendanceController@getGallery')->name('gallery.json');
-    
+
 
     // OIC
     // Route::resource('oic','OicController')->middleware('access_control:administrator,user,encoder');

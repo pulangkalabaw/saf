@@ -240,7 +240,7 @@
 									<li>
 	                                    <a href="{{ route('app.attendanceDashboard') }}">
 	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-dashboard"></i></div>
-	                                        <div class="nav-menu__text"><span>Dashboard</span></div>
+	                                        <div class="nav-menu__text"><span>Summary</span></div>
 	                                    </a>
 	                                </li>
 									{{-- @if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0) --}}
