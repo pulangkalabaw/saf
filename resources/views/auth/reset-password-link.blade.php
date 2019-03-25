@@ -61,7 +61,7 @@
 			<p class="messBody">
 			If you  did not request to reset your password ignore this email and the
 			link will expire on its own.</p><br><br><br>
-			<form method="POST" action="{{ url('set-new-password/'. $token) }}">
+			<form method="POST" action="{{ url('get-new-password/'. $token) }}">
 				{{ csrf_field() }}
 				<button class="btn"><h4>SET NEW PASSWORD</h4></button>
 			</form>

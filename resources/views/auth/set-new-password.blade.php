@@ -22,6 +22,7 @@
                                                 {{ Session::get('message') }}
                                         </div>
                                     @endif
+                                    <input name="password_status" type="hidden" value="1">
                                     <input class="form-control" type="password" name="password" placeholder="Enter new Password">
                                 </div>
                                  <div class="form-group">

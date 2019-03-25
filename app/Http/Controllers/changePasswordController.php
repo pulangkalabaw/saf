@@ -54,7 +54,7 @@ class changePasswordController extends Controller
           return redirect()->route('user.getChangePassword', $data);
         }
     }
-
+    
     //FORGOT PASSWORD VIEW
     public function forgotPassword(){
 
@@ -64,13 +64,13 @@ class changePasswordController extends Controller
     //RESET PASSWORD FUNCTION
     public function passwordReset(Request $request){
         $email = User::where('email', $request->email)->first();
-
+  
         if($request->email != $email['email']){
             Session::flash('message', "Woops Invalid Email Address");
-            return back();
+            return back();           
         }else{
 
-             //create a new token to be sent to the user.
+             //create a new token to be sent to the user. 
             DB::table('password_resets')->insert([
                 'email' => $request->email,
                 'token' => str_random(60), //change 60 to any length you want
@@ -96,15 +96,16 @@ class changePasswordController extends Controller
     }
 
     public function getnewPassword($token){
-        $tokenData = DB::table('password_resets')->where('token', $token)->first();
+        $tokenData = DB::table('password_resets')
+         ->where('token', $token)->first();
 
-        if ( !$tokenData ) return view('errors.404'); //redirect them anywhere you want if the token does not exist.
+         if ( !$tokenData ) return view('errors.404'); //redirect them anywhere you want if the token does not exist.
         return view('auth.set-new-password', ['token' => $token]);
     }
 
 
-    public function setnewPassword(Request $request, $token){
-
+    public function setnewPassword(Request $request, $token){ 
+         
         $password = $request->password;
         $confirm_password = $request->confirm_password;
         if($password != $confirm_password){
@@ -114,18 +115,15 @@ class changePasswordController extends Controller
             $tokenData = DB::table('password_resets')
             ->where('token', $token)->first();
             $user = User::where('email', $tokenData->email)->first();
-            if ( !$user ) return redirect()->back(); //or wherever you want jdela4460@gmail.com
+            if ( !$user ) return redirect()->back(); //or wherever you want
             $user->password = \Hash::make($password);
-            // if($user->password == \Hash::make('Password123')){
-            //     $user->password_status = 1;
-            // }
-            $user->password = \Hash::make($password);
+            $user->password_status = $request->password_status;
             $user->update(); //or $user->save();
 
             //do we log the user directly or let them login and try their password for the first time ? if yes
             Auth::login($user);
 
-            // If the user shouldn't reuse the token later, delete the token
+            // If the user shouldn't reuse the token later, delete the token 
             DB::table('password_resets')->where('email', $user->email)->delete();
             //redirect where we want according to whether they are logged in or not.
             // Session::flash('message', "Your password has been resseted successfully please login");
