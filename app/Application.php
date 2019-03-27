@@ -222,6 +222,10 @@ class Application extends Model
 		return $this->hasOne('App\Clusters', 'cluster_id', 'cluster_id');
 	}
 
+	public function getCluster () {
+		return $this->hasOne('App\Clusters', 'id', 'cluster_id');
+	}
+
 	public function getAgentName () {
 		return $this->hasOne('App\User', 'id', 'agent_id');
 	}

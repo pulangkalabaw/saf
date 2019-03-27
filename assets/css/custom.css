@@ -1,5 +1,17 @@
 /* PUT YOUR CUSTOM CSS HERE */
 
+table td, table th, table td > a {
+    color: #fff !important;
+}
+
+.panel .panel-body, .panel-body a {
+    color: #fff !important;
+}
+
+input, select {
+    color: #fff !important;
+}
+
 /* INPUT COLOR */
 .input-gray {
     /* background: #202428 !important; */

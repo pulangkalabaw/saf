@@ -13,8 +13,10 @@ use App\Devices;
 use App\Clusters;
 use App\Statuses;
 use App\Application;
+use App\Application_Files;
 use App\ApplicationStatus;
 use Illuminate\Http\Request;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class ApplicationController extends Controller
 {
@@ -113,6 +115,25 @@ class ApplicationController extends Controller
 	*/
 	public function store(Request $request)
 	{
+		// return  $files = $request->file;
+		// return $request->file;
+		if (($request->has('file'))) {
+			$files = $request->file('file');
+			$file = request('file');
+			$destinationPath = storage_path() . '/app/public/';
+			foreach ($file as $files) {
+				$fileName = $files->getClientOriginalName();
+				$extension = $files->getClientOriginalExtension();
+				$storeName = $fileName;
+				$image_resize = Image::make($files->getRealPath())->fit(300);
+				// $image_resize->resize(300, 300);
+				// Application_Files::make(Application_Files::file('photo'))->resize(300, 200)->save('foo.jpg');
+				// Store the file in the disk
+				$files->move($destinationPath, $storeName, $image_resize);
+
+			}
+		}
+
 		// return $request->all();
 		$validate = Validator::make($request->all(),[
 			'customer_name' => 'required',
@@ -141,13 +162,13 @@ class ApplicationController extends Controller
 		$device = null;
 
 		// Checks if the given number is sim number or device number gives null on device if sim else gives null on sim if device is selected
-		if(substr($request['sim'],0,2) === '09' || substr($request['sim'],0,3) === '+63'){
-			$sim = $request['sim'];
-			$device = null;
-		} else {
-			$sim = null;
-			$device = $request['sim'];
-		}
+		// if(substr($request['sim'],0,2) === '09' || substr($request['sim'],0,3) === '+63'){
+		// 	$sim = $request['sim'];
+		// 	$device = null;
+		// } else {
+		// 	$sim = null;
+		// 	$device = $request['sim'];
+		// }
 
 		// Get cluster
 		$team_model = new Teams();
@@ -223,7 +244,6 @@ class ApplicationController extends Controller
 	*/
 	public function show($id)
 	{
-		//
 		$application_model = new Application();
 		$application_status = new ApplicationStatus();
 		$application = $application_model
@@ -232,6 +252,8 @@ class ApplicationController extends Controller
 			'getPlan',
 			'getProduct',
 			'getInsertBy',
+			'getTeam',
+			'getCluster'
 		])
 		->where('application_id', $id)
 		->firstOrFail();
@@ -239,7 +261,7 @@ class ApplicationController extends Controller
 		return view('app.applications.show', [
 			'application' => $application,
 			'application_model' => $application_model,
-			'application_status' => $application_status
+			'application_status' => $application_status->appStatus($id)
 		]);
 	}
 
@@ -251,7 +273,6 @@ class ApplicationController extends Controller
 	*/
 	public function edit($id)
 	{
-		//
 		$users = new User();
 
 		$application_model = new Application();
@@ -268,7 +289,6 @@ class ApplicationController extends Controller
 			'users' => $users->get(), // !!! FIX THIS: this code will show all users, but we need is the users or agents that is in this team. !!!
 			'plans' => $plans,
 		]);
-
 	}
 
 	/**
@@ -280,25 +300,31 @@ class ApplicationController extends Controller
 	*/
 	public function update(Request $request, $id)
 	{
+		return $request->all();
 		$application_model = new Application();
 		$application = $application_model->where('application_id', $id)->firstOrFail();
 		$msf = Plans::where('id',$request['plan_id'])->value('msf');
 		$product = Plans::where('id',$request['plan_id'])->value('product');
 
 		// Place to $data variable
+		$data['status'] = $request->post('status');
 		$data['customer_name'] = $request->post('customer_name');
+		$data['plan_id'] = (int) $request->post('plan_id');
 		$data['contact'] = $request->post('contact');
 		$data['address'] = $request->post('address');
 		$data['product'] = $product;
-		$data['plan_id'] = (int) $request->post('plan_id');
 		$data['sim'] = $request->post('sim');
-		$data['device_id'] = empty($request->post('device_id')) ? '-' : $request->post('device_id');
+		$data['sim_id'] = $request->post('sim_id');
+		$data['device'] = $request->post('device');
+		$data['imei'] = $request->post('imei');
 		$data['agent_id'] = (int) $request->post('agent_id');
 		$data['msf'] = (float) $msf;
 		$data['sr_no'] = $request->post('sr_no');
 		$data['so_no'] = $request->post('so_no');
-		$data['status'] = $request->post('status');
 		$data['encoder_id'] = Auth::user()->id;
+		$data['remarks'] = $request->post('remarks');
+		$data['min_no'] = $request->post('min_no');
+		$data['saf_no'] = $request->post('saf_no');
 		$data['encoded_at'] = now();
 		$data['updated_at'] = now();
 

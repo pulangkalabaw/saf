@@ -1085,4 +1085,29 @@ function getIds($getWhat = 'all'){
 	}
 }
 
+function sidebarActive($segment = [], $main = true){
+	if(!empty($segment)){
+		$last_index = count($segment);
+		// dd(!empty(request()->segment(3)));
+		foreach($segment as $index => $sg){
+			if($sg == request()->segment(1 + ($index + 1))){
+				if($main == false){
+					if(!empty(request()->segment(3)) && ($last_index > 1)){
+						if($index == ($last_index - 1)){
+							return 'active';
+						}
+					} else if(empty(request()->segment(3)) && ($last_index == 1)){
+						return 'active';
+					}
+				} else {
+					return 'active';
+				}
+			}
+		}
+	}
+	if(request()->segment(2) == $segment){
+		return 'active';
+	}
+}
+
 ?>

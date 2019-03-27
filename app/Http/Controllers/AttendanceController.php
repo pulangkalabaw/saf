@@ -39,7 +39,6 @@ class AttendanceController extends Controller
         if((count(session()->get('_c')) == 0 && count(session()->get('_t')) == 0) && (base64_decode(auth()->user()->role) != 'administrator')){
     		return view('app.attendance.index');
         }
-		// dd()
 		$date_original = $request->date == null ? Carbon::parse(date('Y-m-d')) : Carbon::parse($request->date);
 		$date_select = $date_original;
 		// return $date_select->subDays(1);
@@ -72,14 +71,16 @@ class AttendanceController extends Controller
 			// return $clusters = $getIds['ids']['all'];
 			foreach($getIds['ids']['all'] as $ids){
 				// return $ids;
+				// return $date_original->toDateString();
 				// return Carbon::parse($date_select)->toDateString();
-				$getAttendance = Attendance::where('user_id', $ids)->whereDate('created_at', Carbon::parse($date_select)->toDateString())->first();
-				if(empty($getAttendance)){
-					// return $ids;
-					$selected_unpresent_users[] = $ids;
+				$selected_unpresent_users[] = $ids;
+				$getAttendance = Attendance::where('user_id', $ids)->whereDate('created_at', $date_original->toDateString())->first();
+				if(!empty($getAttendance)){
+					// return $getAttendance;
+					$get_user_attendance[] = $getAttendance;
 				}
 			}
-			// return $selected_unpresent_users;
+			// return $get_user_attendance;
 		}
 		else if(count(session()->get('_c')) >= 1){
 			$get_session = session()->get('_c');
@@ -348,6 +349,7 @@ class AttendanceController extends Controller
 		// return $get_user_ids;
 		// GET ROLL CALL
 		// return $selected_unpresent_users;
+		// return $get_user_attendance;
 		$unpresent = User::whereIn('id', $selected_unpresent_users)->get();
 		collect($unpresent)->map(function($r) use ($teams, $get_user_attendance){
 			if(!empty($get_user_attendance)){
@@ -508,71 +510,43 @@ class AttendanceController extends Controller
 	*/
 	public function store(Request $request)
 	{
-		// $faker = faker::create();
-		// $cluster_id = $faker->randomElement(Clusters::get());
-		// // return $cluster_id['team_ids'];
-		// $team_id  = Teams::where('team_id', $faker->randomElement($cluster_id['team_ids']))->first();
-		// $user_id = User::where('id', $faker->randomElement($team_id['agent_ids']))->value('id');
-		// $cluster_id = Clusters::where('team_ids', 'like', '%' . $team_id['team_id'] . '%')->value('id');
-		// return $request->all();
-		// return $team_id = Teams::where('tl_id', Auth::user()->id)->get(['team_id']);
-		// return Clusters::where('team_ids', 'like', '%' . $team_id . '%')->get(['cluster_id']);
-		// return checkPosition(Auth::user(), ['tl'], true);
-
 		// return $request->date;
 		$selected_date = !empty($request->selected_date) ? $request->selected_date : Carbon::now()->toDateString();
-
-		if(count(Session::get('_c')) == 0){
-			$get_team = Session::get('_t')[0];
-			$get_cluster = Clusters::get();
-						// return Auth::user()->id;
-			foreach($get_cluster as $cluster){
-				$cluster['team_ids'];
-				foreach($cluster['team_ids'] as $tl){
-					// return $tl;
-					if($get_team['id'] == $tl){
-						$user_cluster_id = $cluster['id'];
-						// break;
+		if(Auth::user()->role != base64_encode('administrator')){
+			if(count(Session::get('_c')) == 0){
+				$get_team = Session::get('_t')[0];
+				$get_cluster = Clusters::get();
+				// return Auth::user()->id;
+				foreach($get_cluster as $cluster){
+					$cluster['team_ids'];
+					foreach($cluster['team_ids'] as $tl){
+						// return $tl;
+						if($get_team['id'] == $tl){
+							$user_cluster_id = $cluster['id'];
+							// break;
+						}
 					}
 				}
-			}
-			// return $user_cluster_id;
-			// return ;
-			$check_user_attendance = Attendance::where('user_id', Auth::user()->id)->whereDate('created_at', Carbon::now()->toDateString())->first();
-			if(empty($check_user_attendance)){
-				Attendance::create([
-					"cluster_id" => $user_cluster_id,
-					"team_id" => $get_team['id'],
-					"user_id" => Auth::user()->id,
-					"activities" => 'Team Leader',
-					"location" => 'Team Leader',
-					"remarks" => 'Team Leader',
-					"status" => 1,
-					'created_by' => Auth::user()->id,
-				]);
+				// return $user_cluster_id;
+				// return ;
+				$check_user_attendance = Attendance::where('user_id', Auth::user()->id)->whereDate('created_at', Carbon::now()->toDateString())->first();
+				if(empty($check_user_attendance)){
+					Attendance::create([
+						"cluster_id" => $user_cluster_id,
+						"team_id" => $get_team['id'],
+						"user_id" => Auth::user()->id,
+						"activities" => 'Team Leader',
+						"location" => 'Team Leader',
+						"remarks" => 'Team Leader',
+						"status" => 1,
+						'created_by' => Auth::user()->id,
+					]);
+				}
 			}
 		}
-		// $this->validate($request, [
-		// 	'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-		// ]);
-		//
-		// if($request->hasFile('empImg')) {
-		// 	$image = $request->file('empImg');
-		// 	$name = time().'.'.$image->getClientOriginalExtension();
-		// 	$destinationPath = public_path('/images/attendance');
-		// 	$image->move($destinationPath, $name);
-		// 	$data_image = [
-		// 		'user_id' => Auth::user()->id,
-		// 		'image' => $name,
-		// 		'alt' => $name,
-		// 	];
-		// }
 
 		if(!empty($request->empImg)){
 			if($image = $request->input('empImg')){
-				// $this->validate($request, [
-				// 	'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-				// ]);
 				$image = $request->input('empImg'); // image base64 encoded
 				preg_match("/data:image\/(.*?);/",$image,$image_extension); // extract the image extension
 				$image = preg_replace('/data:image\/(.*?);base64,/','',$image); // remove the type part
@@ -583,17 +557,10 @@ class AttendanceController extends Controller
 				$status	= $request->status = 0;
 				$has_date =	$request->has_date = 0;
 			}else{
-				// $this->validate($request, [
-				// 	'empImg' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-				// ]);
 				if(\Carbon\Carbon::now()->format('H:i:s') >= \Carbon\Carbon::parse('10:30:00')->format('H:i:s')){
 					Session::flash('message', "Sorry you cannot upload this photo at this time");
 					return back();
-				}else{
-					// $this->validate($request, [
-					// 	'selected_user[]' => 'in:0,1',
-					// 	'empImg' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-					// ]);
+				} else {
 					if(empty(exif_read_data($request->empImg)['DateTimeOriginal'])){
 						$file = $request->file('empImg');
 						$name = 'image_' . time().'.'.$file->getClientOriginalExtension();
@@ -637,13 +604,37 @@ class AttendanceController extends Controller
 		} else {
 			$get_user = $request->only('users')['users'];
 		}
-		// return $get_user;
 		$data = [];
+		$teams = Teams::get();
+		$clusters = Clusters::get();
 		foreach($get_user as $user){
-			// return $request->all();
-
-			$team_id;
-			if(count(Session::get('_c')) != 0){
+			// GET CLUSTER ID AND TEAM ID
+			if(Auth::user()->role ==  base64_encode('administrator')){
+				foreach($teams as $team){
+					foreach($team->tl_ids as $tl_id){
+						if($tl_id == $user['user_id']){
+							$team_id = $team->id;
+							break;
+						}
+					}
+					foreach($team->agent_ids as $agent_id){
+						if($agent_id == $user['user_id']){
+							$team_id = $team->id;
+							break;
+						}
+					}
+				}
+				foreach($clusters as $cluster){
+					foreach($cluster->team_ids as $cluster_team_id){
+						if($cluster_team_id == $team_id){
+							$cluster_id = $cluster->id;
+							break;
+						}
+					}
+				}
+				// return $team_id;
+			}
+			else if(count(Session::get('_c')) != 0){
 				if(count(Session::get('_c')) == 1){
 					$_c = Session::get('_c')[0];
 					$cluster_id = $_c['id'];
@@ -735,28 +726,6 @@ class AttendanceController extends Controller
 					}
 				} else {
 					if($user['status'] != null){
-						// return $team_id;
-						// return $cluster_id;
-						// return $user['user_id'];
-						// return [
-						// 	"cluster_id" => $cluster_id,
-						// 	"team_id" => $team_id,
-						// 	"user_id" => $user['user_id'],
-						// 	"activities" => $user['activities'],
-						// 	"location" => $user['location'],
-						// 	"remarks" => $user['remarks'],
-						// 	"status" => $user['status'],
-						// 	'created_by' => Auth::user()->id,
-						// 	'modified_by' => Auth::user()->id,
-						// 	'modified_remarks' => $user['modified_remarks'],
-						// 	'created_at' => $selected_date,
-						// 	'updated_at' => date('Y-m-d H:i:s'),
-						// ];\
-						// return $request->all();
-						// return $selected_date;
-						// return Attendance::where('user_id', 49)->whereDate('created_at', $selected_date)->first();
-						// return $user;
-						// return $user['modified_remarks'];
 						Attendance::insert([
 							"cluster_id" => $cluster_id,
 							"team_id" => $team_id,
@@ -795,6 +764,10 @@ class AttendanceController extends Controller
 	}
 
 	public function gallery(Request $request){
+		// return (new Response(json_encode(['exists'=>$exists]),200));
+		// return url('gallery2');
+		// return request()->segment(2);
+		// return sidebarActive(['gallery']);
 	 	$date = $request->date != null ? Carbon::parse($request->date)->toDateString() : date('Y-m-d');
 	 	$date_select = $date;
 		$image = Attendance_image::orderBy('image', 'decs')->whereDate('created_at', $date)->paginate(12);
