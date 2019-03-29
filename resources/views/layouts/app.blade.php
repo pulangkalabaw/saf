@@ -268,7 +268,7 @@
 							<div class="sidebar__menu">
 								<div class="sidebar__title">Plans Management</div>
 								<ul class="nav nav-menu">
-									<li class="{{ sidebarActive(['plans']) }}">
+									<li class="{{ sidebarActive(['plans', 'edit']) }}">
 										<a href="{{ route('app.plans.index') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-newspaper-o"></i></div>
 											<div class="nav-menu__text"><span>Plans</span></div>
@@ -296,13 +296,14 @@
 	                                    </a>
 	                                </li>
 									{{-- @if(count(checkPosition(auth()->user(), ['cl', 'tl'], true)) != 0) --}}
+									{{-- {{ sidebarActive(['attendance']) }} --}}
 	                                <li class="{{ sidebarActive(['attendance']) }}">
 	                                    <a href="{{ route('app.attendance.index') }}">
 	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-clock-o"></i></div>
 	                                        <div class="nav-menu__text"><span>Attendance</span></div>
 	                                    </a>
 	                                </li>
-	                                <li class="{{ sidebarActive(['attendance', 'list']) }}">
+	                                <li class="{{ sidebarActive(['attendance', 'list'], false) }}">
 	                                    <a href="{{ route('app.attendance.list') }}">
 	                                        <div class="nav-menu__ico"><i class="fa fa-fw fa-file"></i></div>
 	                                        <div class="nav-menu__text"><span>List of Attendance</span></div>

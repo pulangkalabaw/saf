@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Auth;
+use Storage;
 use Session;
 use Validator;
 use App\User;
@@ -17,6 +18,7 @@ use App\Application_Files;
 use App\ApplicationStatus;
 use Illuminate\Http\Request;
 use Intervention\Image\ImageManagerStatic as Image;
+use Illuminate\Support\Facades\Input;
 
 class ApplicationController extends Controller
 {
@@ -115,22 +117,16 @@ class ApplicationController extends Controller
 	*/
 	public function store(Request $request)
 	{
-		// return  $files = $request->file;
-		// return $request->file;
-		if (($request->has('file'))) {
-			$files = $request->file('file');
-			$file = request('file');
-			$destinationPath = storage_path() . '/app/public/';
-			foreach ($file as $files) {
-				$fileName = $files->getClientOriginalName();
-				$extension = $files->getClientOriginalExtension();
-				$storeName = $fileName;
-				$image_resize = Image::make($files->getRealPath())->fit(300);
-				// $image_resize->resize(300, 300);
-				// Application_Files::make(Application_Files::file('photo'))->resize(300, 200)->save('foo.jpg');
-				// Store the file in the disk
-				$files->move($destinationPath, $storeName, $image_resize);
 
+		$files = $request->file("file");
+		$uploaded = [];
+		 $destinationPath = storage_path() . '/app/public/';
+		if($files){
+			foreach($files as $file) {
+		   return  $fileName = $file->getClientOriginalName();
+             $extension = $file->getClientOriginalExtension();
+             $storeName = $fileName . '.' . $extension;
+			return 	$file->move($destinationPath, $storeName);
 			}
 		}
 

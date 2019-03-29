@@ -156,7 +156,7 @@
 										<div>
 										<div>
 											<div class="col-md-3">Attatch file</div>
-											<input type="file" name="file[]" multiple>
+											<input type="file" name="file[]" multiple="multiple">
 										</div>
 										<div class="clearfix"></div><br>
 

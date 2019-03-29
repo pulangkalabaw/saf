@@ -32,6 +32,7 @@ class AttendanceController extends Controller
 	}
 	public function index(Request $request)
 	{
+		// return sidebarActive(['attendance', 'list'], false);
 		// return getIds('all');
 		// return count(checkPosition(Auth::user(), ['cl', 'tl'], true));
 		$get_session;
@@ -457,6 +458,7 @@ class AttendanceController extends Controller
 
 	public function list(Request $request){
 		// for jump to date, previous, and next
+		// return sidebarActive(['attendance']);
 		$date_original = $request->date == null ? Carbon::parse(date('Y-m-d')) : Carbon::parse($request->date);
 		$date_select = $date_original;
 
@@ -767,7 +769,7 @@ class AttendanceController extends Controller
 		// return (new Response(json_encode(['exists'=>$exists]),200));
 		// return url('gallery2');
 		// return request()->segment(2);
-		// return sidebarActive(['gallery']);
+		return sidebarActive(['gallery']);
 	 	$date = $request->date != null ? Carbon::parse($request->date)->toDateString() : date('Y-m-d');
 	 	$date_select = $date;
 		$image = Attendance_image::orderBy('image', 'decs')->whereDate('created_at', $date)->paginate(12);
