@@ -289,6 +289,22 @@
 									@endif
 
 								</div>
+
+								<div class="col-md-4">
+									<h3>Attatch File</h3><br/>
+									<div>
+										<div class="col-md-3 col-xs-3">
+@foreach($application_files as $application_file)
+												<a href="{{ asset('public/storage/' .$application_file['attached_files']) }}" class="btn btn-default"
+												 download style="margin-top:7px;">{{ $application_file['attached_files']}}</a>
+											@endforeach
+										</div>
+										<div class="col-md-7 col-xs-7">
+
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
+								</div>
 							</div>
 						</div>
 					</div>

@@ -17,8 +17,6 @@ class PlansController extends Controller
     public function index(Request $request)
     {
         // Model
-		// return sidebarActive(['plans', 'edit']);
-		// return sidebarActive(['plans', 'create'], false);
         $plans = new Plans();
 
         // Sorting
@@ -43,8 +41,6 @@ class PlansController extends Controller
      */
     public function create()
     {
-		// return sidebarActive(['plans', 'edit']);
-		// return sidebarActive(['plans', 'create'], false);
         return view('app.plans.create');
     }
 
@@ -105,8 +101,6 @@ class PlansController extends Controller
      */
     public function edit($id)
     {
-		// return sidebarActive(['plans', 'edit']);
-		return sidebarActive(['plans', 'create'], false);
         $plan = Plans::where('id', $id)->firstOrFail();
         return view('app.plans.edit', ['plan' => $plan]);
     }

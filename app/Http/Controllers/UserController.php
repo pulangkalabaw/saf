@@ -53,6 +53,8 @@ class UserController extends Controller
      */
     public function create()
     {
+        // return sidebarActive(['users', 'edit', 'show']);
+        // return sidebarActive(['teams', 'create'], false);
         return view('app.users.create');
     }
 
@@ -102,6 +104,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
+        // return sidebarActive(['users', 'edit', 'show']);
         $user = User::findOrFail($id);
 
         $teams_model = new Teams();

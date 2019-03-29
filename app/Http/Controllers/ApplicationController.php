@@ -117,19 +117,36 @@ class ApplicationController extends Controller
 	*/
 	public function store(Request $request)
 	{
+		$input_file = $request->all();
+		$validator = Validator::make(
+		$input_file, [
+		'image_file.*' => 'required|file|mimes:xlsx,xls,csv,jpg,jpeg,png,bmp,doc,docx,pdf,tif,tiff'
+		],[
+		    'image_file.*.required' => 'Please upload an image',
+		    'image_file.*.mimes' => 'Only xlsx,xls,csv,jpg,jpeg,png,bmp,doc,docx,pdf,tif,tiff images are allowed',
 
-		$files = $request->file("file");
-		$uploaded = [];
-		 $destinationPath = storage_path() . '/app/public/';
-		if($files){
-			foreach($files as $file) {
-		   return  $fileName = $file->getClientOriginalName();
-             $extension = $file->getClientOriginalExtension();
-             $storeName = $fileName . '.' . $extension;
-			return 	$file->move($destinationPath, $storeName);
+		]
+		);
+
+		if ($validator->fails()) {
+		    $messages = $validator->messages();
+		    return Redirect::to('/')->with('message', 'Your erorr message');
+		}else{
+			if (($request->has('attached_files'))) {
+			$files = $request->file('attached_files');
+
+				$destinationPath = storage_path() . '/app/public/';
+				foreach ($files as $file) {
+					$fileName  = date('Y-m-d') . '-' . $file->getClientOriginalName();
+					$extension = $file->getClientOriginalExtension();
+			 		$storeName = $fileName;
+					// Store the file in the disk
+					$file->move($destinationPath, $storeName);
+					$attach_files [] = $fileName;
+					$files_Details = implode(',', (array)$attach_files);
+				}
 			}
 		}
-
 		// return $request->all();
 		$validate = Validator::make($request->all(),[
 			'customer_name' => 'required',
@@ -210,10 +227,18 @@ class ApplicationController extends Controller
 			'created_at' => now(),
 		];
 
+		//Data to be inserted to Application File
+		$attach_files = [
+			'application_id' => $application_id,
+			'attached_files' => $fileName,
+		];
+
+
+		Application_Files::insert($attach_files);
+		ApplicationStatus::insert($application_status_data);
 		if (Application::insert($application_data)) {
 
 			// Insert Application Status
-			ApplicationStatus::insert($application_status_data);
 
 			// Maybe we just pretend everything is fine :(
 			// so, return it hehe
@@ -240,8 +265,10 @@ class ApplicationController extends Controller
 	*/
 	public function show($id)
 	{
+
 		$application_model = new Application();
 		$application_status = new ApplicationStatus();
+		$application_files = new Application_Files();
 		$application = $application_model
 		->with([
 			'getDevice',
@@ -251,16 +278,17 @@ class ApplicationController extends Controller
 			'getTeam',
 			'getCluster'
 		])
+
 		->where('application_id', $id)
 		->firstOrFail();
 
 		return view('app.applications.show', [
 			'application' => $application,
 			'application_model' => $application_model,
+			'application_files' => $application_files->with(['Application'])->get(),
 			'application_status' => $application_status->appStatus($id)
 		]);
 	}
-
 	/**
 	* Show the form for editing the specified resource.
 	*
@@ -366,5 +394,10 @@ class ApplicationController extends Controller
 	public function replaceDashIfNull($arr)
 	{
 		return !empty($arr) ? $arr : "-";
+	}
+
+
+	public function ImageView(Request $request){
+		return 123;
 	}
 }

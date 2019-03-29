@@ -49,6 +49,7 @@ class TeamsController extends Controller
 	public function create()
 	{
 		//
+        // return sidebarActive(['teams', 'create'], false);
 		$users = User::get();
 		return view('app.teams.create', [
 			'users' => $users

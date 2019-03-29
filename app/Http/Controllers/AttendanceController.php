@@ -769,7 +769,7 @@ class AttendanceController extends Controller
 		// return (new Response(json_encode(['exists'=>$exists]),200));
 		// return url('gallery2');
 		// return request()->segment(2);
-		return sidebarActive(['gallery']);
+		// return sidebarActive(['gallery']);
 	 	$date = $request->date != null ? Carbon::parse($request->date)->toDateString() : date('Y-m-d');
 	 	$date_select = $date;
 		$image = Attendance_image::orderBy('image', 'decs')->whereDate('created_at', $date)->paginate(12);

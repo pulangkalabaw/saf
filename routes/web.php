@@ -11,7 +11,7 @@
 |
 */
 
-Route::get('/', 'DashboardController@home');
+Route::get('/login', 'DashboardController@home');
 
 // Authentication
 Route::get('/login', 'LoginController@login')->name('login');
@@ -31,16 +31,15 @@ Route::post('/set-new-password/{token}', 'changePasswordController@setnewPasswor
 
 
 
-
 // App Routes
 Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], function () {
 
     // Dashboard
     Route::get('homedashboard', 'DashboardController@dashboard')->name('dashboard')->middleware('access_control:administrator,user,encoder');
+    Route::get('encoderdashboard', 'DashboardController@encoderDashboard')->name('encoder-dashboard')->middleware('access_control:administrator,user,encoder');
 
     // Dashboard of Attendance
     Route::get('attendancedashboard', 'DashboardController@attendanceDashboard')->name('attendanceDashboard')->middleware('access_control:administrator,user');
-
 
     // Users
     Route::post('users/import-users', 'UserController@importUsers')->name('import-users');

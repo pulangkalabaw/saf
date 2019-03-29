@@ -135,7 +135,7 @@
 				<div class="quickmenu">
 					<div class="quickmenu__cont">
 						<div class="quickmenu__list">
-							<div class="quickmenu__item {{ str_contains(url()->current(), ['home', 'applications']) ? 'active' : '' }}">
+							<div class="quickmenu__item {{ str_contains(url()->current(), ['home', 'applications', '']) ? 'active' : '' }}">
 								<div class="fa fa-fw fa-home"></div>
 							</div>
 							@if (Auth::user()->role == base64_encode("administrator"))
@@ -166,25 +166,34 @@
 						<div class="sidebar__menu">
 							<div class="sidebar__title">Home</div>
 							<ul class="nav nav-menu">
-								<li>
+								@if(auth()->user()->role != base64_encode('encoder'))
+								<li class="{{ sidebarActive(['homedashboard']) }}">
 									<a href="{{ route('app.dashboard') }}">
 										<div class="nav-menu__ico"><i class="fa fa-fw fa-dashboard"></i></div>
 										<div class="nav-menu__text"><span>Dashboard</span></div>
 									</a>
 								</li>
+								@else
+								<li class="{{ sidebarActive(['encoderdashboard']) }}">
+									<a href="{{ route('app.encoder-dashboard') }}">
+										<div class="nav-menu__ico"><i class="fa fa-fw fa-dashboard"></i></div>
+										<div class="nav-menu__text"><span>Dashboard</span></div>
+									</a>
+								</li>
+								@endif
 							</ul>
 
 							@if(!empty(checkUserAgents(auth()->user())) || accessControl(['administrator', 'encoder']))
 							<div class="sidebar__title">Applications</div>
 							<ul class="nav nav-menu">
-								<li>
+								<li class="{{ sidebarActive(['applications', 'edit', 'show']) }}">
 									<a href="{{ route('app.applications.index') }}">
 										<div class="nav-menu__ico"><i class="fa fa-fw fa-folder-o"></i></div>
 										<div class="nav-menu__text"><span>List applications</span></div>
 									</a>
 								</li>
 								@if (count(checkPosition(auth()->user(), ['tl', 'cl'], true)) != 0 || accessControl(['administrator']))
-									<li>
+									<li class="{{ sidebarActive(['applications', 'create'], false) }}">
 										<a href="{{ route('app.applications.create') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-plus-circle"></i></div>
 											<div class="nav-menu__text"><span>Add applications</span></div>
@@ -219,13 +228,13 @@
 							<div class="sidebar__menu">
 								<div class="sidebar__title">Users</div>
 								<ul class="nav nav-menu">
-									<li>
+									<li class="{{ sidebarActive(['users', 'edit', 'show']) }}">
 										<a href="{{ route('app.users.index') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-user"></i></div>
 											<div class="nav-menu__text"><span>User accounts</span></div>
 										</a>
 									</li>
-									<li>
+									<li class="{{ sidebarActive(['users', 'create'], false) }}">
 										<a href="{{ route('app.users.create') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-plus-circle"></i></div>
 											<div class="nav-menu__text"><span>Add user</span></div>
@@ -235,13 +244,13 @@
 
 								<div class="sidebar__title">Teams</div>
 								<ul class="nav nav-menu">
-									<li>
+									<li class="{{ sidebarActive(['teams', 'edit', 'show']) }}">
 										<a href="{{ route('app.teams.index') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-users"></i></div>
 											<div class="nav-menu__text"><span>Teams</span></div>
 										</a>
 									</li>
-									<li>
+									<li class="{{ sidebarActive(['teams', 'create'], false) }}">
 										<a href="{{ route('app.teams.create') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-plus-circle"></i></div>
 											<div class="nav-menu__text"><span>Add team</span></div>
@@ -251,13 +260,13 @@
 
 								<div class="sidebar__title">Clusters</div>
 								<ul class="nav nav-menu">
-									<li>
+									<li class="{{ sidebarActive(['clusters', 'edit', 'show']) }}">
 										<a href="{{ route('app.clusters.index') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-building"></i></div>
 											<div class="nav-menu__text"><span>Clusters</span></div>
 										</a>
 									</li>
-									<li>
+									<li class="{{ sidebarActive(['clusters', 'create'], false) }}">
 										<a href="{{ route('app.clusters.create') }}">
 											<div class="nav-menu__ico"><i class="fa fa-fw fa-plus-circle"></i></div>
 											<div class="nav-menu__text"><span>Add cluster</span></div>
