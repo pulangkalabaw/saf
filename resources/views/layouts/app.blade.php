@@ -135,7 +135,7 @@
 				<div class="quickmenu">
 					<div class="quickmenu__cont">
 						<div class="quickmenu__list">
-							<div class="quickmenu__item {{ str_contains(url()->current(), ['home', 'applications', '']) ? 'active' : '' }}">
+							<div class="quickmenu__item {{ str_contains(url()->current(), ['home', 'applications', 'encoderdashboard']) ? 'active' : '' }}">
 								<div class="fa fa-fw fa-home"></div>
 							</div>
 							@if (Auth::user()->role == base64_encode("administrator"))
@@ -375,14 +375,18 @@
 	<script src="{{ asset('assets/js/main.js') }}"></script>
 	<script src="{{ asset('assets/js/demo.js') }}"></script>
 
-	@yield ('scripts')
 
 	<script>
 	console.log("APP VERSION {{ env('APP_VERSION') }} | Khurt Russel")
 
-	$("form").on("submit", function(){
-		$("form button").attr("disabled", "disabled")
-	})
-</script>
+	$(document).ready(function(){
+		$("form").on("submit", function(){
+			$("form button").attr("disabled", "disabled")
+		})
+	});
+	</script>
+
+	@yield ('scripts')
+
 </body>
 </html>

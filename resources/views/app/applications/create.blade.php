@@ -122,7 +122,7 @@
 										<div>
 											<div class="col-md-3">Sim\Device</div>
 											<div class="col-md-7">
-												<input type="text" name="sim" id="" class="form-control" value="{{ old('sim') }}">
+												<input type="text" name="device" class="form-control" value="{{ old('device') }}">
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
@@ -172,7 +172,6 @@
 								</div>
 							</form>
 						</div>
-
 						{{-- Body end --}}
 					</div>
 				</div>

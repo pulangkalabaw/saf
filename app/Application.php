@@ -162,11 +162,16 @@ class Application extends Model
 		$val = trim($value);
 
 		// Search from the application
-		$return_query = $return_query->where('so_no', 'LIKE', "%".$val."%")
-		->orWhere('sr_no', 'LIKE', '%'.$val.'%')
-		->orWhere('status', 'LIKE', '%'.$val.'%')
-		->orWhere('customer_name', 'LIKE', '%'.$val.'%')
-		->orWhere('product', 'LIKE', '%'.$val.'%');
+		$return_query = $return_query->where('so_no', 'LIKE', "%".strtoupper($val)."%")
+		->orWhere('so_no', 'LIKE', "%".strtolower($val)."%")
+		->orWhere('sr_no', 'LIKE', '%'.strtoupper($val).'%')
+		->orWhere('sr_no', 'LIKE', "%".strtolower($val)."%")
+		->orWhere('status', 'LIKE', '%'.strtoupper($val).'%')
+		->orWhere('status', 'LIKE', "%".strtolower($val)."%")
+		->orWhere('customer_name', 'LIKE', '%'.strtoupper($val).'%')
+		->orWhere('customer_name', 'LIKE', "%".strtolower($val)."%")
+		->orWhere('product', 'LIKE', '%'.strtoupper($val).'%')
+		->orWhere('product', 'LIKE', "%".strtolower($val)."%");
 
 		// Search for Team
 		// Check Team if empty
@@ -244,6 +249,10 @@ class Application extends Model
 
 	public function getProduct () {
 		return $this->hasOne('App\Product', 'product_id', 'product_type');
+	}
+
+	public function getEncoderData () {
+		return $this->hasOne('App\User', 'id', 'encoder_id');
 	}
 
 }

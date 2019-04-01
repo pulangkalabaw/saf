@@ -39,8 +39,8 @@
 								<tr>
 									<td>{{ ucfirst($app->status_id) }}</td>
 									<td>{{ $app->added_by->fname }} {{ $app->added_by->lname }}</td>
-									<td>{{ $app->created_at->toDateString() }}</td>
-									<td>{{ $app->created_at }}</td>
+									<td>{{ $app->created_at->format("M d, Y") }}</td>
+									<td>{{ $app->created_at->format("h:i:s A") }}</td>
 								</tr>
 								@endforeach
 							</tbody>
@@ -80,7 +80,7 @@
 							</div>
 						</div>
 						<div class="panel-body">
-							<form id="OnSubmit" class="" action="{{ route('app.applications.update', $application->application_id) }}" method="post">
+							<form name="updateForm" id="OnSubmit" class="" action="{{ route('app.applications.update', $application->application_id) }}" method="post" onsubmit="return validateFields()">
 								@include('includes.notif')
 
 								{{ csrf_field() }}
@@ -91,12 +91,15 @@
 											<div class="col-md-3 col-xs-3">Status:</div>
 											<div class="col-md-7 col-xs-7">
 												<div class="col-md-11 col-xs-11">
-													<select name="status" class="form-control" required>
+													<select id="status" name="status" class="form-control" required onchange="$('#update-application').removeAttr('disabled');">
 														{{ $application_model->recentStatusShort($application->id) }}
 														<option {{ $application_model->recentStatusShort($application->application_id) == 'new' ? 'selected' : '' }} value="new">New</option>
-														<option {{ $application_model->recentStatusShort($application->application_id) == 'paid' ? 'selected' : '' }} value="paid">Paid</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'disapproved' ? 'selected' : '' }} value="disapproved">Disapproved</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'for_payment' ? 'selected' : '' }} value="for_payment">For Payment</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'for_activation' ? 'selected' : '' }} value="for_activation">For Activation</option>
 														<option {{ $application_model->recentStatusShort($application->application_id) == 'activated' ? 'selected' : '' }} value="activated">Activated</option>
 														<option {{ $application_model->recentStatusShort($application->application_id) == 'cancelled' ? 'selected' : '' }} value="cancelled">Cancelled</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'expired' ? 'selected' : '' }} value="expired">Expired</option>
 													</select>
 												</div>
 												<div class="col-md-1 col-xs-1">
@@ -106,6 +109,14 @@
 														</button>
 													@endif
 												</div>
+											</div>
+										</div>
+										<div class="clearfix"></div><br>
+
+										<div>
+											<div class="col-md-3 col-xs-3">Awaiting Device:</div>
+											<div class="col-md-7 col-xs-7">
+												<input type="checkbox" name="awaiting_device" value="1" {{ ($application->awaiting_device == 1) ? 'checked' : '' }}>
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
@@ -151,7 +162,6 @@
 											<div class="col-md-3 col-xs-3">Address:</div>
 											<div class="col-md-7 col-xs-7">
 												<input type="text" name="address" required class="form-control" value="{{ $application->address }}">
-												<input type="hidden" name="team_id" required class="form-control" value="{{ $application->team_id }}">
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
@@ -160,11 +170,12 @@
 											<div class="col-md-3 col-xs-3">Agent:</div>
 											<div class="col-md-7 col-xs-7">
 
-												<select class="select2 form-control js-example-basic-single" id="agent" name="agent_id">
+												<select class="select2 form-control js-example-basic-single" name="agent_id" id="selected_user" onchange="showTeam($(this).val())">
 													@foreach ($users as $user)
 														<option {{ $application->agent_id == $user->id ? "selected" : ""}} value="{{ $user->id }}">{{ $user->fname }} {{ $user->lname }}</option>
 													@endforeach
 												</select>
+												<input type="hidden" name="team_id" required class="form-control" value="{{ $application->team_id }}">
 
 											</div>
 										</div>
@@ -172,7 +183,7 @@
 
 										<div>
 											<div class="col-md-3 col-xs-3">Team:</div>
-											<div class="col-md-7 col-xs-7">
+											<div class="col-md-7 col-xs-7" id="team_name">
 												{{ $application->getTeam->team_name }}
 											</div>
 										</div>
@@ -181,7 +192,7 @@
 										<div>
 											<div class="col-md-3 col-xs-3">Remarks:</div>
 											<div class="col-md-7 col-xs-7">
-												<textarea name="remarks" rows="8" cols="80" class="form-control"></textarea>
+												<textarea name="remarks" rows="8" cols="80" class="form-control">{{ $application->remarks }}</textarea>
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
@@ -209,18 +220,18 @@
 										<div>
 											<div class="col-md-3 col-xs-3">MIN #:</div>
 											<div class="col-md-7 col-xs-7">
-												<input type="text" name="so_no" class="form-control" value="{{ $application->min_no }}">
+												<input type="text" name="min_no" class="form-control" value="{{ $application->min_no }}">
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
 
-										<div>
+										{{-- <div>
 											<div class="col-md-3 col-xs-3">SAF #:</div>
 											<div class="col-md-7 col-xs-7">
 												<input type="text" name="so_no" class="form-control" value="{{ $application->saf_no }}">
 											</div>
 										</div>
-										<div class="clearfix"></div><br>
+										<div class="clearfix"></div><br> --}}
 
 										<div>
 											<div class="col-md-3 col-xs-3">SIM:</div>
@@ -255,9 +266,27 @@
 										<div class="clearfix"></div><br>
 
 										<div>
+											<div class="col-md-3 col-xs-3">Encoder:</div>
+											<div class="col-md-7 col-xs-7">
+												@if($application->encoder_id == null)
+												<select class="select2 form-control js-example-basic-single" name="encoder_id">
+													@foreach ($encoders as $encoder)
+														<option {{ auth()->user()->id == $encoder->id ? "selected" : ""}} value="{{ $encoder->id }}">{{ $encoder->fname }} {{ $encoder->lname }}</option>
+													@endforeach
+												</select>
+												@else
+													{{ $application->getEncoderData->fname }} {{ $application->getEncoderData->lname }}
+													<input type="hidden" name="encoder_id" value="{{ $application->getEncoderData->id }}">
+												@endif
+
+											</div>
+										</div>
+										<div class="clearfix"></div><br>
+
+										<div>
 											<div class="col-md-3 col-xs-3">Encoded date:</div>
 											<div class="col-md-7 col-xs-7">
-												{{ $application->created_at . ' ('.$application->created_at->diffForHumans().')' }}
+												{{ $application->created_at->format("M d, Y h:i:s A") . ' ('.$application->created_at->diffForHumans().')' }}
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
@@ -265,7 +294,7 @@
 										<div>
 											<div class="col-md-3"></div>
 											<div class="col-md-7 text-right">
-												<button class="btn btn-success btn-xs" name="button">
+												<button class="btn btn-success btn-xs" name="button" id="update-application">
 													<span class="fa fa-edit"></span>
 													Update changes
 												</button>
@@ -295,9 +324,36 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 	@include ('partials.scripts._datatables')
 	<script>
-	$(document).ready(function(){
-		$('#agent').select2();
-	});
-		$('#all_status').dataTable();
+	var $team = $('#team_name');
+	// var $id = $("#selected_user option:selected").val();
+
+	function showTeam(id){
+		//alert(id);
+		$(function (){
+			$.ajax({
+				url: '{{ url("app/api/available-users/") }}' + "/" +id,
+				method: 'GET',
+				success: function(data) {
+					console.log(data);
+					$.each(data, function(i, user){
+						$team.html(user.team_name);
+						$('input[name="team_id"]').val(user.id);
+					});
+
+				}
+			});
+		});
+	}
+
+	function validateFields(){
+		var validate = document.forms["updateForm"]["status"].value;
+		if(validate == "new"){
+			alert("Please change the Status New");
+			$("#status").css({ "border": '#FF0000 1px solid'});
+			$("#update-application").removeAttr("disabled");
+			$("#update-application").prop("disabled", false);
+			return false;
+		}
+	}
 	</script>
 @endsection

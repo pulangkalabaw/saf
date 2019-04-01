@@ -159,9 +159,9 @@
 
 									<h3>Remarks</h3><br/>
 									<div>
-										<div class="col-md-7 col-xs-7">
+										<div class="col-md-12 col-xs-7">
 											@if(!empty($application->remarks))
-												 <textarea class="form-control" name="name" rows="8" cols="80" disabled>{{ $application->remarks }}</textarea>
+												 <textarea class="form-control" name="name" rows="12" cols="100" disabled>{{ $application->remarks }}</textarea>
 											@else
 												 No Remarks Found!
 											@endif
@@ -287,17 +287,17 @@
 										</div>
 
 									@endif
-
 								</div>
-
 								<div class="col-md-4">
 									<h3>Attatch File</h3><br/>
 									<div>
 										<div class="col-md-3 col-xs-3">
-@foreach($application_files as $application_file)
-												<a href="{{ asset('public/storage/' .$application_file['attached_files']) }}" class="btn btn-default"
-												 download style="margin-top:7px;">{{ $application_file['attached_files']}}</a>
-											@endforeach
+											@if(!empty($application_files))
+												@foreach(json_decode($application_files) as $application_file)
+													<a href="{{ asset('public/storage/' . $application_file) }}" class="btn btn-default"
+													download >{{ str_limit($application_file, 15) }}</a>
+												@endforeach
+											@endif
 										</div>
 										<div class="col-md-7 col-xs-7">
 

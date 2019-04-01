@@ -40,10 +40,14 @@ class User extends Authenticatable
 
 	public  function scopeSearch ($query, $value) {
 		$val = trim($value);
-		return $query->where('fname', 'LIKE', "%".$val."%")
-		->orWhere('lname', 'LIKE', "%".$val."%")
-		->orWhere('role', 'LIKE', "%".base64_encode($val)."%")
-		->orWhere('email', 'LIKE', "%".$val."%");
+		return $query->where('fname', 'LIKE', "%".strtoupper($val)."%")
+		->orWhere('fname', 'LIKE', "%".strtolower($val)."%")
+		->orWhere('lname', 'LIKE', "%".strtoupper($val)."%")
+		->orWhere('lname', 'LIKE', "%".strtolower($val)."%")
+		->orWhere('role', 'LIKE', "%".base64_encode(strtoupper($val))."%")
+		->orWhere('role', 'LIKE', "%".base64_encode(strtolower($val))."%")
+		->orWhere('email', 'LIKE', "%".strtoupper($val)."%")
+		->orWhere('email', 'LIKE', "%".strtolower($val)."%");
 	}
 
 	/*
@@ -68,7 +72,7 @@ class User extends Authenticatable
 	public function getAvailableTeamLeader() {
 		return $this->get();
 		//
-		
+
 		// Get all tl created
 		$tl = Teams::get()->pluck('tl_ids');
 

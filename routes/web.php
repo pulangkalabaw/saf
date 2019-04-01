@@ -52,6 +52,8 @@ Route::group(['middleware' => ['auth'], 'prefix' => 'app', 'as' => 'app.'], func
     Route::resource('clusters', 'ClustersController')->middleware('access_control:administrator');
 
     // Applications
+    // ajax reqeust
+    Route::get('api/available-users/{id}', 'ApplicationController@showAvailableApi')->middleware('access_control:encoder');
     Route::resource('applications', 'ApplicationController')->middleware('access_control:administrator,user,encoder');
 
     // Plan

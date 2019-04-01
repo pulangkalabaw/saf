@@ -5,6 +5,10 @@ namespace App\Http\Middleware;
 use Auth;
 use Closure;
 
+use App\Application;
+
+use Carbon\Carbon;
+
 class AccessControl
 {
 	/**
@@ -16,6 +20,16 @@ class AccessControl
 	*/
 	public function handle($request, Closure $next, ...$can_access)
 	{
+		// Check if their is an expired application
+		$application = new Application();
+		$expires_at = $application->where(['expires_at' => Carbon::now()->toDateString(), 'status' => 'new'])->get();
+
+		if($expires_at){
+			$request['status'] = 'expired';
+			$request['expires_at'] = null;
+			$application->where('expires_at', Carbon::now()->toDateString())->update($request->only(['status','expires_at']));
+		}
+
 		// Update sesison
 		getSessions();
 
