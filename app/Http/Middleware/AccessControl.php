@@ -25,9 +25,9 @@ class AccessControl
 		$expires_at = $application->where(['expires_at' => Carbon::now()->toDateString(), 'status' => 'new'])->get();
 
 		if($expires_at){
-			$request['status'] = 'expired';
-			$request['expires_at'] = null;
-			$application->where('expires_at', Carbon::now()->toDateString())->update($request->only(['status','expires_at']));
+			$data['status'] = 'expired';
+			$data['expires_at'] = null;
+			$application->where('expires_at', Carbon::now()->toDateString())->update($data);
 		}
 
 		// Update sesison
