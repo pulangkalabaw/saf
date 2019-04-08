@@ -94,12 +94,18 @@
 													<select id="status" name="status" class="form-control" required onchange="$('#update-application').removeAttr('disabled');">
 														{{ $application_model->recentStatusShort($application->id) }}
 														<option {{ $application_model->recentStatusShort($application->application_id) == 'new' ? 'selected' : '' }} value="new">New</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'rts' ? 'selected' : '' }} value="rts">RTS</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'saved_drafts' ? 'selected' : '' }} value="saved_drafts">Saved Drafts</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'sup' ? 'selected' : '' }} value="sup">For Validation (SUP)</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'crmo' ? 'selected' : '' }} value="crmo">For Validation (CRMO)</option>
 														<option {{ $application_model->recentStatusShort($application->application_id) == 'disapproved' ? 'selected' : '' }} value="disapproved">Disapproved</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'approved' ? 'selected' : '' }} value="approved">Approved</option>
 														<option {{ $application_model->recentStatusShort($application->application_id) == 'for_payment' ? 'selected' : '' }} value="for_payment">For Payment</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'paid' ? 'selected' : '' }} value="paid">Paid</option>
 														<option {{ $application_model->recentStatusShort($application->application_id) == 'for_activation' ? 'selected' : '' }} value="for_activation">For Activation</option>
-														<option {{ $application_model->recentStatusShort($application->application_id) == 'activated' ? 'selected' : '' }} value="activated">Activated</option>
-														<option {{ $application_model->recentStatusShort($application->application_id) == 'cancelled' ? 'selected' : '' }} value="cancelled">Cancelled</option>
-														<option {{ $application_model->recentStatusShort($application->application_id) == 'expired' ? 'selected' : '' }} value="expired">Expired</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'closed_activated' ? 'selected' : '' }} value="closed_activated">Closed/Activated</option>
+														<option {{ $application_model->recentStatusShort($application->application_id) == 'cancelled' ? 'selected' : '' }} value="cancelled">Cancelled Application</option>
+
 													</select>
 												</div>
 												<div class="col-md-1 col-xs-1">
@@ -168,7 +174,7 @@
 
 										<div>
 											<div class="col-md-3 col-xs-3">Agent:</div>
-											<div class="col-md-7 col-xs-7">
+											<div class="col-md-4 col-xs-4">
 
 												<select class="select2 form-control js-example-basic-single" name="agent_id" id="selected_user" onchange="showTeam($(this).val())">
 													@foreach ($users as $user)
@@ -177,6 +183,11 @@
 												</select>
 												<input type="hidden" name="team_id" required class="form-control" value="{{ $application->team_id }}">
 
+											</div>
+											<div class="col-md-3 col-xs-3" id="agent_ref">
+												<div {{ $agent->agent_referral == 0 ? "hidden" : ""}}>
+													<span class='fa fa-info-circle'></span><small> Agent Referral</small>
+												</div>
 											</div>
 										</div>
 										<div class="clearfix"></div><br>
@@ -335,11 +346,15 @@
 				method: 'GET',
 				success: function(data) {
 					console.log(data);
-					$.each(data, function(i, user){
-						$team.html(user.team_name);
-						$('input[name="team_id"]').val(user.id);
-					});
+					$team.html(data.team.team_name);
+					$('input[name="team_id"]').val(data.team.id);
 
+					console.log(data.user.agent_referral);
+					if(data.user.agent_referral == 1){
+						$('#agent_ref').show();
+					} else {
+						$('#agent_ref').hide();
+					}
 				}
 			});
 		});

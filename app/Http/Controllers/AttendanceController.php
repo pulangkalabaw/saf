@@ -786,6 +786,13 @@ class AttendanceController extends Controller
 
 	public function destroy_image($id){
 	    $image = Attendance_image::findOrFail($id);
+	  	$file = Attendance_image::where('id', $id)->get();
+	  	foreach ($file as $document) {
+        	$delete =   Storage::disk('public')->delete($document->image);
+
+            $document->delete();
+	 		response()->json($delete);
+        }
 		$image->delete();
 		Session::flash('message', "Your photo has been deleted successfully");
 		return back();

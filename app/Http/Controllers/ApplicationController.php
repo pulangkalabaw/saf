@@ -124,9 +124,7 @@ class ApplicationController extends Controller
 		],[
 		    'image_file.*.required' => 'Please upload an image',
 		    'image_file.*.mimes' => 'Only xlsx,xls,csv,jpg,jpeg,png,bmp,doc,docx,pdf,tif,tiff images are allowed',
-
-		]
-		);
+		]);
 
 		if ($validator->fails()) {
 		    $messages = $validator->messages();
@@ -307,7 +305,10 @@ class ApplicationController extends Controller
 		}
 
 		$user_ids = array_unique(array_merge($agent_ids, $tl_ids));
-		$available_users = $users->whereIn('id',$user_ids)->get();
+		$available_users = $users
+		->whereIn('id',$user_ids)
+		->where('isActive', '1')
+		->get();
 		// filter end
 
 		$application_model = new Application();
@@ -315,12 +316,14 @@ class ApplicationController extends Controller
 		$plans = Plans::get();
 		$products = Product::get();
 		$application = $application_model->where('application_id', $id)->with(['getEncoderData'])->firstOrFail();
+		$agent = $users->where('id',$application['agent_id'])->first();
 
 		return view('app.applications.edit', [
 			'application' => $application,
 			'application_model' => $application_model,
 			'application_status' => $application_status->appStatus($id),
 			'users' => $available_users,
+			'agent' => $agent,
 			'encoders' => $users->where('role', base64_encode('encoder'))->get(),
 			'plans' => $plans,
 		]);
@@ -466,7 +469,8 @@ class ApplicationController extends Controller
 		}
 
 		return response()->json([
-			'team' => $team
+			'team' => $team,
+			'user' => $user_data
 		]);
 	}
 }

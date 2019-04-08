@@ -372,6 +372,7 @@
 
 	{{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/3.1.3/js/bootstrap-datetimepicker.min.js"></script> --}}
     <script src="{{ asset('assets/libs/bootstrap-select/js/bootstrap-select.min.js') }}"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.css"></script>
 	<script src="{{ asset('assets/js/main.js') }}"></script>
 	<script src="{{ asset('assets/js/demo.js') }}"></script>
 
@@ -382,7 +383,15 @@
 	$(document).ready(function(){
 		$("form").on("submit", function(){
 			$("form button").attr("disabled", "disabled")
-		})
+		});
+
+		$(".select2").select2({
+            tags: true,
+            tokenSeparators: [','],
+            placeholder: "Select Options",
+            width: '100%',
+            closeOnSelect: false
+        });
 	});
 	</script>
 

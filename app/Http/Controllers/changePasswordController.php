@@ -40,7 +40,7 @@ class changePasswordController extends Controller
             return view('auth.change-password');
         }
 
-        $current_password = \Auth::User()->password;
+         $current_password = \Auth::User()->password;
         if($current_password){
             $user_id = \Auth::User()->id;
             $obj_user = User::find($user_id);

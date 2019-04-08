@@ -24,6 +24,8 @@ class CreateUsersTable extends Migration
             $table->string('agent_code')->nullable();
             $table->string('target')->nullable();
             $table->string('password_status')->default(0);
+            $table->tinyInteger('agent_referral')->default(0);
+            $table->tinyInteger('encoder_admin')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

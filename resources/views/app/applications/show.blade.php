@@ -289,7 +289,7 @@
 									@endif
 								</div>
 								<div class="col-md-4">
-									<h3>Attatch File</h3><br/>
+									<h3>Attached File</h3><br/>
 									<div>
 										<div class="col-md-3 col-xs-3">
 											@if(!empty($application_files))

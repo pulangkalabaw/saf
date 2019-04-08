@@ -67,7 +67,7 @@
 										<div>
 											<div class="col-md-3">Team Leader</div>
 											<div class="col-md-7">
-												<select name="tl_ids[]" id="" class="form-control" multiple="" style="height: 200px;">
+												<select name="tl_ids[]" id="" class="form-control select2" multiple="">
 													@foreach ($users as $user)
 														<option value="{{ (int) $user->id }}">{{ $user->fname . ' ' . $user->lname }}</option>
 													@endforeach
