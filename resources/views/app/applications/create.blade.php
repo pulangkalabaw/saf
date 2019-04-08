@@ -34,19 +34,19 @@
 						{{-- Body start --}}
 
 						<div class="panel-body">
-	                        <form id="form_id" action="{{ route('app.applications.store') }}" method="POST">
-	                            @include('includes.notif')
+							<form id="form_id" action="{{ route('app.applications.store') }}" method="POST" enctype="multipart/form-data">
+								@include('includes.notif')
 
-	                            {{ csrf_field() }}
-	                            <div class="row">
-	                                <div class="col-md-7">
+								{{ csrf_field() }}
+								<div class="row">
+									<div class="col-md-7">
 
 										<div>
-	                                        <div class="col-md-3">Team</div>
+											<div class="col-md-3">Team</div>
 											@if($errors->any())
 												<span class="required">*</span>
 											@endif
-	                                        <div class="col-md-7">
+											<div class="col-md-7">
 												@if(count($teams) == 1)
 													<select class="form-control select_enable" name="team_id" disabled>
 														@foreach ($teams as $team)
@@ -64,49 +64,49 @@
 													</select>
 												@endif
 
-	                                        </div>
-	                                    </div>
-	                                    <div class="clearfix"></div><br>
-
-	                                    <div>
-	                                        <div class="col-md-3">Customer</div>
-											@if($errors->any())
-												<span class="required">*</span>
-											@endif
-	                                        <div class="col-md-7">
-	                                            <input type="text" name="customer_name" id="" class="form-control" required value="{{ old('customer_name') }} ">
-	                                        </div>
-	                                    </div>
-	                                    <div class="clearfix"></div><br>
+											</div>
+										</div>
+										<div class="clearfix"></div><br>
 
 										<div>
-	                                        <div class="col-md-3">Contact</div>
+											<div class="col-md-3">Customer</div>
 											@if($errors->any())
 												<span class="required">*</span>
 											@endif
-	                                        <div class="col-md-7">
-	                                            <input type="text" name="contact" id="" class="form-control" required value="{{ old('contact') }}">
-	                                        </div>
-	                                    </div>
-	                                    <div class="clearfix"></div><br>
+											<div class="col-md-7">
+												<input type="text" name="customer_name" id="" class="form-control" required value="{{ old('customer_name') }} ">
+											</div>
+										</div>
+										<div class="clearfix"></div><br>
 
 										<div>
-	                                        <div class="col-md-3">Address</div>
+											<div class="col-md-3">Contact</div>
 											@if($errors->any())
 												<span class="required">*</span>
 											@endif
-	                                        <div class="col-md-7">
-	                                            <input type="text" name="address" id="" class="form-control" required value="{{ old('address') }}">
-	                                        </div>
-	                                    </div>
-	                                    <div class="clearfix"></div><br>
+											<div class="col-md-7">
+												<input type="text" name="contact" id="" class="form-control" required value="{{ old('contact') }}">
+											</div>
+										</div>
+										<div class="clearfix"></div><br>
 
 										<div>
-	                                        <div class="col-md-3">Plan</div>
+											<div class="col-md-3">Address</div>
 											@if($errors->any())
 												<span class="required">*</span>
 											@endif
-	                                        <div class="col-md-7">
+											<div class="col-md-7">
+												<input type="text" name="address" id="" class="form-control" required value="{{ old('address') }}">
+											</div>
+										</div>
+										<div class="clearfix"></div><br>
+
+										<div>
+											<div class="col-md-3">Plan</div>
+											@if($errors->any())
+												<span class="required">*</span>
+											@endif
+											<div class="col-md-7">
 												<select name="plan_id" class="form-control">
 													@if (empty(old('plan_id')))
 														<option value="" selected>Select plan (required)</option>
@@ -115,24 +115,24 @@
 														<option {{ old('plan_applied') == $plan->id ? 'selected' : ''}} value="{{ $plan->id }}">{{ strtoupper($plan->product) }} - {{ $plan->plan_name }}</option>
 													@endforeach
 												</select>
-	                                        </div>
-	                                    </div>
-	                                    <div class="clearfix"></div><br>
+											</div>
+										</div>
+										<div class="clearfix"></div><br>
 
 										<div>
-	                                        <div class="col-md-3">Sim\Device</div>
-	                                        <div class="col-md-7">
-	                                            <input type="text" name="sim" id="" class="form-control" value="{{ old('sim') }}">
-	                                        </div>
-	                                    </div>
-	                                    <div class="clearfix"></div><br>
+											<div class="col-md-3">Sim\Device</div>
+											<div class="col-md-7">
+												<input type="text" name="device" class="form-control" value="{{ old('device') }}">
+											</div>
+										</div>
+										<div class="clearfix"></div><br>
 
 										<div>
-	                                        <div class="col-md-3">Agent</div>
+											<div class="col-md-3">Agent</div>
 											@if($errors->any())
 												<span class="required">*</span>
 											@endif
-	                                        <div class="col-md-7">
+											<div class="col-md-7">
 												@if (count($agents) == 1)
 													<select class="form-control select_enable" name="user_id" disabled>
 														@foreach ($agents as $agent)
@@ -149,23 +149,29 @@
 														@endforeach
 													</select>
 												@endif
-	                                        </div>
-	                                    </div>
-	                                    <div class="clearfix"></div><br>
+											</div>
+										</div>
+										<div class="clearfix"></div><br>
 
 										<div>
-	                                        <div class="col-md-3"></div>
-	                                        <div class="col-md-7 text-right">
-	                                            <button class="btn btn-sm btn-primary">Submit <span class='fa fa-plus-circle'></span> </button>
-	                                        </div>
-	                                    </div>
-	                                    <div class="clearfix"></div><br>
+										<div>
+											<div class="col-md-3">Attached file</div>
+											<input type="file" name="attached_files[]" multiple="multiple">
+										</div>
+										<div class="clearfix"></div><br>
 
-	                                </div>
-	                            </div>
-	                        </form>
-	                    </div>
+										<div>
+											<div class="col-md-3"></div>
+											<div class="col-md-7 text-right">
+												<button class="btn btn-sm btn-primary">Submit <span class='fa fa-plus-circle'></span> </button>
+											</div>
+										</div>
+										<div class="clearfix"></div><br>
 
+									</div>
+								</div>
+							</form>
+						</div>
 						{{-- Body end --}}
 					</div>
 				</div>
@@ -176,9 +182,9 @@
 @endsection
 
 @section('scripts')
-<script>
-$('#form_id').submit(function() {
-	$(".select_enable").prop('disabled', false);
-})
+	<script>
+	$('#form_id').submit(function() {
+		$(".select_enable").prop('disabled', false);
+	})
 </script>
 @endsection

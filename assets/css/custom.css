@@ -1,5 +1,19 @@
 /* PUT YOUR CUSTOM CSS HERE */
 
+table td, table th, table td > a {
+    color: #fff !important;
+}
+
+.panel .panel-body, .panel-body a {
+    color: #fff !important;
+}
+
+input, select {
+    color: #fff !important;
+}
+
+/* CUSTOM PANEL */
+
 /* INPUT COLOR */
 .input-gray {
     /* background: #202428 !important; */
@@ -12,12 +26,12 @@
     color: #fff !important;
 }
 
-/* CUSTOM BACKGROUNF */
+/* CUSTOM BACKGROUND */
 .bg-red {
     background: red !important;
 }
-.bg-blue {
-    background: blue !important;
+.bg-info {
+    background: #1847AC !important;
 }
 .bg-yellow {
     background: yellow !important;

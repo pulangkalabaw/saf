@@ -30,6 +30,8 @@ class CreateSafApplicationTable extends Migration
 			$table->string('sr_no')->nullable();
 			$table->string('so_no')->nullable();
 			$table->string('status');
+            $table->string('awaiting_device')->nullable();
+            $table->string('expires_at')->nullable();
 			$table->integer('insert_by')->unsigned()->nullable();
 			$table->integer('encoder_id')->unsigned()->nullable();
 			$table->string('encoded_at');

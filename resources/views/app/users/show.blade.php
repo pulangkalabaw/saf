@@ -9,7 +9,7 @@
         <li class="">
             <a href="{{ route('app.users.index') }}">User Accounts</a>
         </li>
-        <li class="active">Create</li>
+        <li class="active">Show</li>
     </ol>
 </div>
 <div class="container-fluid half-padding">
@@ -93,7 +93,7 @@
                                 <div>
                                     <div class="col-md-3">Target:</div>
                                     <div class="col-md-7">
-                                        {{ $user->target }}
+                                        {{ number_format($user->target, 2) }}
                                     </div>
                                 </div>
                                 <div class="clearfix"></div><br>

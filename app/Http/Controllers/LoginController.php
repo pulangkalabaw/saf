@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use Auth;
 use Session;
 use Validator;
+
+use App\User;
 use App\Teams;
 use App\Clusters;
+use App\Application;
+
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\User;
 
 class LoginController extends Controller
 {
@@ -50,7 +54,11 @@ class LoginController extends Controller
 			$password = User::select('password_status')->where('id', Auth::user()->id)->value('password_status');
 			// Authenticated
 			if($password == 1){
-				return redirect()->route('app.dashboard');
+				if(Auth::user()->role == base64_encode('encoder')){
+					return redirect()->route('app.encoder-dashboard');
+				} else {
+					return redirect()->route('app.dashboard');
+				}
 			}elseif($password == 0){
 				return view('auth.change-password');
 			}

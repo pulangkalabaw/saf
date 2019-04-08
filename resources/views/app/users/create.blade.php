@@ -88,38 +88,6 @@
                                     <div class="clearfix"></div><br>
 
                                     <div>
-                                        <div class="col-md-3">Role</div>
-                                        <div class="col-md-7">
-                                            <select name="role" id="roles" class="form-control" required>
-                                                <option  value="" disabled="" selected="">Please select for role</option>
-                                                <option  {{ old('role') == 'administrator' ? 'selected': ''  }} value="administrator">Administrator</option>
-                                                <option  {{ old('role') == 'encoder' ? 'selected': ''  }} value="encoder">Encoder</option>
-                                                <option  {{ old('role') == 'user' ? 'selected': ''  }} value="user">User</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div><br>
-
-                                    <div>
-                                        <div class="col-md-3">Target</div>
-                                        <div class="col-md-7">
-                                            <input class="pull-left" type="checkbox" id="checkTarget" onclick="showTarget()">
-                                            <div class="col-sm-10">
-                                                <input type="text" name="target" class="form-control" id="target" style="display:none">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div><br>
-
-                                    <div class="code">
-                                        <div class="col-md-3">Agent Code</div>
-                                        <div class="col-md-7">
-                                            <input type="text" name="agent_code" id="" class="form-control" value="{{ old('agent_code') }}">
-                                        </div>
-                                        <div class="clearfix"></div><br>
-                                    </div>
-
-                                    <div>
                                         <div class="col-md-3">Status</div>
                                         <div class="col-md-7">
                                             <select name="isActive" class="form-control" required>
@@ -129,6 +97,54 @@
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
+
+                                    <div>
+                                        <div class="col-md-3">Role</div>
+                                        <div class="col-md-7">
+                                            <select name="role" id="roles" class="form-control" required onchange="roleValue()">
+                                                <option  value="" disabled="" selected="">Please select for role</option>
+                                                <option  {{ old('role') == 'administrator' ? 'selected': ''  }} value="administrator">Administrator</option>
+                                                <option  {{ old('role') == 'encoder' ? 'selected': ''  }} value="encoder">Encoder</option>
+                                                <option  {{ old('role') == 'user' ? 'selected': ''  }} value="user">User</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
+                                    <div id="ag_ref" hidden>
+                                        <div class="col-md-3">Agent Referral:</div>
+                                        <div class="col-md-7">
+                                            <input type="checkbox" name="agent_referral" value="1">
+                                        </div>
+                                        <div class="clearfix"></div><br>
+                                    </div>
+
+                                    <div id="target" hidden>
+                                        <div class="col-md-3">Target</div>
+                                        <div class="col-md-7">
+                                            <input class="pull-left" type="checkbox" id="checkTarget" onclick="showTarget()">
+                                            <div class="col-sm-10">
+                                                <input type="text" name="target" class="form-control" id="targetField" style="display:none">
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div><br>
+                                    </div>
+
+                                    <div id="ag_code" hidden>
+                                        <div class="col-md-3">Agent Code</div>
+                                        <div class="col-md-7">
+                                            <input type="text" id="agent_code" name="agent_code" class="form-control" value="{{ old('agent_code') }}">
+                                        </div>
+                                        <div class="clearfix"></div><br>
+                                    </div>
+
+                                    <div id="en_admin" hidden>
+                                        <div class="col-md-3">Encoder Admin:</div>
+                                        <div class="col-md-7">
+                                            <input type="checkbox" name="encoder_admin" value="1">
+                                        </div>
+                                        <div class="clearfix"></div><br>
+                                    </div>
 
                                     <div>
                                         <div class="col-md-3"></div>
@@ -151,30 +167,42 @@
 
 @section ('scripts')
 <script>
-    function roleSwitcher()
-    {
-        if ($('#roles').val() == "agent" || $('#roles').val() == "agent_referral") {
-            $('.code').css({'display': 'block'});
-        }
-        else {
-            $('.code').css({'display': 'none'});
-        }
-    }
-
-    roleSwitcher();
-
-    $('#roles').on('change', function(){
-        roleSwitcher();
-    })
-
     function showTarget() {
       var checkBox = document.getElementById("checkTarget");
-      var target = document.getElementById("target");
+      var target = document.getElementById("targetField");
       if (checkBox.checked == true){
         target.style.display = "block";
       } else {
         target.style.display = "none";
       }
     }
+
+    function roleValue() {
+        var roleValue = $('#roles').val();
+
+        if(roleValue == "user") {
+            $('#en_admin').hide();
+            $('#ag_code').show();
+            $('#ag_ref').show();
+            $('#target').show();
+        } else if(roleValue == "encoder") {
+            $('#agent_code').val('');
+            $('#targetField').val('');
+            $('input[type="checkbox"]').prop('checked', false);
+            $('#target').hide();
+            $('#ag_ref').hide();
+            $('#ag_code').hide();
+            $('#en_admin').show();
+        } else if(roleValue == "administrator") {
+            $('#agent_code').val('');
+            $('#targetField').val('');
+            $('input[type="checkbox"]').prop('checked', false);
+            $('#ag_ref').hide();
+            $('#en_admin').hide();
+            $('#target').hide();
+            $('#ag_code').hide();
+        }
+    }
+
 </script>
 @endsection

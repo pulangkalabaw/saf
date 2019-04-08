@@ -15,6 +15,40 @@
 	<!-- {{ base64_encode('administrator') }} -->
 	<div class="container-fluid half-padding">
 		<div class="template template__blank">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="panel bg-info">
+                        <div class="panel-body text-center">
+                            <h3>Total Application</h3>
+                            <h2>{{ $count['total_applications'] }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="panel panel-info">
+                        <div class="panel-body text-center">
+                            <h3>Not Encoded</h3>
+                            <h2>{{ $count['not_encoded'] }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="panel panel-info">
+                        <div class="panel-body text-center">
+                            <h3>Total Encoded</h3>
+                            <h2>{{ $count['total_encoded'] }}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="panel panel-info">
+                        <div class="panel-body text-center">
+                            <h3>Your Encoded</h3>
+                            <h2>{{ $count['your_encoded'] }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
 			<!-- Product Chart and Application Chart -->
 			<div class="row">

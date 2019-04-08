@@ -159,8 +159,12 @@
                                                         <tbody>
                                                             @foreach($attendance as $att)
                                                                 <tr {!! $att['status'] == 1 ? 'title="Present"' : 'title="Absent"' !!}>
-                                                                    <td class="text-light">{{ $att['users']['fname'] }}</td>
-                                                                    <td class="text-light">{{ $att['users']['lname'] }}</td>
+                                                                    <td>
+                                                                        {{ $att['users']['fname'] }}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ $att['users']['lname'] }}
+                                                                    </td>
                                                                     <td class="text-light">{{ $att['activities'] }}</td>
                                                                     <td class="text-light">{{ $att['location'] }}</td>
                                                                     <td class="text-light">{{ $att['remarks'] }}</td>

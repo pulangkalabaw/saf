@@ -31,20 +31,17 @@
 									<th>Status</th>
 									<th>Modified by</th>
 									<th>Date</th>
+									<th>Time</th>
 								</tr>
 							</thead>
 							<tbody>
-								@foreach ($application_model->allStatus($application->application_id) as $appli)
-									<tr>
-										<td>
-											{{ ucfirst($appli->status_id) }}
-										</td>
-										<td>
-											{{ $application_status->addedBy($appli->application_id)->fname }}
-											{{ $application_status->addedBy($appli->application_id)->lname }}
-										</td>
-										<td>{{ $appli->created_at->diffForHumans() }}</td>
-									</tr>
+								@foreach($application_status as $app)
+								<tr>
+									<td>{{ ucfirst($app->status_id) }}</td>
+									<td>{{ $app->added_by->fname }} {{ $app->added_by->lname }}</td>
+									<td>{{ $app->created_at->toDateString() }}</td>
+									<td>{{ $app->created_at->diffForHumans() }}</td>
+								</tr>
 								@endforeach
 							</tbody>
 						</table>
@@ -87,12 +84,12 @@
 						<div class="panel-body">
 
 							<div class="row">
-								<div class="col-md-6">
+								<div class="col-md-4">
 									<h3>Application Form</h3>
 									<br />
 
 									<div>
-										<div class="col-md-3 col-xs-3">Application #:</div>
+										<div class="col-md-3 col-xs-3">App #:</div>
 										<div class="col-md-7 col-xs-7">
 											{{ $application->application_id }}
 										</div>
@@ -160,14 +157,36 @@
 									</div>
 									<div class="clearfix"></div><br>
 
+									<h3>Remarks</h3><br/>
 									<div>
-										<div class="col-md-3 col-xs-3 col-xs-3">Sim/Device:</div>
-										<div class="col-md-7 col-xs-7 col-xs-7">
-											{{ empty($application->sim) ? '-' : $application->sim  }}
+										<div class="col-md-12 col-xs-7">
+											@if(!empty($application->remarks))
+												 <textarea class="form-control" name="name" rows="12" cols="100" disabled>{{ $application->remarks }}</textarea>
+											@else
+												 No Remarks Found!
+											@endif
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
+								</div>
+
+								<div class="col-md-4">
+									<h3>Product Details</h3><br/>
+									<div>
+										<div class="col-md-3 col-xs-3">Device:</div>
+										<div class="col-md-7 col-xs-7">
+											{{ $application->device == '' ? '-' : $application->device }}
 										</div>
 									</div>
 									<div class="clearfix"></div><br>
 
+									<div>
+										<div class="col-md-3 col-xs-3">IMEI:</div>
+										<div class="col-md-7 col-xs-7">
+											{{ $application->imei == '' ? '-' : $application->imei }}
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
 
 									<div>
 										<div class="col-md-3 col-xs-3">SR #:</div>
@@ -185,8 +204,34 @@
 									</div>
 									<div class="clearfix"></div><br>
 
+									<div>
+										<div class="col-md-3 col-xs-3">MIN #:</div>
+										<div class="col-md-7 col-xs-7">
+											{{ $application->min_no == '' ? '-' : $application->min_no }}
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
 
+									<div>
+										<div class="col-md-3 col-xs-3">SIM ID:</div>
+										<div class="col-md-7 col-xs-7">
+											{{ $application->sim_id == '' ? '-' : $application->sim_id }}
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
 
+									<div>
+										<div class="col-md-3 col-xs-3 col-xs-3">Sim:</div>
+										<div class="col-md-7 col-xs-7 col-xs-7">
+											{{ empty($application->sim) ? '-' : $application->sim  }}
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
+
+								</div>
+
+								<div class="col-md-4">
+									<h3>Agent Details</h3><br/>
 									<div>
 										<div class="col-md-3 col-xs-3">Agent:</div>
 										<div class="col-md-7 col-xs-7">
@@ -195,16 +240,24 @@
 									</div>
 									<div class="clearfix"></div><br>
 
-
-								</div>
-
-								<div class="col-md-6">
-
-									<h3>Modified</h3><br />
-
+									<div>
+										<div class="col-md-3 col-xs-3">Team Name:</div>
+										<div class="col-md-7 col-xs-7">
+											{{ $application->getTeam->team_name }}
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
 
 									<div>
-										<div class="col-md-3 col-xs-3">Added by</div>
+										<div class="col-md-3 col-xs-3">Cluster Name:</div>
+										<div class="col-md-7 col-xs-7">
+											{{ $application->getCluster->cluster_name }}
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
+
+									<div>
+										<div class="col-md-3 col-xs-3">Added by:</div>
 										<div class="col-md-7 col-xs-7">
 											{{ $application->getInsertBy->fname }}
 											{{ $application->getInsertBy->lname }}
@@ -234,7 +287,23 @@
 										</div>
 
 									@endif
+								</div>
+								<div class="col-md-4">
+									<h3>Attached File</h3><br/>
+									<div>
+										<div class="col-md-3 col-xs-3">
+											@if(!empty($application_files))
+												@foreach(json_decode($application_files) as $application_file)
+													<a href="{{ asset('public/storage/' . $application_file) }}" class="btn btn-default"
+													download >{{ str_limit($application_file, 15) }}</a>
+												@endforeach
+											@endif
+										</div>
+										<div class="col-md-7 col-xs-7">
 
+										</div>
+									</div>
+									<div class="clearfix"></div><br>
 								</div>
 							</div>
 						</div>

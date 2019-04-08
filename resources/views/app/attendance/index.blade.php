@@ -194,7 +194,15 @@
                                                                         }
                                                                         @endphp</button>
                                                                     </td>
-                                                                    <td class="text-light"><span class="margin-vertical {{ !empty($value['tl']) ? 'text-info' : '' }}">{{ $value['fname'] . ' ' . $value['lname']}}</span></td>
+                                                                    <td class="text-light">
+                                                                        @if (auth()->user()->role == base64_encode('administrator'))
+                                                                            <a href="{{ route('app.users.show', $value['id']) }}">
+                                                                                <span class="margin-vertical {{ !empty($value['tl']) ? 'text-info' : '' }}">{{ $value['fname'] . ' ' . $value['lname']}}</span>
+                                                                            </a>
+                                                                        @else
+                                                                            <span class="margin-vertical {{ !empty($value['tl']) ? 'text-info' : '' }}">{{ $value['fname'] . ' ' . $value['lname']}}</span>
+                                                                        @endif
+                                                                    </td>
                                                                     {{-- <td>{{  }}</td> --}}
                                                                     <td>
                                                                         <input name="user[{{ $index }}][user_id]" class="form-control" type="hidden" value={{ $value['id'] }}>

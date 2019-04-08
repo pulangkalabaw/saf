@@ -1085,4 +1085,105 @@ function getIds($getWhat = 'all'){
 	}
 }
 
+function sidebarActive($segment = [], $main = true){
+				// return (string) $main;
+				// return $segment;
+	if(!empty($segment)){
+		$last_index = count($segment);
+		foreach($segment as $index => $sg){
+			$current_route = request()->segment(1 + ($index + 1));
+			if($main){
+				if($sg == 'edit'){
+					if($last_index > 1){
+						// return request()->segment(4);
+						if(request()->segment(4) == 'edit'){
+							if(Request::segment(2) == $segment[0]){
+								return 'active';
+							}
+						}
+					} else {
+						if($current_route == $sg){
+							return 'active';
+						}
+					}
+				} else {
+					if(($sg == $current_route) && ($index == 0) && empty(request()->segment(3))){
+						return 'active';
+					} else {
+						if($index == 2 && ($sg == 'show' && Request::segment(3) != 'create')){
+							if(Request::segment(2) == $segment[0]){
+								return 'active';
+							}
+						}
+					}
+					// if($last_index > 1){
+					//
+					// 	if($current_route == $sg){
+					// 		return 'active';
+					// 	}
+					// }
+				}
+			}
+			else {
+				// return Request::segment(2);
+				// dd(Request::segment(2) == $sg);
+				// return $sg;
+				if($current_route == $sg){
+					if($last_index == 1){
+						return 'active';
+					} else if($last_index > 1) {
+						if(!empty(Request::segment(3))){
+							if($segment[1] == Request::segment(3)){
+								if($index == 1 && Request::segment(2) == $segment[0]){
+									 // && Request::segment(2) == $segment[0]
+									// return $segment[0];
+									return 'active';
+								}
+							}
+						}
+						// return $sg;
+					}
+				}
+			// 	if($current_route == $sg){
+			// 		if(($last_index - 1) == $index){
+			// 			return 'active';
+			// 		}
+			// 	}
+			}
+		}
+		// dd(!empty(request()->segment(3)));
+		// foreach($segment as $index => $sg){
+		// 	if($sg == request()->segment(1 + ($index + 1))){
+		// 		if($main == false){
+		// 			if(!empty(request()->segment(3)) && ($last_index > 1)){
+		// 				if($index == ($last_index - 1)){
+		// 					return 'active';
+		// 				}
+		// 			} else if(empty(request()->segment(3)) && ($last_index == 1)){
+		// 				return 'active';
+		// 			}
+		// 		} else {
+		// 			return $last_index;
+		// 			if($last_index > 1){
+		// 				if($index > 0){
+		// 					if($sg == 'index' || $sg == 'create' || $sg == 'store' || $sg == 'edit' || $sg == 'show' || $sg == 'update' || $sg == 'destroy'){
+		// 					}
+		// 				}
+		// 			}
+		// 			else {
+		// 				if(empty(request()->segment(3))){
+		// 					return 'active';
+		// 				} else {
+		// 					if($sg == 'index' || $sg == 'create' || $sg == 'store' || $sg == 'edit' || $sg == 'show' || $sg == 'update' || $sg == 'destroy'){
+		// 						return 'sad';
+		// 						return 'active';
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
+	}
+}
+
 ?>

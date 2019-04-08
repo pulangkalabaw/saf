@@ -78,28 +78,6 @@
                                     <div class="clearfix"></div><br>
 
                                     <div>
-                                        <div class="col-md-3">Role</div>
-                                        <div class="col-md-7">
-                                            <select name="role" id="roles" class="form-control" required>
-                                                <option {{ $user->role == base64_encode("administrator") ? 'selected' : '' }} value="administrator">Administrator</option>
-                                                <option {{ $user->role == base64_encode("encoder") ? 'selected' : '' }} value="encoder">Encoder</option>
-                                                <option {{ $user->role == base64_encode("user") ? 'selected' : '' }} value="user">User</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div><br>
-
-                                    {{-- @if ($user->agent_code)
-                                    <div class="code">
-                                        <div class="col-md-3">Agent Code</div>
-                                        <div class="col-md-7">
-                                            <input type="text" name="agent_code" id="" class="form-control" value="{{ $user->agent_code }}">
-                                        </div>
-                                    </div>
-                                    <div class="clearfix"></div><br>
-                                    @endif --}}
-
-                                    <div>
                                         <div class="col-md-3">Status</div>
                                         <div class="col-md-7">
                                             <select name="isActive" class="form-control" required>
@@ -110,17 +88,45 @@
                                     </div>
                                     <div class="clearfix"></div><br>
 
+                                    <div>
+                                        <div class="col-md-3">Role</div>
+                                        <div class="col-md-7">
+                                            <select name="role" id="roles" class="form-control" required onchange="roleValue()">
+                                                <option {{ $user->role == base64_encode("administrator") ? 'selected' : '' }} value="administrator">Administrator</option>
+                                                <option {{ $user->role == base64_encode("encoder") ? 'selected' : '' }} value="encoder">Encoder</option>
+                                                <option {{ $user->role == base64_encode("user") ? 'selected' : '' }} value="user">User</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div><br>
+
+                                    <div id="ag_ref" {{ base64_decode($user->role) != "user" ? 'hidden' : '' }}>
+                                        <div class="col-md-3">Agent Referral:</div>
+                                        <div class="col-md-7">
+                                            <input type="checkbox" name="agent_referral" value="1" {{ $user->agent_referral == 1 ? "checked" : ""}}>
+                                        </div>
+                                        <div class="clearfix"></div><br>
+                                    </div>
+
+                                    <div id="en_admin" {{ base64_decode($user->role) != "encoder" ? 'hidden' : '' }}>
+                                        <div class="col-md-3">Encoder Admin:</div>
+                                        <div class="col-md-7">
+                                            <input type="checkbox" name="encoder_admin" value="1">
+                                        </div>
+                                        <div class="clearfix"></div><br>
+                                    </div>
+
                                     @if(empty($user->target))
-                                        <div>
+                                        <div id="target" {{ base64_decode($user->role) != "user" ? 'hidden' : '' }}>
                                             <div class="col-md-3">Add Target</div>
                                             <div class="col-md-7">
                                                 <input class="pull-left" type="checkbox" id="checkTarget" onclick="showTarget()">
                                                 <div class="col-sm-10">
-                                                    <input type="text" name="target" class="form-control" id="target" style="display:none">
+                                                    <input type="text" name="target" class="form-control" id="targetField" style="display:none">
                                                 </div>
                                             </div>
+                                            <div class="clearfix"></div><br>
                                         </div>
-                                        <div class="clearfix"></div><br>
                                     @endif
 
                                     @if($user->target)
@@ -128,6 +134,16 @@
                                         <div class="col-md-3">Target</div>
                                         <div class="col-md-7">
                                             <input type="text" name="target" class="form-control" value="{{ $user->target }}">
+                                        </div>
+                                        <div class="clearfix"></div><br>
+                                    </div>
+                                    @endif
+
+                                    @if (base64_decode($user->role) == "user")
+                                    <div class="code">
+                                        <div class="col-md-3">Agent Code</div>
+                                        <div class="col-md-7">
+                                            <input type="text" name="agent_code" id="" class="form-control" value="{{ $user->agent_code }}">
                                         </div>
                                     </div>
                                     <div class="clearfix"></div><br>
@@ -154,30 +170,32 @@
 
 @section ('scripts')
 <script>
-    function roleSwitcher()
-    {
-        if ($('#roles').val() == "agent" || $('#roles').val() == "agent_referral") {
-            $('.code').css({'display': 'block'});
-        }
-        else {
-            $('.code').css({'display': 'none'});
-        }
-    }
-
-    roleSwitcher();
-
-    $('#roles').on('change', function(){
-        roleSwitcher();
-    })
-
     function showTarget() {
       var checkBox = document.getElementById("checkTarget");
-      var target = document.getElementById("target");
+      var target = document.getElementById("targetField");
       if (checkBox.checked == true){
         target.style.display = "block";
       } else {
         target.style.display = "none";
       }
+    }
+
+    function roleValue() {
+        var roleValue = $('#roles').val();
+
+        if(roleValue == "user") {
+            $('#en_admin').hide();
+            $('#ag_ref').show();
+            $('#target').show();
+        } else if(roleValue == "encoder") {
+            $('#target').hide();
+            $('#ag_ref').hide();
+            $('#en_admin').show();
+        } else if(roleValue == "administrator") {
+            $('#ag_ref').hide();
+            $('#en_admin').hide();
+            $('#target').hide();
+        }
     }
 </script>
 @endsection

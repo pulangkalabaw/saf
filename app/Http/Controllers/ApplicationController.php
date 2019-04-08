@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
+// use Form;
 use Auth;
+use Storage;
 use Session;
 use Validator;
 use App\User;
@@ -13,8 +14,11 @@ use App\Devices;
 use App\Clusters;
 use App\Statuses;
 use App\Application;
+use App\Application_Files;
 use App\ApplicationStatus;
 use Illuminate\Http\Request;
+use Intervention\Image\ImageManagerStatic as Image;
+use Illuminate\Support\Facades\Input;
 
 class ApplicationController extends Controller
 {
@@ -113,6 +117,38 @@ class ApplicationController extends Controller
 	*/
 	public function store(Request $request)
 	{
+		$input_file = $request->all();
+		$validator = Validator::make(
+		$input_file, [
+		'image_file.*' => 'required|file|mimes:xlsx,xls,csv,jpg,jpeg,png,bmp,doc,docx,pdf,tif,tiff'
+		],[
+		    'image_file.*.required' => 'Please upload an image',
+		    'image_file.*.mimes' => 'Only xlsx,xls,csv,jpg,jpeg,png,bmp,doc,docx,pdf,tif,tiff images are allowed',
+		]);
+
+		if ($validator->fails()) {
+		    $messages = $validator->messages();
+		    return Redirect::to('/')->with('message', 'Your erorr message');
+		}else{
+			if (($request->has('attached_files'))) {
+			$files = $request->file('attached_files');
+
+				$destinationPath = storage_path() . '/app/public/';
+				foreach ($files as $file) {
+					$fileName  =  $file->getClientOriginalName(); //date('Y-m-d') . '-' .
+					$extension = $file->getClientOriginalExtension();
+			 		$storeName = $fileName;
+					// Store the file in the disk
+					$file->move($destinationPath, $storeName);
+					$data[] = $storeName;
+					// $storeName [] = $fileName;
+					// $files_Details = implode(',', (array)$attach_files);
+				}
+			}
+
+			// $form = new Form();
+		 	$attached_files = json_encode($data);
+		}
 		// return $request->all();
 		$validate = Validator::make($request->all(),[
 			'customer_name' => 'required',
@@ -134,20 +170,6 @@ class ApplicationController extends Controller
 
 		// Generate application_id
 		$application_id = rand(1111,9999);
-
-		// variable by default
-		// if sim / device field is empty default given value will be null
-		$sim = null;
-		$device = null;
-
-		// Checks if the given number is sim number or device number gives null on device if sim else gives null on sim if device is selected
-		if(substr($request['sim'],0,2) === '09' || substr($request['sim'],0,3) === '+63'){
-			$sim = $request['sim'];
-			$device = null;
-		} else {
-			$sim = null;
-			$device = $request['sim'];
-		}
 
 		// Get cluster
 		$team_model = new Teams();
@@ -175,11 +197,11 @@ class ApplicationController extends Controller
 			'address' => $request['address'],
 			'plan_id' => (int) $request['plan_id'],
 			'msf' => (float) $plan->msf,
-			'sim' => $sim,
-			'device_id' => $device,
+			'device' => $request['device'],
 			'agent_id' => (int) $request['user_id'],
 			'status' => 'new',
 			'insert_by' => (int) Auth::user()->id,
+			'expires_at' => now()->addDays(30)->toDateString(),
 			'created_at' => now(),
 		];
 
@@ -193,10 +215,18 @@ class ApplicationController extends Controller
 			'created_at' => now(),
 		];
 
+		//Data to be inserted to Application File
+		$attach_files = [
+			'application_id' => $application_id,
+			'attached_files' => $attached_files,
+		];
+
+
+		Application_Files::insert($attach_files);
+		ApplicationStatus::insert($application_status_data);
 		if (Application::insert($application_data)) {
 
 			// Insert Application Status
-			ApplicationStatus::insert($application_status_data);
 
 			// Maybe we just pretend everything is fine :(
 			// so, return it hehe
@@ -223,26 +253,31 @@ class ApplicationController extends Controller
 	*/
 	public function show($id)
 	{
-		//
+
 		$application_model = new Application();
 		$application_status = new ApplicationStatus();
+		$application_files = new Application_Files();
 		$application = $application_model
 		->with([
 			'getDevice',
 			'getPlan',
 			'getProduct',
 			'getInsertBy',
+			'getTeam',
+			'getCluster'
 		])
+
 		->where('application_id', $id)
 		->firstOrFail();
 
+		// return $application_files->where('application_id', $id)->with(['Application'])->value('attached_files');
 		return view('app.applications.show', [
 			'application' => $application,
 			'application_model' => $application_model,
-			'application_status' => $application_status
+			'application_files' => $application_files->where('application_id', $id)->with(['Application'])->value('attached_files'),
+			'application_status' => $application_status->appStatus($id)
 		]);
 	}
-
 	/**
 	* Show the form for editing the specified resource.
 	*
@@ -251,24 +286,47 @@ class ApplicationController extends Controller
 	*/
 	public function edit($id)
 	{
-		//
 		$users = new User();
+		$teams = new Teams();
+
+		// filters the agent and tl_ids
+		$tl_ids = [];
+		$teams_tl = $teams->get()->pluck("tl_ids")->toArray();
+
+		foreach($teams_tl as $tl){
+			$tl_ids = array_unique(array_merge($tl_ids, $tl));
+		}
+
+		$agent_ids = [];
+		$teams_agent = $teams->get()->pluck("agent_ids")->toArray();
+
+		foreach($teams_agent as $agent){
+			$agent_ids = array_unique(array_merge($agent_ids, $agent));
+		}
+
+		$user_ids = array_unique(array_merge($agent_ids, $tl_ids));
+		$available_users = $users
+		->whereIn('id',$user_ids)
+		->where('isActive', '1')
+		->get();
+		// filter end
 
 		$application_model = new Application();
 		$application_status = new ApplicationStatus();
 		$plans = Plans::get();
-		$devices = Devices::get();
 		$products = Product::get();
-		$application = $application_model->where('application_id', $id)->firstOrFail();
+		$application = $application_model->where('application_id', $id)->with(['getEncoderData'])->firstOrFail();
+		$agent = $users->where('id',$application['agent_id'])->first();
 
 		return view('app.applications.edit', [
 			'application' => $application,
 			'application_model' => $application_model,
 			'application_status' => $application_status->appStatus($id),
-			'users' => $users->get(), // !!! FIX THIS: this code will show all users, but we need is the users or agents that is in this team. !!!
+			'users' => $available_users,
+			'agent' => $agent,
+			'encoders' => $users->where('role', base64_encode('encoder'))->get(),
 			'plans' => $plans,
 		]);
-
 	}
 
 	/**
@@ -280,29 +338,51 @@ class ApplicationController extends Controller
 	*/
 	public function update(Request $request, $id)
 	{
+		$validate = Validator::make($request->all(),[
+			'encoder_id' => 'required'
+		],[
+			'encoder.required' => 'Please select encoder!'
+		]);
+
+		if($validate->fails()) return back()->withErrors($validate->errors())->withInput();
+
 		$application_model = new Application();
-		$application = $application_model->where('application_id', $id)->firstOrFail();
+		$application = $application_model->where('application_id', $id);
 		$msf = Plans::where('id',$request['plan_id'])->value('msf');
 		$product = Plans::where('id',$request['plan_id'])->value('product');
 
+		//Check if the status does not change
+		if($request->post('status') != 'new'){
+			$expires_at = null;
+		} else {
+			$expires_at = $application->value('expires_at');
+		}
+
 		// Place to $data variable
+		$data['status'] = $request->post('status');
 		$data['customer_name'] = $request->post('customer_name');
+		$data['plan_id'] = (int) $request->post('plan_id');
 		$data['contact'] = $request->post('contact');
 		$data['address'] = $request->post('address');
 		$data['product'] = $product;
-		$data['plan_id'] = (int) $request->post('plan_id');
 		$data['sim'] = $request->post('sim');
-		$data['device_id'] = empty($request->post('device_id')) ? '-' : $request->post('device_id');
+		$data['sim_id'] = $request->post('sim_id');
+		$data['device'] = $request->post('device');
+		$data['imei'] = $request->post('imei');
 		$data['agent_id'] = (int) $request->post('agent_id');
+		$data['team_id'] = (int) $request->post('team_id');
 		$data['msf'] = (float) $msf;
 		$data['sr_no'] = $request->post('sr_no');
 		$data['so_no'] = $request->post('so_no');
-		$data['status'] = $request->post('status');
-		$data['encoder_id'] = Auth::user()->id;
+		$data['encoder_id'] = $request->post('encoder_id');
+		$data['remarks'] = $request->post('remarks');
+		$data['min_no'] = $request->post('min_no');
+		$data['awaiting_device'] = $request->post('awaiting_device');
+		$data['expires_at'] = $expires_at;
 		$data['encoded_at'] = now();
 		$data['updated_at'] = now();
 
-		if ($application->update($data)) {
+		if ($application->firstOrFail()->update($data)) {
 
 			ApplicationStatus::where('id', $id)->update(['active' => 0]);
 
@@ -344,5 +424,53 @@ class ApplicationController extends Controller
 	public function replaceDashIfNull($arr)
 	{
 		return !empty($arr) ? $arr : "-";
+	}
+
+
+	public function ImageView(Request $request){
+		return 123;
+	}
+
+	public function showAvailableApi(Request $request, $id)
+	{
+		$team_model = new Teams();
+		$user = new User();
+		$user_data = $user->where('id', $id)->first();
+		// check first if the given user is tl
+		if(checkPosition($user_data)[0] == 'tl'){
+			$team_ids = [];
+
+			$teams = $team_model->get(['tl_ids', 'id'])->toArray();
+
+			foreach ($teams as $team) {
+				if(!empty('tl_ids')) {
+					if(in_array($id, $team['tl_ids'])){
+						$team_ids[] = $team['id'];
+					}
+				}
+			}
+
+			$team = $team_model->whereIn('id', $team_ids)->first()->toArray();
+		}
+		else if(checkPosition($user_data)[0] == 'agent'){
+			$team_ids = [];
+
+			$teams = $team_model->get(['agent_ids', 'id'])->toArray();
+
+			foreach($teams as $team) {
+				if(!empty('agent_ids')){
+					if(in_array($id, $team['agent_ids'])){
+						$team_ids[] = $team['id'];
+					}
+				}
+			}
+
+			$team = $team_model->whereIn('id',$team_ids)->first()->toArray();
+		}
+
+		return response()->json([
+			'team' => $team,
+			'user' => $user_data
+		]);
 	}
 }
